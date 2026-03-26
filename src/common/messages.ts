@@ -17,6 +17,17 @@ export const messages = {
       usernameMax: "VALIDATION_USERNAME_MAX",
     },
   },
+  jobProfile: {
+    notFound: "JOB_PROFILE_NOT_FOUND",
+    alreadyExists: "JOB_PROFILE_ALREADY_EXISTS",
+    validation: {
+      daysOfLeaveMin: "VALIDATION_DAYS_OF_LEAVE_MIN",
+      daysOfLeaveMax: "VALIDATION_DAYS_OF_LEAVE_MAX",
+      daysOfSickLeaveMin: "VALIDATION_DAYS_OF_SICK_LEAVE_MIN",
+      daysOfSickLeaveMax: "VALIDATION_DAYS_OF_SICK_LEAVE_MAX",
+      titleMax: "VALIDATION_TITLE_MAX",
+    },
+  },
   auth: {
     invalidCredentials: "INVALID_CREDENTIALS",
     notAuthenticated: "NOT_AUTHENTICATED",
