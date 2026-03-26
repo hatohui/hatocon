@@ -1,4 +1,4 @@
-import { Event } from "@prisma/client";
+import type { Event } from "@prisma/client";
 
 export type EventCreateDTO = {
   title: string;

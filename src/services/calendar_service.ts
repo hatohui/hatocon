@@ -1,4 +1,4 @@
-import { Event } from "@prisma/client";
+import type { Event } from "@prisma/client";
 import { ParticipationWithEvent } from "@/types/participation.d";
 import axios from "axios";
 

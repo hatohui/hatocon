@@ -1,5 +1,5 @@
-import { Event } from "@prisma/client";
-import { EventCreateDTO } from "@/types/event.d";
+import type { Event } from "@prisma/client";
+import { EventCreateDTO, EventUpdateDTO } from "@/types/event.d";
 import axios from "axios";
 
 type ApiOk<T> = { data: T };
@@ -16,6 +16,22 @@ const eventService = {
 
   create: (data: EventCreateDTO) =>
     axios.post<ApiOk<Event>>("/api/events", data),
+
+  getAllAdmin: (opts: { q?: string; approved?: "true" | "false" } = {}) => {
+    const params = new URLSearchParams();
+    if (opts.q) params.set("q", opts.q);
+    if (opts.approved !== undefined) params.set("approved", opts.approved);
+    return axios.get<ApiOk<Event[]>>(`/api/admin/events?${params}`);
+  },
+
+  approve: (id: string) =>
+    axios.post<ApiOk<Event>>(`/api/admin/events/${id}/approve`),
+
+  update: (id: string, data: EventUpdateDTO) =>
+    axios.patch<ApiOk<Event>>(`/api/admin/events/${id}`, data),
+
+  delete: (id: string) =>
+    axios.delete<ApiOk<void>>(`/api/admin/events/${id}`),
 };
 
 export { eventService };

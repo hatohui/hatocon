@@ -1,4 +1,5 @@
-import { LeaveType, Participation } from "@prisma/client";
+import type { Participation } from "@prisma/client";
+import { LeaveType } from "@/types/leave-type";
 
 export type ParticipationCreateDTO = {
   eventId?: string;

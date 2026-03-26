@@ -1,5 +1,4 @@
 import { auth } from "@/auth";
-import { messages } from "@/common/messages";
 import { BadRequest, Created, OK, Unauthorized } from "@/common/response";
 import eventRepository from "@/repositories/event_repository";
 import { eventSchema } from "@/validations/eventSchema";
@@ -9,22 +8,26 @@ const GET = async (req: NextRequest) => {
   const { searchParams } = req.nextUrl;
   const fromParam = searchParams.get("from");
   const toParam = searchParams.get("to");
+  const q = searchParams.get("q") ?? undefined;
   const createdBy = searchParams.get("createdBy") ?? undefined;
+  const limitParam = searchParams.get("limit");
+  const limit = limitParam ? parseInt(limitParam, 10) : undefined;
 
-  if (!fromParam || !toParam) {
-    return BadRequest(
-      "Query params 'from' and 'to' are required (ISO date strings)",
-    );
-  }
+  const from = fromParam ? new Date(fromParam) : undefined;
+  const to = toParam ? new Date(toParam) : undefined;
 
-  const from = new Date(fromParam);
-  const to = new Date(toParam);
+  if (from && isNaN(from.getTime()))
+    return BadRequest("Invalid date format for 'from'");
+  if (to && isNaN(to.getTime()))
+    return BadRequest("Invalid date format for 'to'");
 
-  if (isNaN(from.getTime()) || isNaN(to.getTime())) {
-    return BadRequest("Invalid date format for 'from' or 'to'");
-  }
-
-  const events = await eventRepository.getInRange(from, to, createdBy);
+  const events = await eventRepository.getAllFiltered({
+    q,
+    from,
+    to,
+    createdBy,
+    limit,
+  });
 
   return OK(events);
 };
@@ -43,7 +46,11 @@ const POST = async (req: NextRequest) => {
     return BadRequest(result.error.issues.map((i) => i.message).join(", "));
   }
 
-  const event = await eventRepository.create(session.user.id, result.data);
+  const event = await eventRepository.create(
+    session.user.id,
+    result.data,
+    session.user.isAdmin ?? false,
+  );
 
   return Created(event);
 };

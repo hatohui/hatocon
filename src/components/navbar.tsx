@@ -14,9 +14,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LayoutDashboard, LogOut, Settings } from "lucide-react";
 import AppIcon from "./common/AppIcon";
+import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
   const { data: session } = useSession();
+  const pathname = usePathname();
+  const isAdmin = session?.user.isAdmin;
 
   if (!session) return null;
 
@@ -37,12 +41,18 @@ export default function Navbar() {
             <AppIcon />
             <p>Hatocon</p>
           </Link>
-          {session.user.isAdmin && (
+          {isAdmin && (
             <Link
-              href="/admin/job-profiles"
-              className="text-sm text-muted-foreground hover:text-foreground"
+              href="/admin/events"
+              className={cn(
+                "flex items-center gap-1.5 text-sm font-medium transition-colors",
+                pathname.startsWith("/admin")
+                  ? "text-foreground"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
             >
-              Job Profiles
+              <LayoutDashboard className="h-4 w-4" />
+              Dashboard
             </Link>
           )}
         </div>
@@ -78,17 +88,6 @@ export default function Navbar() {
                 Settings
               </Link>
             </DropdownMenuItem>
-            {session.user.isAdmin && (
-              <DropdownMenuItem asChild>
-                <Link
-                  href="/admin/job-profiles"
-                  className="flex items-center gap-2"
-                >
-                  <LayoutDashboard className="h-4 w-4" />
-                  Admin Dashboard
-                </Link>
-              </DropdownMenuItem>
-            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="flex items-center gap-2 text-destructive focus:text-destructive"

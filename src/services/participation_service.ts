@@ -1,4 +1,4 @@
-import { Participation } from "@prisma/client";
+import type { Participation } from "@prisma/client";
 import {
   HeatmapEntry,
   LeaveBalance,
