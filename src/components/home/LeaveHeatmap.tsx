@@ -38,11 +38,12 @@ const isWeekendDay = (dayIndex: number) => dayIndex === 0 || dayIndex === 6;
 
 function getCellClass(intensity: number, weekend: boolean): string {
   if (weekend) {
-    return "bg-muted/20 border border-muted/20 cursor-default opacity-40";
+    return "bg-muted border border-muted cursor-default opacity-40";
   }
-  if (intensity === 0) return "bg-muted/50 hover:bg-muted/70";
+  if (intensity === 0)
+    return "bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-700 dark:hover:bg-zinc-600";
   if (intensity <= 0.5)
-    return "bg-emerald-200 hover:bg-emerald-300 dark:bg-emerald-900 dark:hover:bg-emerald-800";
+    return "bg-emerald-300 hover:bg-emerald-400 dark:bg-emerald-900 dark:hover:bg-emerald-800";
   if (intensity <= 1)
     return "bg-emerald-400 hover:bg-emerald-500 dark:bg-emerald-700 dark:hover:bg-emerald-600";
   if (intensity <= 2)

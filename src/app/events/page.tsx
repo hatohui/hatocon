@@ -1,13 +1,13 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import {
   addMonths,
   eachDayOfInterval,
   endOfMonth,
   format,
   isSameDay,
-  isSameMonth,
   startOfMonth,
   startOfToday,
 } from "date-fns";
@@ -16,6 +16,7 @@ import {
   Calendar,
   CalendarDays,
   Clock,
+  ExternalLink,
   LayoutList,
   List,
   MapPin,
@@ -28,16 +29,20 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAllEvents, useCreateEvent } from "@/hooks/events/useEvents";
+import { useAllEvents } from "@/hooks/events/useEvents";
 import CreateEventDialog from "@/components/home/CreateEventDialog";
 import { cn } from "@/lib/utils";
 import {
@@ -57,44 +62,150 @@ function durationLabel(start: Date, end: Date) {
   return days === 1 ? "1 day" : `${days} days`;
 }
 
-function EventCard({ event }: { event: Event }) {
+// ─── Event Detail Sheet ───────────────────────────────────────────────────────
+
+function EventDetailSheet({
+  event,
+  onClose,
+}: {
+  event: Event | null;
+  onClose: () => void;
+}) {
+  const start = event ? new Date(event.startAt) : null;
+  const end = event ? new Date(event.endAt) : null;
+  return (
+    <Sheet open={!!event} onOpenChange={(o) => !o && onClose()}>
+      <SheetContent className="w-full sm:max-w-lg overflow-y-auto p-0">
+        {event && start && end && (
+          <>
+            {event.image && (
+              <div className="relative w-full aspect-video">
+                <Image
+                  src={event.image}
+                  alt={event.title}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            )}
+            <div className="p-6 space-y-5">
+              <SheetHeader className="p-0 space-y-1">
+                <SheetTitle className="text-xl leading-tight">{event.title}</SheetTitle>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant="secondary">{durationLabel(start, end)}</Badge>
+                </div>
+              </SheetHeader>
+
+              <Separator />
+
+              <div className="space-y-3 text-sm">
+                <div className="flex items-start gap-3">
+                  <Clock className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                  <div>
+                    <p className="font-medium">
+                      {format(start, "EEEE, MMMM d, yyyy")}
+                    </p>
+                    <p className="text-muted-foreground">
+                      to {format(end, "EEEE, MMMM d, yyyy")}
+                    </p>
+                  </div>
+                </div>
+
+                {event.location && (
+                  <div className="flex items-start gap-3">
+                    <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                    <div className="min-w-0">
+                      <p className="font-medium">{event.location}</p>
+                      {event.locationUrl && (
+                        <a
+                          href={event.locationUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-primary flex items-center gap-1 hover:underline mt-0.5"
+                        >
+                          View on map
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {event.reference && (
+                  <div className="flex items-start gap-3">
+                    <ExternalLink className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                    <a
+                      href={event.reference}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline text-sm truncate"
+                    >
+                      {event.reference}
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              {event.description && (
+                <>
+                  <Separator />
+                  <div className="space-y-1.5">
+                    <p className="text-sm font-semibold">About</p>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                      {event.description}
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
+          </>
+        )}
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+// ─── Event Card ───────────────────────────────────────────────────────────────
+
+function EventCard({ event, onClick }: { event: Event; onClick?: () => void }) {
   const start = new Date(event.startAt);
   const end = new Date(event.endAt);
   return (
-    <Card className="hover:shadow-md transition-shadow group cursor-default">
-      <CardContent className="p-5">
-        <div className="flex items-start gap-4">
-          <div className="shrink-0 text-center bg-primary/10 rounded-xl px-3 py-2 min-w-13">
-            <p className="text-[10px] font-semibold text-primary uppercase tracking-wide">
-              {format(start, "MMM")}
-            </p>
-            <p className="text-2xl font-bold text-primary leading-none">
-              {format(start, "d")}
-            </p>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm leading-tight">{event.title}</p>
-            {event.description && (
-              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-                {event.description}
-              </p>
-            )}
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2">
-              <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Clock className="h-3 w-3" />
-                {format(start, "MMM d")} – {format(end, "MMM d, yyyy")}
-              </span>
-              <Badge variant="secondary" className="text-[10px] h-4 px-1.5">
-                {durationLabel(start, end)}
-              </Badge>
-              {event.location && (
-                <span className="flex items-center gap-1 text-xs text-muted-foreground truncate max-w-45">
-                  <MapPin className="h-3 w-3 shrink-0" />
-                  {event.location}
-                </span>
-              )}
-            </div>
-          </div>
+    <Card
+      className="hover:shadow-md transition-shadow cursor-pointer overflow-hidden"
+      onClick={onClick}
+    >
+      {event.image && (
+        <div className="relative w-full aspect-video">
+          <Image
+            src={event.image}
+            alt={event.title}
+            fill
+            className="object-cover"
+          />
+        </div>
+      )}
+      <CardContent className="p-4">
+        <p className="font-semibold text-sm leading-tight">{event.title}</p>
+        {event.description && (
+          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+            {event.description}
+          </p>
+        )}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2">
+          <span className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Clock className="h-3 w-3" />
+            {format(start, "MMM d")} – {format(end, "MMM d, yyyy")}
+          </span>
+          <Badge variant="secondary" className="text-[10px] h-4 px-1.5">
+            {durationLabel(start, end)}
+          </Badge>
+          {event.location && (
+            <span className="flex items-center gap-1 text-xs text-muted-foreground truncate max-w-45">
+              <MapPin className="h-3 w-3 shrink-0" />
+              {event.location}
+            </span>
+          )}
         </div>
       </CardContent>
     </Card>
@@ -106,9 +217,11 @@ function EventCard({ event }: { event: Event }) {
 function ListView({
   events,
   isLoading,
+  onSelect,
 }: {
   events: Event[] | undefined;
   isLoading: boolean;
+  onSelect: (e: Event) => void;
 }) {
   if (isLoading) {
     return (
@@ -135,7 +248,7 @@ function ListView({
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {events.map((e) => (
-        <EventCard key={e.id} event={e} />
+        <EventCard key={e.id} event={e} onClick={() => onSelect(e)} />
       ))}
     </div>
   );
@@ -143,7 +256,7 @@ function ListView({
 
 // ─── Calendar View ────────────────────────────────────────────────────────────
 
-function CalendarView({ q }: { q: string }) {
+function CalendarView({ q, onSelect }: { q: string; onSelect: (e: Event) => void }) {
   const [currentMonth, setCurrentMonth] = React.useState(startOfToday());
   const [selectedDay, setSelectedDay] = React.useState<Date | null>(null);
 
@@ -318,7 +431,7 @@ function CalendarView({ q }: { q: string }) {
           ) : (
             <div className="grid gap-3 sm:grid-cols-2">
               {selectedEvents.map((e) => (
-                <EventCard key={e.id} event={e} />
+                <EventCard key={e.id} event={e} onClick={() => onSelect(e)} />
               ))}
             </div>
           )}
@@ -333,9 +446,11 @@ function CalendarView({ q }: { q: string }) {
 function TimelineView({
   events,
   isLoading,
+  onSelect,
 }: {
   events: Event[] | undefined;
   isLoading: boolean;
+  onSelect: (e: Event) => void;
 }) {
   if (isLoading) {
     return (
@@ -400,17 +515,32 @@ function TimelineView({
                     {/* Timeline dot */}
                     <div className="absolute -left-4 top-4 h-3 w-3 rounded-full border-2 border-primary bg-background" />
 
-                    <Card className="hover:shadow-sm transition-shadow">
+                    <Card
+                      className="hover:shadow-sm transition-shadow cursor-pointer"
+                      onClick={() => onSelect(event)}
+                    >
                       <CardContent className="p-4">
                         <div className="flex items-start gap-3">
-                          <div className="shrink-0 text-center">
-                            <p className="text-xs text-muted-foreground">
-                              {format(start, "MMM d")}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {format(end, "MMM d")}
-                            </p>
-                          </div>
+                          {event.image && (
+                            <div className="relative h-14 w-20 rounded-md overflow-hidden shrink-0">
+                              <Image
+                                src={event.image}
+                                alt={event.title}
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                          )}
+                          {!event.image && (
+                            <div className="shrink-0 text-center">
+                              <p className="text-xs text-muted-foreground">
+                                {format(start, "MMM d")}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {format(end, "MMM d")}
+                              </p>
+                            </div>
+                          )}
                           <Separator
                             orientation="vertical"
                             className="h-auto self-stretch"
@@ -467,6 +597,7 @@ export default function EventsPage() {
   const [debouncedQ, setDebouncedQ] = React.useState("");
   const [rangeDays, setRangeDays] = React.useState(90);
   const [showCreate, setShowCreate] = React.useState(false);
+  const [selectedEvent, setSelectedEvent] = React.useState<Event | null>(null);
 
   React.useEffect(() => {
     const t = setTimeout(() => setDebouncedQ(q), 300);
@@ -550,19 +681,20 @@ export default function EventsPage() {
         </TabsList>
 
         <TabsContent value="list">
-          <ListView events={events} isLoading={isLoading} />
+          <ListView events={events} isLoading={isLoading} onSelect={setSelectedEvent} />
         </TabsContent>
 
         <TabsContent value="calendar">
-          <CalendarView q={debouncedQ} />
+          <CalendarView q={debouncedQ} onSelect={setSelectedEvent} />
         </TabsContent>
 
         <TabsContent value="timeline">
-          <TimelineView events={events} isLoading={isLoading} />
+          <TimelineView events={events} isLoading={isLoading} onSelect={setSelectedEvent} />
         </TabsContent>
       </Tabs>
 
       <CreateEventDialog open={showCreate} onOpenChange={setShowCreate} />
+      <EventDetailSheet event={selectedEvent} onClose={() => setSelectedEvent(null)} />
     </main>
   );
 }

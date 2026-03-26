@@ -22,6 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { useCreateEvent } from "@/hooks/events/useEvents";
 
 const schema = z
@@ -36,6 +37,7 @@ const schema = z
       .url("Must be a valid URL")
       .optional()
       .or(z.literal("")),
+    isYearly: z.boolean(),
   })
   .refine((d) => new Date(d.endAt) > new Date(d.startAt), {
     message: "End must be after start",
@@ -62,6 +64,7 @@ export default function CreateEventDialog({
       endAt: "",
       location: "",
       locationUrl: "",
+      isYearly: false,
     },
   });
 
@@ -72,6 +75,7 @@ export default function CreateEventDialog({
         locationUrl: values.locationUrl || undefined,
         startAt: new Date(values.startAt),
         endAt: new Date(values.endAt),
+        isYearly: values.isYearly,
       },
       {
         onSuccess: () => {
@@ -192,6 +196,27 @@ export default function CreateEventDialog({
                     />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="isYearly"
+              render={({ field }) => (
+                <FormItem className="flex items-center justify-between rounded-lg border p-3">
+                  <div className="space-y-0.5">
+                    <FormLabel>Yearly Event</FormLabel>
+                    <p className="text-xs text-muted-foreground">
+                      This event repeats every year
+                    </p>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
                 </FormItem>
               )}
             />

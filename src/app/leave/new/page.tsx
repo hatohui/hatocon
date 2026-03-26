@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   Clock,
   MapPin,
+  RefreshCw,
   Search,
   X,
 } from "lucide-react";
@@ -38,6 +39,7 @@ import { useCreateParticipation } from "@/hooks/participations/useParticipations
 import { useAllEvents } from "@/hooks/events/useEvents";
 import { LeaveType } from "@/types/leave-type";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 // ─── Event Picker ─────────────────────────────────────────────────────────────
 
@@ -67,32 +69,55 @@ function EventPicker({
     const start = new Date(value.startAt);
     const end = new Date(value.endAt);
     return (
-      <div className="rounded-xl border bg-primary/5 border-primary/20 p-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex items-start gap-3 flex-1 min-w-0">
-            <CheckCircle2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-            <div className="min-w-0">
-              <p className="font-semibold text-sm">{value.title}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {format(start, "MMM d")} – {format(end, "MMM d, yyyy")}
-              </p>
-              {value.location && (
-                <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-                  <MapPin className="h-3 w-3" />
-                  {value.location}
-                </p>
-              )}
-            </div>
+      <div className="rounded-xl border bg-primary/5 border-primary/20 overflow-hidden">
+        {value.image && (
+          <div className="relative aspect-[3/1] w-full">
+            <Image
+              src={value.image}
+              alt={value.title}
+              fill
+              className="object-cover"
+            />
           </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="h-7 w-7 p-0 rounded-full shrink-0"
-            onClick={() => onChange(null)}
-          >
-            <X className="h-4 w-4" />
-          </Button>
+        )}
+        <div className="p-4">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-3 flex-1 min-w-0">
+              <CheckCircle2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="font-semibold text-sm">{value.title}</p>
+                  {value.isYearly && (
+                    <Badge
+                      variant="outline"
+                      className="text-[9px] h-4 px-1 shrink-0"
+                    >
+                      <RefreshCw className="h-2.5 w-2.5 mr-0.5" />
+                      Yearly
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {format(start, "MMM d")} – {format(end, "MMM d, yyyy")}
+                </p>
+                {value.location && (
+                  <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                    <MapPin className="h-3 w-3" />
+                    {value.location}
+                  </p>
+                )}
+              </div>
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0 rounded-full shrink-0"
+              onClick={() => onChange(null)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -124,7 +149,7 @@ function EventPicker({
               No events match your search
             </div>
           ) : (
-            <div className="max-h-64 overflow-y-auto divide-y">
+            <div className="max-h-80 overflow-y-auto divide-y">
               {results.map((event) => {
                 const start = new Date(event.startAt);
                 const end = new Date(event.endAt);
@@ -135,35 +160,58 @@ function EventPicker({
                   <button
                     key={event.id}
                     type="button"
-                    className="w-full px-4 py-3 text-left hover:bg-muted/60 transition-colors flex items-start gap-3"
+                    className="w-full text-left hover:bg-muted/60 transition-colors"
                     onClick={() => {
                       onChange(event);
                       setQ("");
                     }}
                   >
-                    <div className="shrink-0 text-center bg-primary/10 rounded-lg px-2 py-1 min-w-[40px]">
-                      <p className="text-[9px] font-bold text-primary uppercase">
-                        {format(start, "MMM")}
-                      </p>
-                      <p className="text-base font-bold text-primary leading-none">
-                        {format(start, "d")}
-                      </p>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">
-                        {event.title}
-                      </p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {format(start, "MMM d")} – {format(end, "MMM d")}
-                        </span>
-                        <Badge
-                          variant="outline"
-                          className="text-[9px] h-4 px-1"
-                        >
-                          {days === 1 ? "1 day" : `${days} days`}
-                        </Badge>
+                    {event.image && (
+                      <div className="relative aspect-[4/1] w-full">
+                        <Image
+                          src={event.image}
+                          alt={event.title}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    )}
+                    <div className="flex items-start gap-3 px-4 py-3">
+                      <div className="shrink-0 text-center bg-primary/10 rounded-lg px-2 py-1 min-w-[40px]">
+                        <p className="text-[9px] font-bold text-primary uppercase">
+                          {format(start, "MMM")}
+                        </p>
+                        <p className="text-base font-bold text-primary leading-none">
+                          {format(start, "d")}
+                        </p>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-sm truncate">
+                            {event.title}
+                          </p>
+                          {event.isYearly && (
+                            <Badge
+                              variant="outline"
+                              className="text-[9px] h-4 px-1 shrink-0"
+                            >
+                              <RefreshCw className="h-2.5 w-2.5 mr-0.5" />
+                              Yearly
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="text-xs text-muted-foreground flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {format(start, "MMM d")} – {format(end, "MMM d")}
+                          </span>
+                          <Badge
+                            variant="outline"
+                            className="text-[9px] h-4 px-1"
+                          >
+                            {days === 1 ? "1 day" : `${days} days`}
+                          </Badge>
+                        </div>
                       </div>
                     </div>
                   </button>

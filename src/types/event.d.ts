@@ -9,6 +9,7 @@ export type EventCreateDTO = {
   location?: string;
   locationUrl?: string;
   reference?: string;
+  isYearly?: boolean;
 };
 
 export type EventUpdateDTO = Partial<EventCreateDTO>;

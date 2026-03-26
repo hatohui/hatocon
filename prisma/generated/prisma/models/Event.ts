@@ -30,6 +30,7 @@ export type EventMinAggregateOutputType = {
   image: string | null
   description: string | null
   isApproved: boolean | null
+  isYearly: boolean | null
   startAt: Date | null
   endAt: Date | null
   location: string | null
@@ -48,6 +49,7 @@ export type EventMaxAggregateOutputType = {
   image: string | null
   description: string | null
   isApproved: boolean | null
+  isYearly: boolean | null
   startAt: Date | null
   endAt: Date | null
   location: string | null
@@ -66,6 +68,7 @@ export type EventCountAggregateOutputType = {
   image: number
   description: number
   isApproved: number
+  isYearly: number
   startAt: number
   endAt: number
   location: number
@@ -86,6 +89,7 @@ export type EventMinAggregateInputType = {
   image?: true
   description?: true
   isApproved?: true
+  isYearly?: true
   startAt?: true
   endAt?: true
   location?: true
@@ -104,6 +108,7 @@ export type EventMaxAggregateInputType = {
   image?: true
   description?: true
   isApproved?: true
+  isYearly?: true
   startAt?: true
   endAt?: true
   location?: true
@@ -122,6 +127,7 @@ export type EventCountAggregateInputType = {
   image?: true
   description?: true
   isApproved?: true
+  isYearly?: true
   startAt?: true
   endAt?: true
   location?: true
@@ -213,6 +219,7 @@ export type EventGroupByOutputType = {
   image: string | null
   description: string | null
   isApproved: boolean
+  isYearly: boolean
   startAt: Date
   endAt: Date
   location: string | null
@@ -252,6 +259,7 @@ export type EventWhereInput = {
   image?: Prisma.StringNullableFilter<"Event"> | string | null
   description?: Prisma.StringNullableFilter<"Event"> | string | null
   isApproved?: Prisma.BoolFilter<"Event"> | boolean
+  isYearly?: Prisma.BoolFilter<"Event"> | boolean
   startAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   endAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   location?: Prisma.StringNullableFilter<"Event"> | string | null
@@ -272,6 +280,7 @@ export type EventOrderByWithRelationInput = {
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   isApproved?: Prisma.SortOrder
+  isYearly?: Prisma.SortOrder
   startAt?: Prisma.SortOrder
   endAt?: Prisma.SortOrder
   location?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -295,6 +304,7 @@ export type EventWhereUniqueInput = Prisma.AtLeast<{
   image?: Prisma.StringNullableFilter<"Event"> | string | null
   description?: Prisma.StringNullableFilter<"Event"> | string | null
   isApproved?: Prisma.BoolFilter<"Event"> | boolean
+  isYearly?: Prisma.BoolFilter<"Event"> | boolean
   startAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   endAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   location?: Prisma.StringNullableFilter<"Event"> | string | null
@@ -315,6 +325,7 @@ export type EventOrderByWithAggregationInput = {
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   isApproved?: Prisma.SortOrder
+  isYearly?: Prisma.SortOrder
   startAt?: Prisma.SortOrder
   endAt?: Prisma.SortOrder
   location?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -339,6 +350,7 @@ export type EventScalarWhereWithAggregatesInput = {
   image?: Prisma.StringNullableWithAggregatesFilter<"Event"> | string | null
   description?: Prisma.StringNullableWithAggregatesFilter<"Event"> | string | null
   isApproved?: Prisma.BoolWithAggregatesFilter<"Event"> | boolean
+  isYearly?: Prisma.BoolWithAggregatesFilter<"Event"> | boolean
   startAt?: Prisma.DateTimeWithAggregatesFilter<"Event"> | Date | string
   endAt?: Prisma.DateTimeWithAggregatesFilter<"Event"> | Date | string
   location?: Prisma.StringNullableWithAggregatesFilter<"Event"> | string | null
@@ -357,6 +369,7 @@ export type EventCreateInput = {
   image?: string | null
   description?: string | null
   isApproved?: boolean
+  isYearly?: boolean
   startAt: Date | string
   endAt: Date | string
   location?: string | null
@@ -376,6 +389,7 @@ export type EventUncheckedCreateInput = {
   image?: string | null
   description?: string | null
   isApproved?: boolean
+  isYearly?: boolean
   startAt: Date | string
   endAt: Date | string
   location?: string | null
@@ -395,6 +409,7 @@ export type EventUpdateInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isYearly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -414,6 +429,7 @@ export type EventUncheckedUpdateInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isYearly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -433,6 +449,7 @@ export type EventCreateManyInput = {
   image?: string | null
   description?: string | null
   isApproved?: boolean
+  isYearly?: boolean
   startAt: Date | string
   endAt: Date | string
   location?: string | null
@@ -451,6 +468,7 @@ export type EventUpdateManyMutationInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isYearly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -468,6 +486,7 @@ export type EventUncheckedUpdateManyInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isYearly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -496,6 +515,7 @@ export type EventCountOrderByAggregateInput = {
   image?: Prisma.SortOrder
   description?: Prisma.SortOrder
   isApproved?: Prisma.SortOrder
+  isYearly?: Prisma.SortOrder
   startAt?: Prisma.SortOrder
   endAt?: Prisma.SortOrder
   location?: Prisma.SortOrder
@@ -514,6 +534,7 @@ export type EventMaxOrderByAggregateInput = {
   image?: Prisma.SortOrder
   description?: Prisma.SortOrder
   isApproved?: Prisma.SortOrder
+  isYearly?: Prisma.SortOrder
   startAt?: Prisma.SortOrder
   endAt?: Prisma.SortOrder
   location?: Prisma.SortOrder
@@ -532,6 +553,7 @@ export type EventMinOrderByAggregateInput = {
   image?: Prisma.SortOrder
   description?: Prisma.SortOrder
   isApproved?: Prisma.SortOrder
+  isYearly?: Prisma.SortOrder
   startAt?: Prisma.SortOrder
   endAt?: Prisma.SortOrder
   location?: Prisma.SortOrder
@@ -613,6 +635,7 @@ export type EventCreateWithoutCreatedByUserInput = {
   image?: string | null
   description?: string | null
   isApproved?: boolean
+  isYearly?: boolean
   startAt: Date | string
   endAt: Date | string
   location?: string | null
@@ -631,6 +654,7 @@ export type EventUncheckedCreateWithoutCreatedByUserInput = {
   image?: string | null
   description?: string | null
   isApproved?: boolean
+  isYearly?: boolean
   startAt: Date | string
   endAt: Date | string
   location?: string | null
@@ -678,6 +702,7 @@ export type EventScalarWhereInput = {
   image?: Prisma.StringNullableFilter<"Event"> | string | null
   description?: Prisma.StringNullableFilter<"Event"> | string | null
   isApproved?: Prisma.BoolFilter<"Event"> | boolean
+  isYearly?: Prisma.BoolFilter<"Event"> | boolean
   startAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   endAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   location?: Prisma.StringNullableFilter<"Event"> | string | null
@@ -696,6 +721,7 @@ export type EventCreateWithoutParticipationsInput = {
   image?: string | null
   description?: string | null
   isApproved?: boolean
+  isYearly?: boolean
   startAt: Date | string
   endAt: Date | string
   location?: string | null
@@ -714,6 +740,7 @@ export type EventUncheckedCreateWithoutParticipationsInput = {
   image?: string | null
   description?: string | null
   isApproved?: boolean
+  isYearly?: boolean
   startAt: Date | string
   endAt: Date | string
   location?: string | null
@@ -748,6 +775,7 @@ export type EventUpdateWithoutParticipationsInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isYearly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -766,6 +794,7 @@ export type EventUncheckedUpdateWithoutParticipationsInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isYearly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -784,6 +813,7 @@ export type EventCreateManyCreatedByUserInput = {
   image?: string | null
   description?: string | null
   isApproved?: boolean
+  isYearly?: boolean
   startAt: Date | string
   endAt: Date | string
   location?: string | null
@@ -801,6 +831,7 @@ export type EventUpdateWithoutCreatedByUserInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isYearly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -819,6 +850,7 @@ export type EventUncheckedUpdateWithoutCreatedByUserInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isYearly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -837,6 +869,7 @@ export type EventUncheckedUpdateManyWithoutCreatedByUserInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isYearly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -885,6 +918,7 @@ export type EventSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   image?: boolean
   description?: boolean
   isApproved?: boolean
+  isYearly?: boolean
   startAt?: boolean
   endAt?: boolean
   location?: boolean
@@ -906,6 +940,7 @@ export type EventSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   image?: boolean
   description?: boolean
   isApproved?: boolean
+  isYearly?: boolean
   startAt?: boolean
   endAt?: boolean
   location?: boolean
@@ -925,6 +960,7 @@ export type EventSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   image?: boolean
   description?: boolean
   isApproved?: boolean
+  isYearly?: boolean
   startAt?: boolean
   endAt?: boolean
   location?: boolean
@@ -944,6 +980,7 @@ export type EventSelectScalar = {
   image?: boolean
   description?: boolean
   isApproved?: boolean
+  isYearly?: boolean
   startAt?: boolean
   endAt?: boolean
   location?: boolean
@@ -956,7 +993,7 @@ export type EventSelectScalar = {
   deletedAt?: boolean
 }
 
-export type EventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "image" | "description" | "isApproved" | "startAt" | "endAt" | "location" | "locationUrl" | "reference" | "createdAt" | "updatedAt" | "createdBy" | "isDeleted" | "deletedAt", ExtArgs["result"]["event"]>
+export type EventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "image" | "description" | "isApproved" | "isYearly" | "startAt" | "endAt" | "location" | "locationUrl" | "reference" | "createdAt" | "updatedAt" | "createdBy" | "isDeleted" | "deletedAt", ExtArgs["result"]["event"]>
 export type EventInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   participations?: boolean | Prisma.Event$participationsArgs<ExtArgs>
   createdByUser?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -981,6 +1018,7 @@ export type $EventPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     image: string | null
     description: string | null
     isApproved: boolean
+    isYearly: boolean
     startAt: Date
     endAt: Date
     location: string | null
@@ -1421,6 +1459,7 @@ export interface EventFieldRefs {
   readonly image: Prisma.FieldRef<"Event", 'String'>
   readonly description: Prisma.FieldRef<"Event", 'String'>
   readonly isApproved: Prisma.FieldRef<"Event", 'Boolean'>
+  readonly isYearly: Prisma.FieldRef<"Event", 'Boolean'>
   readonly startAt: Prisma.FieldRef<"Event", 'DateTime'>
   readonly endAt: Prisma.FieldRef<"Event", 'DateTime'>
   readonly location: Prisma.FieldRef<"Event", 'String'>

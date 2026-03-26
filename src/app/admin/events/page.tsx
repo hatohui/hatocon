@@ -48,6 +48,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { CheckCircle, Pencil, Trash2, Search, Upload, X } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Switch } from "@/components/ui/switch";
 import Image from "next/image";
 import axios from "axios";
 import type { EventWithCreator } from "@/types/event.d";
@@ -68,6 +69,7 @@ const editSchema = z
       .optional()
       .or(z.literal("")),
     reference: z.string().optional(),
+    isYearly: z.boolean(),
   })
   .refine((d) => new Date(d.endAt) > new Date(d.startAt), {
     message: "End must be after start",
@@ -131,6 +133,7 @@ export default function AdminEventsPage() {
       location: event.location ?? "",
       locationUrl: event.locationUrl ?? "",
       reference: event.reference ?? "",
+      isYearly: event.isYearly ?? false,
     });
   };
 
@@ -169,6 +172,7 @@ export default function AdminEventsPage() {
           location: values.location || undefined,
           locationUrl: values.locationUrl || undefined,
           reference: values.reference || undefined,
+          isYearly: values.isYearly,
         },
       },
       {
@@ -269,7 +273,17 @@ export default function AdminEventsPage() {
                 <TableRow key={event.id} onClick={() => setEditEvent(event)}>
                   <TableCell className="font-medium max-w-xs">
                     <div>
-                      <p className="truncate">{event.title}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="truncate">{event.title}</p>
+                        {event.isYearly && (
+                          <Badge
+                            variant="outline"
+                            className="text-[9px] h-4 px-1 shrink-0"
+                          >
+                            Yearly
+                          </Badge>
+                        )}
+                      </div>
                       {event.location && (
                         <p className="text-xs text-muted-foreground truncate">
                           {event.location}
@@ -548,6 +562,27 @@ export default function AdminEventsPage() {
                       <Input {...field} />
                     </FormControl>
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={editForm.control}
+                name="isYearly"
+                render={({ field }) => (
+                  <FormItem className="flex items-center justify-between rounded-lg border p-3">
+                    <div className="space-y-0.5">
+                      <FormLabel>Yearly Event</FormLabel>
+                      <p className="text-xs text-muted-foreground">
+                        This event repeats every year
+                      </p>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
                   </FormItem>
                 )}
               />

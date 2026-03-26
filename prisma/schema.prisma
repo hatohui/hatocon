@@ -91,6 +91,7 @@ model Event {
   image       String?
   description String?
   isApproved  Boolean @default(false)
+  isYearly    Boolean @default(false)
 
   startAt DateTime
   endAt   DateTime

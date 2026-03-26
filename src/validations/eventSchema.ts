@@ -17,6 +17,7 @@ export const eventBaseSchema = zod.object({
   location: zod.string().optional(),
   locationUrl: zod.string().url().optional(),
   reference: zod.string().optional(),
+  isYearly: zod.boolean().optional().default(false),
 });
 
 export const eventSchema = eventBaseSchema.refine(
