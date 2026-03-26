@@ -31,6 +31,7 @@ export type ParticipationMinAggregateOutputType = {
   from: Date | null
   to: Date | null
   leaveType: $Enums.LeaveType | null
+  createdBy: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -42,6 +43,7 @@ export type ParticipationMaxAggregateOutputType = {
   from: Date | null
   to: Date | null
   leaveType: $Enums.LeaveType | null
+  createdBy: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -53,6 +55,7 @@ export type ParticipationCountAggregateOutputType = {
   from: number
   to: number
   leaveType: number
+  createdBy: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -66,6 +69,7 @@ export type ParticipationMinAggregateInputType = {
   from?: true
   to?: true
   leaveType?: true
+  createdBy?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -77,6 +81,7 @@ export type ParticipationMaxAggregateInputType = {
   from?: true
   to?: true
   leaveType?: true
+  createdBy?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -88,6 +93,7 @@ export type ParticipationCountAggregateInputType = {
   from?: true
   to?: true
   leaveType?: true
+  createdBy?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -172,6 +178,7 @@ export type ParticipationGroupByOutputType = {
   from: Date
   to: Date
   leaveType: $Enums.LeaveType
+  createdBy: string | null
   createdAt: Date
   updatedAt: Date
   _count: ParticipationCountAggregateOutputType | null
@@ -204,10 +211,12 @@ export type ParticipationWhereInput = {
   from?: Prisma.DateTimeFilter<"Participation"> | Date | string
   to?: Prisma.DateTimeFilter<"Participation"> | Date | string
   leaveType?: Prisma.EnumLeaveTypeFilter<"Participation"> | $Enums.LeaveType
+  createdBy?: Prisma.StringNullableFilter<"Participation"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Participation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Participation"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   event?: Prisma.XOR<Prisma.EventNullableScalarRelationFilter, Prisma.EventWhereInput> | null
+  images?: Prisma.ParticipationImageListRelationFilter
 }
 
 export type ParticipationOrderByWithRelationInput = {
@@ -217,10 +226,12 @@ export type ParticipationOrderByWithRelationInput = {
   from?: Prisma.SortOrder
   to?: Prisma.SortOrder
   leaveType?: Prisma.SortOrder
+  createdBy?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   event?: Prisma.EventOrderByWithRelationInput
+  images?: Prisma.ParticipationImageOrderByRelationAggregateInput
 }
 
 export type ParticipationWhereUniqueInput = Prisma.AtLeast<{
@@ -235,10 +246,12 @@ export type ParticipationWhereUniqueInput = Prisma.AtLeast<{
   from?: Prisma.DateTimeFilter<"Participation"> | Date | string
   to?: Prisma.DateTimeFilter<"Participation"> | Date | string
   leaveType?: Prisma.EnumLeaveTypeFilter<"Participation"> | $Enums.LeaveType
+  createdBy?: Prisma.StringNullableFilter<"Participation"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Participation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Participation"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   event?: Prisma.XOR<Prisma.EventNullableScalarRelationFilter, Prisma.EventWhereInput> | null
+  images?: Prisma.ParticipationImageListRelationFilter
 }, "id" | "userId_eventId" | "userId_from_to">
 
 export type ParticipationOrderByWithAggregationInput = {
@@ -248,6 +261,7 @@ export type ParticipationOrderByWithAggregationInput = {
   from?: Prisma.SortOrder
   to?: Prisma.SortOrder
   leaveType?: Prisma.SortOrder
+  createdBy?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ParticipationCountOrderByAggregateInput
@@ -265,6 +279,7 @@ export type ParticipationScalarWhereWithAggregatesInput = {
   from?: Prisma.DateTimeWithAggregatesFilter<"Participation"> | Date | string
   to?: Prisma.DateTimeWithAggregatesFilter<"Participation"> | Date | string
   leaveType?: Prisma.EnumLeaveTypeWithAggregatesFilter<"Participation"> | $Enums.LeaveType
+  createdBy?: Prisma.StringNullableWithAggregatesFilter<"Participation"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Participation"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Participation"> | Date | string
 }
@@ -274,10 +289,12 @@ export type ParticipationCreateInput = {
   from: Date | string
   to: Date | string
   leaveType: $Enums.LeaveType
+  createdBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutParticipationsInput
   event?: Prisma.EventCreateNestedOneWithoutParticipationsInput
+  images?: Prisma.ParticipationImageCreateNestedManyWithoutParticipationInput
 }
 
 export type ParticipationUncheckedCreateInput = {
@@ -287,8 +304,10 @@ export type ParticipationUncheckedCreateInput = {
   from: Date | string
   to: Date | string
   leaveType: $Enums.LeaveType
+  createdBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  images?: Prisma.ParticipationImageUncheckedCreateNestedManyWithoutParticipationInput
 }
 
 export type ParticipationUpdateInput = {
@@ -296,10 +315,12 @@ export type ParticipationUpdateInput = {
   from?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutParticipationsNestedInput
   event?: Prisma.EventUpdateOneWithoutParticipationsNestedInput
+  images?: Prisma.ParticipationImageUpdateManyWithoutParticipationNestedInput
 }
 
 export type ParticipationUncheckedUpdateInput = {
@@ -309,8 +330,10 @@ export type ParticipationUncheckedUpdateInput = {
   from?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  images?: Prisma.ParticipationImageUncheckedUpdateManyWithoutParticipationNestedInput
 }
 
 export type ParticipationCreateManyInput = {
@@ -320,6 +343,7 @@ export type ParticipationCreateManyInput = {
   from: Date | string
   to: Date | string
   leaveType: $Enums.LeaveType
+  createdBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -329,6 +353,7 @@ export type ParticipationUpdateManyMutationInput = {
   from?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -340,6 +365,7 @@ export type ParticipationUncheckedUpdateManyInput = {
   from?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -372,6 +398,7 @@ export type ParticipationCountOrderByAggregateInput = {
   from?: Prisma.SortOrder
   to?: Prisma.SortOrder
   leaveType?: Prisma.SortOrder
+  createdBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -383,6 +410,7 @@ export type ParticipationMaxOrderByAggregateInput = {
   from?: Prisma.SortOrder
   to?: Prisma.SortOrder
   leaveType?: Prisma.SortOrder
+  createdBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -394,8 +422,14 @@ export type ParticipationMinOrderByAggregateInput = {
   from?: Prisma.SortOrder
   to?: Prisma.SortOrder
   leaveType?: Prisma.SortOrder
+  createdBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type ParticipationScalarRelationFilter = {
+  is?: Prisma.ParticipationWhereInput
+  isNot?: Prisma.ParticipationWhereInput
 }
 
 export type ParticipationCreateNestedManyWithoutUserInput = {
@@ -486,14 +520,30 @@ export type EnumLeaveTypeFieldUpdateOperationsInput = {
   set?: $Enums.LeaveType
 }
 
+export type ParticipationCreateNestedOneWithoutImagesInput = {
+  create?: Prisma.XOR<Prisma.ParticipationCreateWithoutImagesInput, Prisma.ParticipationUncheckedCreateWithoutImagesInput>
+  connectOrCreate?: Prisma.ParticipationCreateOrConnectWithoutImagesInput
+  connect?: Prisma.ParticipationWhereUniqueInput
+}
+
+export type ParticipationUpdateOneRequiredWithoutImagesNestedInput = {
+  create?: Prisma.XOR<Prisma.ParticipationCreateWithoutImagesInput, Prisma.ParticipationUncheckedCreateWithoutImagesInput>
+  connectOrCreate?: Prisma.ParticipationCreateOrConnectWithoutImagesInput
+  upsert?: Prisma.ParticipationUpsertWithoutImagesInput
+  connect?: Prisma.ParticipationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ParticipationUpdateToOneWithWhereWithoutImagesInput, Prisma.ParticipationUpdateWithoutImagesInput>, Prisma.ParticipationUncheckedUpdateWithoutImagesInput>
+}
+
 export type ParticipationCreateWithoutUserInput = {
   id?: string
   from: Date | string
   to: Date | string
   leaveType: $Enums.LeaveType
+  createdBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   event?: Prisma.EventCreateNestedOneWithoutParticipationsInput
+  images?: Prisma.ParticipationImageCreateNestedManyWithoutParticipationInput
 }
 
 export type ParticipationUncheckedCreateWithoutUserInput = {
@@ -502,8 +552,10 @@ export type ParticipationUncheckedCreateWithoutUserInput = {
   from: Date | string
   to: Date | string
   leaveType: $Enums.LeaveType
+  createdBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  images?: Prisma.ParticipationImageUncheckedCreateNestedManyWithoutParticipationInput
 }
 
 export type ParticipationCreateOrConnectWithoutUserInput = {
@@ -542,6 +594,7 @@ export type ParticipationScalarWhereInput = {
   from?: Prisma.DateTimeFilter<"Participation"> | Date | string
   to?: Prisma.DateTimeFilter<"Participation"> | Date | string
   leaveType?: Prisma.EnumLeaveTypeFilter<"Participation"> | $Enums.LeaveType
+  createdBy?: Prisma.StringNullableFilter<"Participation"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Participation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Participation"> | Date | string
 }
@@ -551,9 +604,11 @@ export type ParticipationCreateWithoutEventInput = {
   from: Date | string
   to: Date | string
   leaveType: $Enums.LeaveType
+  createdBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutParticipationsInput
+  images?: Prisma.ParticipationImageCreateNestedManyWithoutParticipationInput
 }
 
 export type ParticipationUncheckedCreateWithoutEventInput = {
@@ -562,8 +617,10 @@ export type ParticipationUncheckedCreateWithoutEventInput = {
   from: Date | string
   to: Date | string
   leaveType: $Enums.LeaveType
+  createdBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  images?: Prisma.ParticipationImageUncheckedCreateNestedManyWithoutParticipationInput
 }
 
 export type ParticipationCreateOrConnectWithoutEventInput = {
@@ -592,12 +649,77 @@ export type ParticipationUpdateManyWithWhereWithoutEventInput = {
   data: Prisma.XOR<Prisma.ParticipationUpdateManyMutationInput, Prisma.ParticipationUncheckedUpdateManyWithoutEventInput>
 }
 
+export type ParticipationCreateWithoutImagesInput = {
+  id?: string
+  from: Date | string
+  to: Date | string
+  leaveType: $Enums.LeaveType
+  createdBy?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutParticipationsInput
+  event?: Prisma.EventCreateNestedOneWithoutParticipationsInput
+}
+
+export type ParticipationUncheckedCreateWithoutImagesInput = {
+  id?: string
+  userId: string
+  eventId?: string | null
+  from: Date | string
+  to: Date | string
+  leaveType: $Enums.LeaveType
+  createdBy?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ParticipationCreateOrConnectWithoutImagesInput = {
+  where: Prisma.ParticipationWhereUniqueInput
+  create: Prisma.XOR<Prisma.ParticipationCreateWithoutImagesInput, Prisma.ParticipationUncheckedCreateWithoutImagesInput>
+}
+
+export type ParticipationUpsertWithoutImagesInput = {
+  update: Prisma.XOR<Prisma.ParticipationUpdateWithoutImagesInput, Prisma.ParticipationUncheckedUpdateWithoutImagesInput>
+  create: Prisma.XOR<Prisma.ParticipationCreateWithoutImagesInput, Prisma.ParticipationUncheckedCreateWithoutImagesInput>
+  where?: Prisma.ParticipationWhereInput
+}
+
+export type ParticipationUpdateToOneWithWhereWithoutImagesInput = {
+  where?: Prisma.ParticipationWhereInput
+  data: Prisma.XOR<Prisma.ParticipationUpdateWithoutImagesInput, Prisma.ParticipationUncheckedUpdateWithoutImagesInput>
+}
+
+export type ParticipationUpdateWithoutImagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  from?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutParticipationsNestedInput
+  event?: Prisma.EventUpdateOneWithoutParticipationsNestedInput
+}
+
+export type ParticipationUncheckedUpdateWithoutImagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  eventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  from?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type ParticipationCreateManyUserInput = {
   id?: string
   eventId?: string | null
   from: Date | string
   to: Date | string
   leaveType: $Enums.LeaveType
+  createdBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -607,9 +729,11 @@ export type ParticipationUpdateWithoutUserInput = {
   from?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   event?: Prisma.EventUpdateOneWithoutParticipationsNestedInput
+  images?: Prisma.ParticipationImageUpdateManyWithoutParticipationNestedInput
 }
 
 export type ParticipationUncheckedUpdateWithoutUserInput = {
@@ -618,8 +742,10 @@ export type ParticipationUncheckedUpdateWithoutUserInput = {
   from?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  images?: Prisma.ParticipationImageUncheckedUpdateManyWithoutParticipationNestedInput
 }
 
 export type ParticipationUncheckedUpdateManyWithoutUserInput = {
@@ -628,6 +754,7 @@ export type ParticipationUncheckedUpdateManyWithoutUserInput = {
   from?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -638,6 +765,7 @@ export type ParticipationCreateManyEventInput = {
   from: Date | string
   to: Date | string
   leaveType: $Enums.LeaveType
+  createdBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -647,9 +775,11 @@ export type ParticipationUpdateWithoutEventInput = {
   from?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutParticipationsNestedInput
+  images?: Prisma.ParticipationImageUpdateManyWithoutParticipationNestedInput
 }
 
 export type ParticipationUncheckedUpdateWithoutEventInput = {
@@ -658,8 +788,10 @@ export type ParticipationUncheckedUpdateWithoutEventInput = {
   from?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  images?: Prisma.ParticipationImageUncheckedUpdateManyWithoutParticipationNestedInput
 }
 
 export type ParticipationUncheckedUpdateManyWithoutEventInput = {
@@ -668,10 +800,40 @@ export type ParticipationUncheckedUpdateManyWithoutEventInput = {
   from?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+
+/**
+ * Count Type ParticipationCountOutputType
+ */
+
+export type ParticipationCountOutputType = {
+  images: number
+}
+
+export type ParticipationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  images?: boolean | ParticipationCountOutputTypeCountImagesArgs
+}
+
+/**
+ * ParticipationCountOutputType without action
+ */
+export type ParticipationCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ParticipationCountOutputType
+   */
+  select?: Prisma.ParticipationCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * ParticipationCountOutputType without action
+ */
+export type ParticipationCountOutputTypeCountImagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ParticipationImageWhereInput
+}
 
 
 export type ParticipationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -681,10 +843,13 @@ export type ParticipationSelect<ExtArgs extends runtime.Types.Extensions.Interna
   from?: boolean
   to?: boolean
   leaveType?: boolean
+  createdBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   event?: boolean | Prisma.Participation$eventArgs<ExtArgs>
+  images?: boolean | Prisma.Participation$imagesArgs<ExtArgs>
+  _count?: boolean | Prisma.ParticipationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["participation"]>
 
 export type ParticipationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -694,6 +859,7 @@ export type ParticipationSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   from?: boolean
   to?: boolean
   leaveType?: boolean
+  createdBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -707,6 +873,7 @@ export type ParticipationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   from?: boolean
   to?: boolean
   leaveType?: boolean
+  createdBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -720,14 +887,17 @@ export type ParticipationSelectScalar = {
   from?: boolean
   to?: boolean
   leaveType?: boolean
+  createdBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ParticipationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "eventId" | "from" | "to" | "leaveType" | "createdAt" | "updatedAt", ExtArgs["result"]["participation"]>
+export type ParticipationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "eventId" | "from" | "to" | "leaveType" | "createdBy" | "createdAt" | "updatedAt", ExtArgs["result"]["participation"]>
 export type ParticipationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   event?: boolean | Prisma.Participation$eventArgs<ExtArgs>
+  images?: boolean | Prisma.Participation$imagesArgs<ExtArgs>
+  _count?: boolean | Prisma.ParticipationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ParticipationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -743,6 +913,7 @@ export type $ParticipationPayload<ExtArgs extends runtime.Types.Extensions.Inter
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
     event: Prisma.$EventPayload<ExtArgs> | null
+    images: Prisma.$ParticipationImagePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -751,6 +922,7 @@ export type $ParticipationPayload<ExtArgs extends runtime.Types.Extensions.Inter
     from: Date
     to: Date
     leaveType: $Enums.LeaveType
+    createdBy: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["participation"]>
@@ -1149,6 +1321,7 @@ export interface Prisma__ParticipationClient<T, Null = never, ExtArgs extends ru
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   event<T extends Prisma.Participation$eventArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Participation$eventArgs<ExtArgs>>): Prisma.Prisma__EventClient<runtime.Types.Result.GetResult<Prisma.$EventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  images<T extends Prisma.Participation$imagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Participation$imagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ParticipationImagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1184,6 +1357,7 @@ export interface ParticipationFieldRefs {
   readonly from: Prisma.FieldRef<"Participation", 'DateTime'>
   readonly to: Prisma.FieldRef<"Participation", 'DateTime'>
   readonly leaveType: Prisma.FieldRef<"Participation", 'LeaveType'>
+  readonly createdBy: Prisma.FieldRef<"Participation", 'String'>
   readonly createdAt: Prisma.FieldRef<"Participation", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Participation", 'DateTime'>
 }
@@ -1603,6 +1777,30 @@ export type Participation$eventArgs<ExtArgs extends runtime.Types.Extensions.Int
    */
   include?: Prisma.EventInclude<ExtArgs> | null
   where?: Prisma.EventWhereInput
+}
+
+/**
+ * Participation.images
+ */
+export type Participation$imagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ParticipationImage
+   */
+  select?: Prisma.ParticipationImageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ParticipationImage
+   */
+  omit?: Prisma.ParticipationImageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ParticipationImageInclude<ExtArgs> | null
+  where?: Prisma.ParticipationImageWhereInput
+  orderBy?: Prisma.ParticipationImageOrderByWithRelationInput | Prisma.ParticipationImageOrderByWithRelationInput[]
+  cursor?: Prisma.ParticipationImageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ParticipationImageScalarFieldEnum | Prisma.ParticipationImageScalarFieldEnum[]
 }
 
 /**

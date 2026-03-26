@@ -1,13 +1,11 @@
 "use client";
 
-import * as React from "react";
-import { CalendarPlus, ClipboardList, Zap, ChevronRight } from "lucide-react";
+import { CalendarPlus, Zap, ChevronRight, Plane } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLeaveBalance } from "@/hooks/participations/useParticipations";
-import LogLeaveDialog from "./LogLeaveDialog";
 
 function BalanceBar({
   label,
@@ -45,7 +43,6 @@ function BalanceBar({
 }
 
 export default function QuickActions() {
-  const [showLogLeave, setShowLogLeave] = React.useState(false);
   const { data: balance, isLoading } = useLeaveBalance();
 
   return (
@@ -61,10 +58,12 @@ export default function QuickActions() {
             variant="outline"
             size="sm"
             className="flex-col h-auto py-3 gap-1.5 text-xs"
-            onClick={() => setShowLogLeave(true)}
+            asChild
           >
-            <ClipboardList className="h-4 w-4" />
-            Log Leave
+            <Link href="/leave/new">
+              <Plane className="h-4 w-4" />
+              Create A Plan
+            </Link>
           </Button>
           <Button
             variant="outline"
@@ -86,7 +85,12 @@ export default function QuickActions() {
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
               Leave Balance
             </p>
-            <Button variant="ghost" size="sm" className="h-6 text-xs gap-1 px-1" asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 text-xs gap-1 px-1"
+              asChild
+            >
               <Link href="/settings/leave">
                 Adjust
                 <ChevronRight className="h-3 w-3" />
@@ -105,7 +109,12 @@ export default function QuickActions() {
             <p className="text-xs text-muted-foreground">
               Set up your job profile to track leave balance.
             </p>
-            <Button variant="link" size="sm" className="mt-1 h-auto p-0 text-xs" asChild>
+            <Button
+              variant="link"
+              size="sm"
+              className="mt-1 h-auto p-0 text-xs"
+              asChild
+            >
               <Link href="/settings/leave">Set up now</Link>
             </Button>
           </div>
@@ -126,8 +135,6 @@ export default function QuickActions() {
           </div>
         )}
       </div>
-
-      <LogLeaveDialog open={showLogLeave} onOpenChange={setShowLogLeave} />
     </>
   );
 }

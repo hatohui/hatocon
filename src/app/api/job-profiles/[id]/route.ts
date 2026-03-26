@@ -52,6 +52,9 @@ const PUT = async (req: NextRequest, ctx: Context) => {
   }
 
   const data = await req.json();
+  if (data.leaveCycleStart && typeof data.leaveCycleStart === "string") {
+    data.leaveCycleStart = new Date(data.leaveCycleStart);
+  }
   const validationResult = jobProfileSchema.partial().safeParse(data);
 
   if (!validationResult.success) {

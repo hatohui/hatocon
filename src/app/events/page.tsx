@@ -260,14 +260,17 @@ function CalendarView({ q, onSelect }: { q: string; onSelect: (e: Event) => void
   const [currentMonth, setCurrentMonth] = React.useState(startOfToday());
   const [selectedDay, setSelectedDay] = React.useState<Date | null>(null);
 
+  const year = currentMonth.getFullYear();
+
+  // Fetch all events for the year
+  const { data: yearEvents } = useAllEvents({
+    q: q || undefined,
+    from: new Date(year, 0, 1),
+    to: new Date(year, 11, 31, 23, 59, 59),
+  });
+
   const monthFrom = startOfMonth(currentMonth);
   const monthTo = endOfMonth(currentMonth);
-
-  const { data: events, isLoading } = useAllEvents({
-    q: q || undefined,
-    from: monthFrom,
-    to: monthTo,
-  });
 
   const days = eachDayOfInterval({ start: monthFrom, end: monthTo });
   // Pad start to Monday (1) – shift from Sunday-first to Monday-first
@@ -281,16 +284,34 @@ function CalendarView({ q, onSelect }: { q: string; onSelect: (e: Event) => void
   const weeks: (Date | null)[][] = [];
   for (let i = 0; i < padded.length; i += 7) weeks.push(padded.slice(i, i + 7));
 
+  // Filter events for the visible month and map by date
+  const events = React.useMemo(() => {
+    if (!yearEvents) return [];
+    return yearEvents.filter((e) => {
+      const start = new Date(e.startAt);
+      const end = new Date(e.endAt);
+      return start <= monthTo && end >= monthFrom;
+    });
+  }, [yearEvents, monthFrom, monthTo]);
+
   const eventsByDate = React.useMemo(() => {
     const map = new Map<string, Event[]>();
     events?.forEach((e) => {
-      const key = format(new Date(e.startAt), "yyyy-MM-dd");
-      const list = map.get(key) ?? [];
-      list.push(e);
-      map.set(key, list);
+      // Place event on every day it spans within the visible month
+      const start = new Date(e.startAt);
+      const end = new Date(e.endAt);
+      const rangeStart = start < monthFrom ? monthFrom : start;
+      const rangeEnd = end > monthTo ? monthTo : end;
+      const days = eachDayOfInterval({ start: rangeStart, end: rangeEnd });
+      for (const day of days) {
+        const key = format(day, "yyyy-MM-dd");
+        const list = map.get(key) ?? [];
+        list.push(e);
+        map.set(key, list);
+      }
     });
     return map;
-  }, [events]);
+  }, [events, monthFrom, monthTo]);
 
   const selectedEvents = selectedDay
     ? (eventsByDate.get(format(selectedDay, "yyyy-MM-dd")) ?? [])
@@ -586,16 +607,16 @@ function TimelineView({
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 const DATE_RANGES = [
-  { label: "Next 30 days", days: 30 },
-  { label: "Next 3 months", days: 90 },
-  { label: "Next 6 months", days: 180 },
   { label: "This year", days: 365 },
+  { label: "Next 6 months", days: 180 },
+  { label: "Next 3 months", days: 90 },
+  { label: "Next 30 days", days: 30 },
 ];
 
 export default function EventsPage() {
   const [q, setQ] = React.useState("");
   const [debouncedQ, setDebouncedQ] = React.useState("");
-  const [rangeDays, setRangeDays] = React.useState(90);
+  const [rangeDays, setRangeDays] = React.useState(365);
   const [showCreate, setShowCreate] = React.useState(false);
   const [selectedEvent, setSelectedEvent] = React.useState<Event | null>(null);
 

@@ -6,6 +6,15 @@ export type ParticipationCreateDTO = {
   from: Date | string;
   to: Date | string;
   leaveType: LeaveType;
+  coTravelerIds?: string[];
+};
+
+export type ParticipationImageDTO = {
+  id: string;
+  participationId: string;
+  url: string;
+  caption?: string | null;
+  createdAt: Date;
 };
 
 export type HeatmapEntry = {

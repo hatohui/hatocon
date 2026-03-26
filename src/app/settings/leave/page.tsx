@@ -37,7 +37,12 @@ export default function SettingsLeavePage() {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(jobProfileSchema),
-    defaultValues: { title: "", daysOfLeave: 0, daysOfSickLeave: 0 },
+    defaultValues: {
+      title: "",
+      daysOfLeave: 0,
+      daysOfSickLeave: 0,
+      leaveCycleStart: undefined,
+    },
   });
 
   useEffect(() => {
@@ -46,6 +51,9 @@ export default function SettingsLeavePage() {
         title: profile.title ?? "",
         daysOfLeave: profile.daysOfLeave,
         daysOfSickLeave: profile.daysOfSickLeave,
+        leaveCycleStart: profile.leaveCycleStart
+          ? new Date(profile.leaveCycleStart)
+          : undefined,
       });
     }
   }, [profile, form]);
@@ -59,6 +67,7 @@ export default function SettingsLeavePage() {
           title: values.title || undefined,
           daysOfLeave: values.daysOfLeave,
           daysOfSickLeave: values.daysOfSickLeave,
+          leaveCycleStart: values.leaveCycleStart ?? undefined,
         },
       },
       {
@@ -152,6 +161,31 @@ export default function SettingsLeavePage() {
                       max={365}
                       {...field}
                       onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="leaveCycleStart"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Leave Cycle Start</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="date"
+                      value={
+                        field.value
+                          ? new Date(field.value).toISOString().split("T")[0]
+                          : ""
+                      }
+                      onChange={(e) =>
+                        field.onChange(
+                          e.target.value ? new Date(e.target.value) : undefined,
+                        )
+                      }
                     />
                   </FormControl>
                   <FormMessage />

@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Briefcase } from "lucide-react";
+import { CalendarDays, Briefcase, Plane } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/admin/events", label: "Events", icon: CalendarDays },
   { href: "/admin/job-profiles", label: "Job Profiles", icon: Briefcase },
+  { href: "/admin/participations", label: "Participations", icon: Plane },
 ];
 
 export default function AdminSidenav() {
@@ -29,7 +30,7 @@ export default function AdminSidenav() {
                 "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                 isActive
                   ? "bg-muted text-foreground"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
               )}
             >
               <Icon className="h-4 w-4 shrink-0" />

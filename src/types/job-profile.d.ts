@@ -6,6 +6,7 @@ export type JobProfileCreateDTO = {
   title?: string;
   daysOfLeave: number;
   daysOfSickLeave: number;
+  leaveCycleStart?: Date | string;
 };
 
 export type JobProfileUpdateDTO = Partial<JobProfileCreateDTO>;

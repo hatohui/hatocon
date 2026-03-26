@@ -12,10 +12,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LayoutDashboard, LogOut, Settings } from "lucide-react";
+import { CalendarDays, LayoutDashboard, LogOut, Plane, Settings } from "lucide-react";
 import AppIcon from "./common/AppIcon";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
+
+const NAV_LINKS = [
+  { href: "/events", label: "Events", icon: CalendarDays },
+  { href: "/leave/new", label: "Create A Plan", icon: Plane },
+];
 
 export default function Navbar() {
   const { data: session } = useSession();
@@ -55,6 +60,21 @@ export default function Navbar() {
               Dashboard
             </Link>
           )}
+          {NAV_LINKS.map(({ href, label, icon: Icon }) => (
+            <Link
+              key={href}
+              href={href}
+              className={cn(
+                "flex items-center gap-1.5 text-sm font-medium transition-colors",
+                pathname.startsWith(href)
+                  ? "text-foreground"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              <Icon className="h-4 w-4" />
+              {label}
+            </Link>
+          ))}
         </div>
 
         <DropdownMenu>

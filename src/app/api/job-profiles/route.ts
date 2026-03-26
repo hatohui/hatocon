@@ -38,6 +38,9 @@ const POST = async (req: NextRequest) => {
   }
 
   const data = await req.json();
+  if (data.leaveCycleStart && typeof data.leaveCycleStart === "string") {
+    data.leaveCycleStart = new Date(data.leaveCycleStart);
+  }
   const validationResult = jobProfileSchema.safeParse(data);
 
   if (!validationResult.success) {

@@ -2,16 +2,18 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { format, isWeekend, parseISO } from "date-fns";
-import type { Event } from "@prisma/client";
+import { format, isWeekend } from "date-fns";
+import type { Event, User } from "@prisma/client";
 import {
   ArrowLeft,
   CalendarDays,
   CheckCircle2,
   Clock,
   MapPin,
+  Plane,
   RefreshCw,
   Search,
+  UserPlus,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -35,11 +37,20 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useCreateParticipation } from "@/hooks/participations/useParticipations";
 import { useAllEvents } from "@/hooks/events/useEvents";
+import { useUsers } from "@/hooks/users/useUsers";
 import { LeaveType } from "@/types/leave-type";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 // ─── Event Picker ─────────────────────────────────────────────────────────────
 
@@ -225,43 +236,146 @@ function EventPicker({
   );
 }
 
-// ─── Date input with weekend warning ─────────────────────────────────────────
+// ─── Date Picker Field ───────────────────────────────────────────────────────
 
-function DateField({
-  id,
+function DatePickerField({
   label,
   value,
   onChange,
-  min,
-  required,
+  fromDate,
 }: {
-  id: string;
   label: string;
-  value: string;
-  onChange: (v: string) => void;
-  min?: string;
-  required?: boolean;
+  value: Date | undefined;
+  onChange: (d: Date | undefined) => void;
+  fromDate?: Date;
 }) {
-  const isWknd = value && isWeekend(parseISO(value));
+  const isWknd = value ? isWeekend(value) : false;
   return (
     <div className="space-y-1.5">
-      <Label htmlFor={id}>{label}</Label>
-      <Input
-        id={id}
-        type="date"
-        value={value}
-        min={min}
-        required={required}
-        onChange={(e) => onChange(e.target.value)}
-        className={cn(
-          isWknd && "border-orange-400 focus-visible:ring-orange-400",
-        )}
-      />
+      <Label>{label}</Label>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            className={cn(
+              "w-full justify-start text-left font-normal",
+              !value && "text-muted-foreground",
+              isWknd && "border-orange-400",
+            )}
+          >
+            <CalendarDays className="mr-2 h-4 w-4" />
+            {value ? format(value, "PPP") : "Pick a date"}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="single"
+            selected={value}
+            onSelect={onChange}
+            fromDate={fromDate}
+          />
+        </PopoverContent>
+      </Popover>
       {isWknd && (
         <p className="text-xs text-orange-500">
-          Heads up — this falls on a weekend. Leave is typically taken on
-          weekdays.
+          Heads up — this falls on a weekend.
         </p>
+      )}
+    </div>
+  );
+}
+
+// ─── Co-Traveler Picker ──────────────────────────────────────────────────────
+
+function CoTravelerPicker({
+  selected,
+  onChange,
+}: {
+  selected: Omit<User, "password">[];
+  onChange: (users: Omit<User, "password">[]) => void;
+}) {
+  const { data: response } = useUsers();
+  const { data: session } = useSession();
+  const [searchQ, setSearchQ] = React.useState("");
+
+  const allUsers = React.useMemo(() => {
+    const users = response?.data ?? [];
+    return users.filter((u) => u.id !== session?.user?.id);
+  }, [response, session]);
+
+  const filtered = allUsers.filter(
+    (u) =>
+      !selected.some((s) => s.id === u.id) &&
+      (u.name?.toLowerCase().includes(searchQ.toLowerCase()) ||
+        u.email?.toLowerCase().includes(searchQ.toLowerCase())),
+  );
+
+  return (
+    <div className="space-y-3">
+      {selected.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {selected.map((u) => (
+            <Badge key={u.id} variant="secondary" className="gap-1.5 pr-1">
+              <Avatar className="h-4 w-4">
+                <AvatarImage src={u.image ?? undefined} />
+                <AvatarFallback className="text-[8px]">
+                  {u.name?.[0]}
+                </AvatarFallback>
+              </Avatar>
+              {u.name}
+              <button
+                type="button"
+                className="ml-0.5 rounded-full hover:bg-muted p-0.5"
+                onClick={() => onChange(selected.filter((s) => s.id !== u.id))}
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          ))}
+        </div>
+      )}
+      <div className="relative">
+        <UserPlus className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          className="pl-9"
+          placeholder="Search people to add…"
+          value={searchQ}
+          onChange={(e) => setSearchQ(e.target.value)}
+        />
+      </div>
+      {searchQ && (
+        <div className="border rounded-lg max-h-48 overflow-y-auto divide-y">
+          {filtered.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">
+              No users found
+            </p>
+          ) : (
+            filtered.slice(0, 10).map((u) => (
+              <button
+                key={u.id}
+                type="button"
+                className="w-full flex items-center gap-3 px-3 py-2 hover:bg-muted/60 transition-colors text-left"
+                onClick={() => {
+                  onChange([...selected, u]);
+                  setSearchQ("");
+                }}
+              >
+                <Avatar className="h-7 w-7">
+                  <AvatarImage src={u.image ?? undefined} />
+                  <AvatarFallback className="text-xs">
+                    {u.name?.[0]}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium truncate">{u.name}</p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {u.email}
+                  </p>
+                </div>
+              </button>
+            ))
+          )}
+        </div>
       )}
     </div>
   );
@@ -269,29 +383,29 @@ function DateField({
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function LogLeavePage() {
+export default function CreatePlanPage() {
   const router = useRouter();
   const { mutateAsync: createParticipation, isPending } =
     useCreateParticipation();
 
   const [selectedEvent, setSelectedEvent] = React.useState<Event | null>(null);
-  const [from, setFrom] = React.useState("");
-  const [to, setTo] = React.useState("");
+  const [from, setFrom] = React.useState<Date | undefined>();
+  const [to, setTo] = React.useState<Date | undefined>();
   const [leaveType, setLeaveType] = React.useState<string>("");
+  const [coTravelers, setCoTravelers] = React.useState<
+    Omit<User, "password">[]
+  >([]);
 
   // Auto-fill dates when an event is selected
   const handleEventSelect = (event: Event | null) => {
     setSelectedEvent(event);
     if (event) {
-      setFrom(format(new Date(event.startAt), "yyyy-MM-dd"));
-      setTo(format(new Date(event.endAt), "yyyy-MM-dd"));
+      setFrom(new Date(event.startAt));
+      setTo(new Date(event.endAt));
     }
   };
 
-  const todayStr = format(new Date(), "yyyy-MM-dd");
-
-  const canSubmit =
-    from && to && leaveType && new Date(to) >= new Date(from) && !isPending;
+  const canSubmit = from && to && leaveType && to >= from && !isPending;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -300,19 +414,25 @@ export default function LogLeavePage() {
     try {
       await createParticipation({
         eventId: selectedEvent?.id,
-        from: new Date(from),
-        to: new Date(to),
+        from,
+        to,
         leaveType: leaveType as (typeof LeaveType)[keyof typeof LeaveType],
+        coTravelerIds: coTravelers.map((u) => u.id),
       });
-      toast.success("Leave logged successfully!");
+      toast.success("Plan created successfully!");
       router.push("/");
     } catch (err: unknown) {
       const msg =
         (err as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message ?? "Failed to log leave. Please try again.";
+          ?.message ?? "Failed to create plan. Please try again.";
       toast.error(msg);
     }
   };
+
+  const duration =
+    from && to && to >= from
+      ? Math.ceil((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24)) + 1
+      : null;
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-10 space-y-6">
@@ -329,11 +449,16 @@ export default function LogLeavePage() {
         </Button>
       </div>
 
-      <div>
-        <h1 className="text-2xl font-bold">Log Leave</h1>
-        <p className="text-muted-foreground text-sm mt-0.5">
-          Record your leave. Optionally link it to a company event.
-        </p>
+      <div className="flex items-center gap-3">
+        <div className="rounded-full bg-primary/10 p-2">
+          <Plane className="h-5 w-5 text-primary" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold">Create A Plan</h1>
+          <p className="text-muted-foreground text-sm mt-0.5">
+            Plan your travel. Optionally link to an event and add co-travelers.
+          </p>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -342,8 +467,8 @@ export default function LogLeavePage() {
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Link to an Event</CardTitle>
             <CardDescription>
-              Optional — attach this leave to an existing company event. Dates
-              will auto-fill.
+              Optional — attach this plan to an existing event. Dates will
+              auto-fill.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -351,12 +476,12 @@ export default function LogLeavePage() {
           </CardContent>
         </Card>
 
-        {/* Leave details */}
+        {/* Travel details */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">Leave Details</CardTitle>
+            <CardTitle className="text-base">Travel Details</CardTitle>
             <CardDescription>
-              Set the leave type and date range.
+              Set the leave type and pick your travel dates.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
@@ -377,46 +502,53 @@ export default function LogLeavePage() {
 
             <Separator />
 
-            {/* Date range */}
+            {/* Date pickers */}
             <div className="grid grid-cols-2 gap-4">
-              <DateField
-                id="from"
+              <DatePickerField
                 label="From"
                 value={from}
                 onChange={setFrom}
-                min={todayStr}
-                required
+                fromDate={new Date()}
               />
-              <DateField
-                id="to"
+              <DatePickerField
                 label="To"
                 value={to}
-                onChange={(v) => {
-                  setTo(v);
-                }}
-                min={from || todayStr}
-                required
+                onChange={setTo}
+                fromDate={from ?? new Date()}
               />
             </div>
 
-            {from && to && new Date(to) < new Date(from) && (
+            {from && to && to < from && (
               <p className="text-sm text-destructive">
                 End date must be on or after the start date.
               </p>
             )}
 
-            {from && to && new Date(to) >= new Date(from) && (
+            {duration && (
               <p className="text-sm text-muted-foreground">
                 Duration:{" "}
                 <span className="font-medium text-foreground">
-                  {Math.ceil(
-                    (new Date(to).getTime() - new Date(from).getTime()) /
-                      (1000 * 60 * 60 * 24),
-                  ) + 1}{" "}
-                  days
+                  {duration} {duration === 1 ? "day" : "days"}
                 </span>
               </p>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Co-travelers */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Co-Travelers</CardTitle>
+            <CardDescription>
+              Optional — invite others to join this plan. They will also have
+              leave logged for the same dates.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <CoTravelerPicker
+              selected={coTravelers}
+              onChange={setCoTravelers}
+            />
           </CardContent>
         </Card>
 
@@ -426,7 +558,7 @@ export default function LogLeavePage() {
             Cancel
           </Button>
           <Button type="submit" disabled={!canSubmit}>
-            {isPending ? "Logging…" : "Log Leave"}
+            {isPending ? "Creating…" : "Create Plan"}
           </Button>
         </div>
       </form>

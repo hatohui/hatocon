@@ -42,6 +42,7 @@ export type JobProfileMinAggregateOutputType = {
   title: string | null
   daysOfLeave: number | null
   daysOfSickLeave: number | null
+  leaveCycleStart: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -52,6 +53,7 @@ export type JobProfileMaxAggregateOutputType = {
   title: string | null
   daysOfLeave: number | null
   daysOfSickLeave: number | null
+  leaveCycleStart: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -62,6 +64,7 @@ export type JobProfileCountAggregateOutputType = {
   title: number
   daysOfLeave: number
   daysOfSickLeave: number
+  leaveCycleStart: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -84,6 +87,7 @@ export type JobProfileMinAggregateInputType = {
   title?: true
   daysOfLeave?: true
   daysOfSickLeave?: true
+  leaveCycleStart?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -94,6 +98,7 @@ export type JobProfileMaxAggregateInputType = {
   title?: true
   daysOfLeave?: true
   daysOfSickLeave?: true
+  leaveCycleStart?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -104,6 +109,7 @@ export type JobProfileCountAggregateInputType = {
   title?: true
   daysOfLeave?: true
   daysOfSickLeave?: true
+  leaveCycleStart?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -201,6 +207,7 @@ export type JobProfileGroupByOutputType = {
   title: string | null
   daysOfLeave: number
   daysOfSickLeave: number
+  leaveCycleStart: Date
   createdAt: Date
   updatedAt: Date
   _count: JobProfileCountAggregateOutputType | null
@@ -234,6 +241,7 @@ export type JobProfileWhereInput = {
   title?: Prisma.StringNullableFilter<"JobProfile"> | string | null
   daysOfLeave?: Prisma.IntFilter<"JobProfile"> | number
   daysOfSickLeave?: Prisma.IntFilter<"JobProfile"> | number
+  leaveCycleStart?: Prisma.DateTimeFilter<"JobProfile"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"JobProfile"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"JobProfile"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -245,6 +253,7 @@ export type JobProfileOrderByWithRelationInput = {
   title?: Prisma.SortOrderInput | Prisma.SortOrder
   daysOfLeave?: Prisma.SortOrder
   daysOfSickLeave?: Prisma.SortOrder
+  leaveCycleStart?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -259,6 +268,7 @@ export type JobProfileWhereUniqueInput = Prisma.AtLeast<{
   title?: Prisma.StringNullableFilter<"JobProfile"> | string | null
   daysOfLeave?: Prisma.IntFilter<"JobProfile"> | number
   daysOfSickLeave?: Prisma.IntFilter<"JobProfile"> | number
+  leaveCycleStart?: Prisma.DateTimeFilter<"JobProfile"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"JobProfile"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"JobProfile"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -270,6 +280,7 @@ export type JobProfileOrderByWithAggregationInput = {
   title?: Prisma.SortOrderInput | Prisma.SortOrder
   daysOfLeave?: Prisma.SortOrder
   daysOfSickLeave?: Prisma.SortOrder
+  leaveCycleStart?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.JobProfileCountOrderByAggregateInput
@@ -288,6 +299,7 @@ export type JobProfileScalarWhereWithAggregatesInput = {
   title?: Prisma.StringNullableWithAggregatesFilter<"JobProfile"> | string | null
   daysOfLeave?: Prisma.IntWithAggregatesFilter<"JobProfile"> | number
   daysOfSickLeave?: Prisma.IntWithAggregatesFilter<"JobProfile"> | number
+  leaveCycleStart?: Prisma.DateTimeWithAggregatesFilter<"JobProfile"> | Date | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"JobProfile"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"JobProfile"> | Date | string
 }
@@ -297,6 +309,7 @@ export type JobProfileCreateInput = {
   title?: string | null
   daysOfLeave: number
   daysOfSickLeave: number
+  leaveCycleStart?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutJobProfileInput
@@ -308,6 +321,7 @@ export type JobProfileUncheckedCreateInput = {
   title?: string | null
   daysOfLeave: number
   daysOfSickLeave: number
+  leaveCycleStart?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -317,6 +331,7 @@ export type JobProfileUpdateInput = {
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   daysOfLeave?: Prisma.IntFieldUpdateOperationsInput | number
   daysOfSickLeave?: Prisma.IntFieldUpdateOperationsInput | number
+  leaveCycleStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutJobProfileNestedInput
@@ -328,6 +343,7 @@ export type JobProfileUncheckedUpdateInput = {
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   daysOfLeave?: Prisma.IntFieldUpdateOperationsInput | number
   daysOfSickLeave?: Prisma.IntFieldUpdateOperationsInput | number
+  leaveCycleStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -338,6 +354,7 @@ export type JobProfileCreateManyInput = {
   title?: string | null
   daysOfLeave: number
   daysOfSickLeave: number
+  leaveCycleStart?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -347,6 +364,7 @@ export type JobProfileUpdateManyMutationInput = {
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   daysOfLeave?: Prisma.IntFieldUpdateOperationsInput | number
   daysOfSickLeave?: Prisma.IntFieldUpdateOperationsInput | number
+  leaveCycleStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -357,6 +375,7 @@ export type JobProfileUncheckedUpdateManyInput = {
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   daysOfLeave?: Prisma.IntFieldUpdateOperationsInput | number
   daysOfSickLeave?: Prisma.IntFieldUpdateOperationsInput | number
+  leaveCycleStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -372,6 +391,7 @@ export type JobProfileCountOrderByAggregateInput = {
   title?: Prisma.SortOrder
   daysOfLeave?: Prisma.SortOrder
   daysOfSickLeave?: Prisma.SortOrder
+  leaveCycleStart?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -387,6 +407,7 @@ export type JobProfileMaxOrderByAggregateInput = {
   title?: Prisma.SortOrder
   daysOfLeave?: Prisma.SortOrder
   daysOfSickLeave?: Prisma.SortOrder
+  leaveCycleStart?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -397,6 +418,7 @@ export type JobProfileMinOrderByAggregateInput = {
   title?: Prisma.SortOrder
   daysOfLeave?: Prisma.SortOrder
   daysOfSickLeave?: Prisma.SortOrder
+  leaveCycleStart?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -451,6 +473,7 @@ export type JobProfileCreateWithoutUserInput = {
   title?: string | null
   daysOfLeave: number
   daysOfSickLeave: number
+  leaveCycleStart?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -460,6 +483,7 @@ export type JobProfileUncheckedCreateWithoutUserInput = {
   title?: string | null
   daysOfLeave: number
   daysOfSickLeave: number
+  leaveCycleStart?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -485,6 +509,7 @@ export type JobProfileUpdateWithoutUserInput = {
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   daysOfLeave?: Prisma.IntFieldUpdateOperationsInput | number
   daysOfSickLeave?: Prisma.IntFieldUpdateOperationsInput | number
+  leaveCycleStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -494,6 +519,7 @@ export type JobProfileUncheckedUpdateWithoutUserInput = {
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   daysOfLeave?: Prisma.IntFieldUpdateOperationsInput | number
   daysOfSickLeave?: Prisma.IntFieldUpdateOperationsInput | number
+  leaveCycleStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -506,6 +532,7 @@ export type JobProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   title?: boolean
   daysOfLeave?: boolean
   daysOfSickLeave?: boolean
+  leaveCycleStart?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -517,6 +544,7 @@ export type JobProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   title?: boolean
   daysOfLeave?: boolean
   daysOfSickLeave?: boolean
+  leaveCycleStart?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -528,6 +556,7 @@ export type JobProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   title?: boolean
   daysOfLeave?: boolean
   daysOfSickLeave?: boolean
+  leaveCycleStart?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -539,11 +568,12 @@ export type JobProfileSelectScalar = {
   title?: boolean
   daysOfLeave?: boolean
   daysOfSickLeave?: boolean
+  leaveCycleStart?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type JobProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "title" | "daysOfLeave" | "daysOfSickLeave" | "createdAt" | "updatedAt", ExtArgs["result"]["jobProfile"]>
+export type JobProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "title" | "daysOfLeave" | "daysOfSickLeave" | "leaveCycleStart" | "createdAt" | "updatedAt", ExtArgs["result"]["jobProfile"]>
 export type JobProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -565,6 +595,7 @@ export type $JobProfilePayload<ExtArgs extends runtime.Types.Extensions.Internal
     title: string | null
     daysOfLeave: number
     daysOfSickLeave: number
+    leaveCycleStart: Date
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["jobProfile"]>
@@ -996,6 +1027,7 @@ export interface JobProfileFieldRefs {
   readonly title: Prisma.FieldRef<"JobProfile", 'String'>
   readonly daysOfLeave: Prisma.FieldRef<"JobProfile", 'Int'>
   readonly daysOfSickLeave: Prisma.FieldRef<"JobProfile", 'Int'>
+  readonly leaveCycleStart: Prisma.FieldRef<"JobProfile", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"JobProfile", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"JobProfile", 'DateTime'>
 }

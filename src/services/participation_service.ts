@@ -31,7 +31,10 @@ const participationService = {
     return axios.get<ApiOk<HeatmapEntry[]>>(`/api/heatmap?${params}`);
   },
 
-  getLeaveBalance: () => axios.get<ApiOk<LeaveBalance>>("/api/leave-balance"),
+  getLeaveBalance: () =>
+    axios.get<ApiOk<LeaveBalance & { cycleFrom: string; cycleTo: string }>>(
+      "/api/leave-balance",
+    ),
 };
 
 export { participationService };

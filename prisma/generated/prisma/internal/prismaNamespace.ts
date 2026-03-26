@@ -391,6 +391,7 @@ export const ModelName = {
   JobProfile: 'JobProfile',
   Event: 'Event',
   Participation: 'Participation',
+  ParticipationImage: 'ParticipationImage',
   Holiday: 'Holiday'
 } as const
 
@@ -407,7 +408,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "account" | "session" | "verificationToken" | "jobProfile" | "event" | "participation" | "holiday"
+    modelProps: "user" | "account" | "session" | "verificationToken" | "jobProfile" | "event" | "participation" | "participationImage" | "holiday"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -929,6 +930,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ParticipationImage: {
+      payload: Prisma.$ParticipationImagePayload<ExtArgs>
+      fields: Prisma.ParticipationImageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ParticipationImageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ParticipationImagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ParticipationImageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ParticipationImagePayload>
+        }
+        findFirst: {
+          args: Prisma.ParticipationImageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ParticipationImagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ParticipationImageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ParticipationImagePayload>
+        }
+        findMany: {
+          args: Prisma.ParticipationImageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ParticipationImagePayload>[]
+        }
+        create: {
+          args: Prisma.ParticipationImageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ParticipationImagePayload>
+        }
+        createMany: {
+          args: Prisma.ParticipationImageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ParticipationImageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ParticipationImagePayload>[]
+        }
+        delete: {
+          args: Prisma.ParticipationImageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ParticipationImagePayload>
+        }
+        update: {
+          args: Prisma.ParticipationImageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ParticipationImagePayload>
+        }
+        deleteMany: {
+          args: Prisma.ParticipationImageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ParticipationImageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ParticipationImageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ParticipationImagePayload>[]
+        }
+        upsert: {
+          args: Prisma.ParticipationImageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ParticipationImagePayload>
+        }
+        aggregate: {
+          args: Prisma.ParticipationImageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateParticipationImage>
+        }
+        groupBy: {
+          args: Prisma.ParticipationImageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ParticipationImageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ParticipationImageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ParticipationImageCountAggregateOutputType> | number
+        }
+      }
+    }
     Holiday: {
       payload: Prisma.$HolidayPayload<ExtArgs>
       fields: Prisma.HolidayFieldRefs
@@ -1105,6 +1180,7 @@ export const JobProfileScalarFieldEnum = {
   title: 'title',
   daysOfLeave: 'daysOfLeave',
   daysOfSickLeave: 'daysOfSickLeave',
+  leaveCycleStart: 'leaveCycleStart',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1141,11 +1217,23 @@ export const ParticipationScalarFieldEnum = {
   from: 'from',
   to: 'to',
   leaveType: 'leaveType',
+  createdBy: 'createdBy',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type ParticipationScalarFieldEnum = (typeof ParticipationScalarFieldEnum)[keyof typeof ParticipationScalarFieldEnum]
+
+
+export const ParticipationImageScalarFieldEnum = {
+  id: 'id',
+  participationId: 'participationId',
+  url: 'url',
+  caption: 'caption',
+  createdAt: 'createdAt'
+} as const
+
+export type ParticipationImageScalarFieldEnum = (typeof ParticipationImageScalarFieldEnum)[keyof typeof ParticipationImageScalarFieldEnum]
 
 
 export const HolidayScalarFieldEnum = {
@@ -1367,6 +1455,7 @@ export type GlobalOmitConfig = {
   jobProfile?: Prisma.JobProfileOmit
   event?: Prisma.EventOmit
   participation?: Prisma.ParticipationOmit
+  participationImage?: Prisma.ParticipationImageOmit
   holiday?: Prisma.HolidayOmit
 }
 

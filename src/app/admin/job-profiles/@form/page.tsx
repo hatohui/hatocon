@@ -35,7 +35,12 @@ import {
 function CreateForm({ onClose }: { onClose: () => void }) {
   const form = useForm<JobProfileFormValues>({
     resolver: zodResolver(jobProfileSchema),
-    defaultValues: { title: "", daysOfLeave: 0, daysOfSickLeave: 0 },
+    defaultValues: {
+      title: "",
+      daysOfLeave: 0,
+      daysOfSickLeave: 0,
+      leaveCycleStart: undefined,
+    },
   });
   const createProfile = useCreateJobProfile();
 
@@ -45,6 +50,7 @@ function CreateForm({ onClose }: { onClose: () => void }) {
         title: values.title || undefined,
         daysOfLeave: values.daysOfLeave,
         daysOfSickLeave: values.daysOfSickLeave,
+        leaveCycleStart: values.leaveCycleStart ?? undefined,
       },
       {
         onSuccess: onClose,
@@ -114,6 +120,31 @@ function CreateForm({ onClose }: { onClose: () => void }) {
           </FormItem>
         )}
       />
+      <FormField
+        control={form.control}
+        name="leaveCycleStart"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Leave Cycle Start (optional)</FormLabel>
+            <FormControl>
+              <Input
+                type="date"
+                value={
+                  field.value
+                    ? new Date(field.value).toISOString().split("T")[0]
+                    : ""
+                }
+                onChange={(e) =>
+                  field.onChange(
+                    e.target.value ? new Date(e.target.value) : undefined,
+                  )
+                }
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
       {form.formState.errors.root && (
         <p className="text-sm text-destructive">
           {form.formState.errors.root.message}
@@ -153,6 +184,7 @@ function EditForm({
           title: values.title || undefined,
           daysOfLeave: values.daysOfLeave,
           daysOfSickLeave: values.daysOfSickLeave,
+          leaveCycleStart: values.leaveCycleStart ?? undefined,
         },
       },
       {
@@ -212,6 +244,31 @@ function EditForm({
                 max={365}
                 {...field}
                 onChange={(e) => field.onChange(e.target.valueAsNumber)}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="leaveCycleStart"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Leave Cycle Start (optional)</FormLabel>
+            <FormControl>
+              <Input
+                type="date"
+                value={
+                  field.value
+                    ? new Date(field.value).toISOString().split("T")[0]
+                    : ""
+                }
+                onChange={(e) =>
+                  field.onChange(
+                    e.target.value ? new Date(e.target.value) : undefined,
+                  )
+                }
               />
             </FormControl>
             <FormMessage />
@@ -290,6 +347,9 @@ function FormSlotInner() {
                 title: editingProfile.title ?? "",
                 daysOfLeave: editingProfile.daysOfLeave,
                 daysOfSickLeave: editingProfile.daysOfSickLeave,
+                leaveCycleStart: editingProfile.leaveCycleStart
+                  ? new Date(editingProfile.leaveCycleStart)
+                  : undefined,
               }}
               onClose={close}
             />

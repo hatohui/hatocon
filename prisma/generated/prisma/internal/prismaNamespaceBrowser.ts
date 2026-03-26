@@ -58,6 +58,7 @@ export const ModelName = {
   JobProfile: 'JobProfile',
   Event: 'Event',
   Participation: 'Participation',
+  ParticipationImage: 'ParticipationImage',
   Holiday: 'Holiday'
 } as const
 
@@ -140,6 +141,7 @@ export const JobProfileScalarFieldEnum = {
   title: 'title',
   daysOfLeave: 'daysOfLeave',
   daysOfSickLeave: 'daysOfSickLeave',
+  leaveCycleStart: 'leaveCycleStart',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -176,11 +178,23 @@ export const ParticipationScalarFieldEnum = {
   from: 'from',
   to: 'to',
   leaveType: 'leaveType',
+  createdBy: 'createdBy',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type ParticipationScalarFieldEnum = (typeof ParticipationScalarFieldEnum)[keyof typeof ParticipationScalarFieldEnum]
+
+
+export const ParticipationImageScalarFieldEnum = {
+  id: 'id',
+  participationId: 'participationId',
+  url: 'url',
+  caption: 'caption',
+  createdAt: 'createdAt'
+} as const
+
+export type ParticipationImageScalarFieldEnum = (typeof ParticipationImageScalarFieldEnum)[keyof typeof ParticipationImageScalarFieldEnum]
 
 
 export const HolidayScalarFieldEnum = {

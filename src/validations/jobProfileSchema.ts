@@ -16,4 +16,5 @@ export const jobProfileSchema = zod.object({
     .int()
     .min(0, messages.jobProfile.validation.daysOfSickLeaveMin)
     .max(365, messages.jobProfile.validation.daysOfSickLeaveMax),
+  leaveCycleStart: zod.date().optional(),
 });
