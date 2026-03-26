@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -234,6 +235,14 @@ function EditForm({
 }
 
 export default function FormSlot() {
+  return (
+    <Suspense>
+      <FormSlotInner />
+    </Suspense>
+  );
+}
+
+function FormSlotInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const modal = searchParams.get("modal");
