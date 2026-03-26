@@ -5,6 +5,7 @@ export const authConfig: NextAuthConfig = {
   pages: {
     signIn: "/login",
   },
+  trustHost: true,
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
