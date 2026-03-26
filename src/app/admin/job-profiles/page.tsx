@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Pencil, Trash2, UserPlus } from "lucide-react";
+import UserAvatar from "@/components/UserAvatar";
 
 export default function AdminJobProfilesPage() {
   const { data: session, status } = useSession();
@@ -64,7 +65,7 @@ export default function AdminJobProfilesPage() {
             <TableRow>
               <TableHead>User</TableHead>
               <TableHead>Title</TableHead>
-              <TableHead>Days of Leave</TableHead>
+              <TableHead>Paid Leave</TableHead>
               <TableHead>Sick Leave</TableHead>
               <TableHead className="w-28">Actions</TableHead>
             </TableRow>
@@ -83,11 +84,14 @@ export default function AdminJobProfilesPage() {
               profiles.map((profile) => (
                 <TableRow key={profile.id}>
                   <TableCell>
-                    <div>
-                      <p className="font-medium">{profile.user.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {profile.user.email}
-                      </p>
+                    <div className="flex items-center gap-3">
+                      <UserAvatar profile={profile} />
+                      <div>
+                        <p className="font-medium">{profile.user.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {profile.user.email}
+                        </p>
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell>

@@ -90,7 +90,7 @@ export default function ProfileSetupDialog({
             name="daysOfLeave"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Days of Leave (per year)</FormLabel>
+                <FormLabel>Paid Leave (per year)</FormLabel>
                 <FormControl>
                   <Input
                     type="number"

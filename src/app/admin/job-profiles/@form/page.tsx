@@ -81,7 +81,7 @@ function CreateForm({ onClose }: { onClose: () => void }) {
         name="daysOfLeave"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Days of Leave (per year)</FormLabel>
+            <FormLabel>Paid Leave (per year)</FormLabel>
             <FormControl>
               <Input
                 type="number"
@@ -185,7 +185,7 @@ function EditForm({
         name="daysOfLeave"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Days of Leave (per year)</FormLabel>
+            <FormLabel>Paid Leave (per year)</FormLabel>
             <FormControl>
               <Input
                 type="number"

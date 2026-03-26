@@ -34,4 +34,27 @@ export const messages = {
     notAuthorized: "NOT_AUTHORIZED",
     passwordChangeNotSupported: "PASSWORD_CHANGE_NOT_SUPPORTED",
   },
+  event: {
+    notFound: "EVENT_NOT_FOUND",
+    alreadyExists: "EVENT_ALREADY_EXISTS",
+    validation: {
+      titleRequired: "VALIDATION_EVENT_TITLE_REQUIRED",
+      titleMax: "VALIDATION_EVENT_TITLE_MAX",
+      startAtRequired: "VALIDATION_EVENT_START_AT_REQUIRED",
+      endAtRequired: "VALIDATION_EVENT_END_AT_REQUIRED",
+      endAtAfterStartAt: "VALIDATION_EVENT_END_AT_AFTER_START_AT",
+    },
+  },
+  participation: {
+    notFound: "PARTICIPATION_NOT_FOUND",
+    overlap: "PARTICIPATION_OVERLAP",
+    outOfEventBounds: "PARTICIPATION_OUT_OF_EVENT_BOUNDS",
+    validation: {
+      fromRequired: "VALIDATION_PARTICIPATION_FROM_REQUIRED",
+      toRequired: "VALIDATION_PARTICIPATION_TO_REQUIRED",
+      toAfterFrom: "VALIDATION_PARTICIPATION_TO_AFTER_FROM",
+      leaveTypeRequired: "VALIDATION_PARTICIPATION_LEAVE_TYPE_REQUIRED",
+      leaveTypeInvalid: "VALIDATION_PARTICIPATION_LEAVE_TYPE_INVALID",
+    },
+  },
 };

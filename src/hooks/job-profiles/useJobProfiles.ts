@@ -1,6 +1,9 @@
 import { jobProfileService } from "@/services/job_profile_service";
 import { JobProfileCreateDTO, JobProfileUpdateDTO } from "@/types/job-profile";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+
+const THREE_MONTHS_MS = 90 * 24 * 60 * 60 * 1000;
 
 const useMyJobProfile = () =>
   useQuery({
@@ -49,10 +52,22 @@ const useDeleteJobProfile = () => {
   });
 };
 
+const useConfirmProfile = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => axios.post("/api/job-profiles/me/confirm"),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["job-profile", "me"] });
+    },
+  });
+};
+
 export {
   useMyJobProfile,
   useJobProfiles,
   useCreateJobProfile,
   useUpdateJobProfile,
   useDeleteJobProfile,
+  useConfirmProfile,
+  THREE_MONTHS_MS,
 };

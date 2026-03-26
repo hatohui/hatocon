@@ -12,7 +12,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LayoutDashboard, LogOut, User } from "lucide-react";
+import { LayoutDashboard, LogOut, Settings } from "lucide-react";
+import AppIcon from "./common/AppIcon";
 
 export default function Navbar() {
   const { data: session } = useSession();
@@ -29,8 +30,12 @@ export default function Navbar() {
     <nav className="border-b bg-background">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
         <div className="flex items-center gap-6">
-          <Link href="/" className="text-lg font-semibold">
-            Hatocon
+          <Link
+            href="/"
+            className="text-xl flex items-end gap-2 justify-center font-semibold"
+          >
+            <AppIcon />
+            <p>Hatocon</p>
           </Link>
           {session.user.isAdmin && (
             <Link
@@ -65,9 +70,12 @@ export default function Navbar() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link href="/profile" className="flex items-center gap-2">
-                <User className="h-4 w-4" />
-                Profile
+              <Link
+                href="/settings/profile"
+                className="flex items-center gap-2"
+              >
+                <Settings className="h-4 w-4" />
+                Settings
               </Link>
             </DropdownMenuItem>
             {session.user.isAdmin && (
