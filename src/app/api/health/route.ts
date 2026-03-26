@@ -1,8 +1,5 @@
-import { NextResponse } from "next/server";
+import { OK } from "@/common/response";
 
 export const GET = async () => {
-  return NextResponse.json({
-    status: 200,
-    message: "OK",
-  });
+  return OK();
 };

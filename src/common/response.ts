@@ -218,5 +218,3 @@ const status = {
   BadGateway: 502,
   ServiceUnavailable: 503,
 };
-
-export { messages, status };
