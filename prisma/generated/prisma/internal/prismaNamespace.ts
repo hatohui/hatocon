@@ -392,7 +392,8 @@ export const ModelName = {
   Event: 'Event',
   Participation: 'Participation',
   ParticipationImage: 'ParticipationImage',
-  Holiday: 'Holiday'
+  Holiday: 'Holiday',
+  EventInvitee: 'EventInvitee'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -408,7 +409,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "account" | "session" | "verificationToken" | "jobProfile" | "event" | "participation" | "participationImage" | "holiday"
+    modelProps: "user" | "account" | "session" | "verificationToken" | "jobProfile" | "event" | "participation" | "participationImage" | "holiday" | "eventInvitee"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1078,6 +1079,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    EventInvitee: {
+      payload: Prisma.$EventInviteePayload<ExtArgs>
+      fields: Prisma.EventInviteeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.EventInviteeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EventInviteePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.EventInviteeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EventInviteePayload>
+        }
+        findFirst: {
+          args: Prisma.EventInviteeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EventInviteePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.EventInviteeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EventInviteePayload>
+        }
+        findMany: {
+          args: Prisma.EventInviteeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EventInviteePayload>[]
+        }
+        create: {
+          args: Prisma.EventInviteeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EventInviteePayload>
+        }
+        createMany: {
+          args: Prisma.EventInviteeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.EventInviteeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EventInviteePayload>[]
+        }
+        delete: {
+          args: Prisma.EventInviteeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EventInviteePayload>
+        }
+        update: {
+          args: Prisma.EventInviteeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EventInviteePayload>
+        }
+        deleteMany: {
+          args: Prisma.EventInviteeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.EventInviteeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.EventInviteeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EventInviteePayload>[]
+        }
+        upsert: {
+          args: Prisma.EventInviteeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EventInviteePayload>
+        }
+        aggregate: {
+          args: Prisma.EventInviteeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEventInvitee>
+        }
+        groupBy: {
+          args: Prisma.EventInviteeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EventInviteeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.EventInviteeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EventInviteeCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1195,6 +1270,7 @@ export const EventScalarFieldEnum = {
   description: 'description',
   isApproved: 'isApproved',
   isYearly: 'isYearly',
+  visibility: 'visibility',
   startAt: 'startAt',
   endAt: 'endAt',
   location: 'location',
@@ -1245,6 +1321,16 @@ export const HolidayScalarFieldEnum = {
 } as const
 
 export type HolidayScalarFieldEnum = (typeof HolidayScalarFieldEnum)[keyof typeof HolidayScalarFieldEnum]
+
+
+export const EventInviteeScalarFieldEnum = {
+  id: 'id',
+  eventId: 'eventId',
+  userId: 'userId',
+  createdAt: 'createdAt'
+} as const
+
+export type EventInviteeScalarFieldEnum = (typeof EventInviteeScalarFieldEnum)[keyof typeof EventInviteeScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1323,6 +1409,20 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'EventVisibility'
+ */
+export type EnumEventVisibilityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EventVisibility'>
+    
+
+
+/**
+ * Reference to a field of type 'EventVisibility[]'
+ */
+export type ListEnumEventVisibilityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EventVisibility[]'>
     
 
 
@@ -1457,6 +1557,7 @@ export type GlobalOmitConfig = {
   participation?: Prisma.ParticipationOmit
   participationImage?: Prisma.ParticipationImageOmit
   holiday?: Prisma.HolidayOmit
+  eventInvitee?: Prisma.EventInviteeOmit
 }
 
 /* Types for Logging */

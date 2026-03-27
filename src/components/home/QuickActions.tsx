@@ -1,6 +1,13 @@
 "use client";
 
-import { CalendarPlus, Zap, ChevronRight, Plane } from "lucide-react";
+import {
+  CalendarPlus,
+  Zap,
+  ChevronRight,
+  Plane,
+  CalendarClock,
+} from "lucide-react";
+import { format, addYears } from "date-fns";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -97,6 +104,18 @@ export default function QuickActions() {
               </Link>
             </Button>
           </div>
+          {balance?.cycleFrom && (
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <CalendarClock className="h-3 w-3 shrink-0" />
+              <span>
+                Cycle: {format(new Date(balance.cycleFrom), "MMM d, yyyy")} –{" "}
+                {format(
+                  addYears(new Date(balance.cycleFrom), 1),
+                  "MMM d, yyyy",
+                )}
+              </span>
+            </div>
+          )}
         </div>
 
         {isLoading ? (

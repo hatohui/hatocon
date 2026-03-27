@@ -20,18 +20,14 @@ import {
   LayoutList,
   List,
   MapPin,
+  Pencil,
   Plus,
   Search,
   SlidersHorizontal,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -43,7 +39,8 @@ import {
 } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAllEvents } from "@/hooks/events/useEvents";
-import CreateEventDialog from "@/components/home/CreateEventDialog";
+import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import {
   Select,
@@ -71,8 +68,14 @@ function EventDetailSheet({
   event: Event | null;
   onClose: () => void;
 }) {
+  const { data: session } = useSession();
   const start = event ? new Date(event.startAt) : null;
   const end = event ? new Date(event.endAt) : null;
+  const canEdit =
+    event &&
+    session?.user &&
+    (event.createdBy === session.user.id || session.user.isAdmin);
+
   return (
     <Sheet open={!!event} onOpenChange={(o) => !o && onClose()}>
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto p-0">
@@ -90,7 +93,24 @@ function EventDetailSheet({
             )}
             <div className="p-6 space-y-5">
               <SheetHeader className="p-0 space-y-1">
-                <SheetTitle className="text-xl leading-tight">{event.title}</SheetTitle>
+                <div className="flex items-start justify-between gap-2">
+                  <SheetTitle className="text-xl leading-tight">
+                    {event.title}
+                  </SheetTitle>
+                  {canEdit && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1.5 shrink-0"
+                      asChild
+                    >
+                      <Link href={`/events/${event.id}/edit`}>
+                        <Pencil className="h-3.5 w-3.5" />
+                        Edit
+                      </Link>
+                    </Button>
+                  )}
+                </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge variant="secondary">{durationLabel(start, end)}</Badge>
                 </div>
@@ -256,7 +276,13 @@ function ListView({
 
 // ─── Calendar View ────────────────────────────────────────────────────────────
 
-function CalendarView({ q, onSelect }: { q: string; onSelect: (e: Event) => void }) {
+function CalendarView({
+  q,
+  onSelect,
+}: {
+  q: string;
+  onSelect: (e: Event) => void;
+}) {
   const [currentMonth, setCurrentMonth] = React.useState(startOfToday());
   const [selectedDay, setSelectedDay] = React.useState<Date | null>(null);
 
@@ -542,6 +568,22 @@ function TimelineView({
                     >
                       <CardContent className="p-4">
                         <div className="flex items-start gap-3">
+                          {/* Date range column */}
+                          <div className="shrink-0 text-center w-14">
+                            <p className="text-xs font-medium tabular-nums">
+                              {format(start, "dd EEE")}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground leading-none my-0.5">
+                              -&gt;
+                            </p>
+                            <p className="text-xs font-medium tabular-nums">
+                              {format(end, "dd EEE")}
+                            </p>
+                          </div>
+                          <Separator
+                            orientation="vertical"
+                            className="h-auto self-stretch"
+                          />
                           {event.image && (
                             <div className="relative h-14 w-20 rounded-md overflow-hidden shrink-0">
                               <Image
@@ -552,20 +594,6 @@ function TimelineView({
                               />
                             </div>
                           )}
-                          {!event.image && (
-                            <div className="shrink-0 text-center">
-                              <p className="text-xs text-muted-foreground">
-                                {format(start, "MMM d")}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                {format(end, "MMM d")}
-                              </p>
-                            </div>
-                          )}
-                          <Separator
-                            orientation="vertical"
-                            className="h-auto self-stretch"
-                          />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2">
                               <p className="font-semibold text-sm">
@@ -617,7 +645,6 @@ export default function EventsPage() {
   const [q, setQ] = React.useState("");
   const [debouncedQ, setDebouncedQ] = React.useState("");
   const [rangeDays, setRangeDays] = React.useState(365);
-  const [showCreate, setShowCreate] = React.useState(false);
   const [selectedEvent, setSelectedEvent] = React.useState<Event | null>(null);
 
   React.useEffect(() => {
@@ -644,9 +671,11 @@ export default function EventsPage() {
             Browse, search and track all approved events
           </p>
         </div>
-        <Button onClick={() => setShowCreate(true)} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Create Event
+        <Button asChild className="gap-2">
+          <Link href="/events/new">
+            <Plus className="h-4 w-4" />
+            Create Event
+          </Link>
         </Button>
       </div>
 
@@ -702,7 +731,11 @@ export default function EventsPage() {
         </TabsList>
 
         <TabsContent value="list">
-          <ListView events={events} isLoading={isLoading} onSelect={setSelectedEvent} />
+          <ListView
+            events={events}
+            isLoading={isLoading}
+            onSelect={setSelectedEvent}
+          />
         </TabsContent>
 
         <TabsContent value="calendar">
@@ -710,12 +743,18 @@ export default function EventsPage() {
         </TabsContent>
 
         <TabsContent value="timeline">
-          <TimelineView events={events} isLoading={isLoading} onSelect={setSelectedEvent} />
+          <TimelineView
+            events={events}
+            isLoading={isLoading}
+            onSelect={setSelectedEvent}
+          />
         </TabsContent>
       </Tabs>
 
-      <CreateEventDialog open={showCreate} onOpenChange={setShowCreate} />
-      <EventDetailSheet event={selectedEvent} onClose={() => setSelectedEvent(null)} />
+      <EventDetailSheet
+        event={selectedEvent}
+        onClose={() => setSelectedEvent(null)}
+      />
     </main>
   );
 }

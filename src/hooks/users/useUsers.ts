@@ -8,4 +8,11 @@ const useUsers = () =>
     retry: 1,
   });
 
-export { useUsers };
+const useSearchUsers = (query: string) =>
+  useQuery({
+    queryKey: ["users", "search", query],
+    queryFn: () => userService.search(query),
+    enabled: query.length >= 1,
+  });
+
+export { useUsers, useSearchUsers };

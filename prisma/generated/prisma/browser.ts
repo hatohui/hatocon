@@ -62,3 +62,8 @@ export type ParticipationImage = Prisma.ParticipationImageModel
  * 
  */
 export type Holiday = Prisma.HolidayModel
+/**
+ * Model EventInvitee
+ * 
+ */
+export type EventInvitee = Prisma.EventInviteeModel

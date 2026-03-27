@@ -25,7 +25,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Loader2 } from "lucide-react";
+import { CalendarClock, Loader2 } from "lucide-react";
+import { format, addYears } from "date-fns";
 import type { z } from "zod";
 import axios from "axios";
 
@@ -170,27 +171,43 @@ export default function SettingsLeavePage() {
             <FormField
               control={form.control}
               name="leaveCycleStart"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Leave Cycle Start</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="date"
-                      value={
-                        field.value
-                          ? new Date(field.value).toISOString().split("T")[0]
-                          : ""
-                      }
-                      onChange={(e) =>
-                        field.onChange(
-                          e.target.value ? new Date(e.target.value) : undefined,
-                        )
-                      }
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              render={({ field }) => {
+                const cycleStart = field.value ? new Date(field.value) : null;
+                const cycleEnd = cycleStart ? addYears(cycleStart, 1) : null;
+
+                return (
+                  <FormItem>
+                    <FormLabel>Leave Cycle Start</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="date"
+                        value={
+                          field.value
+                            ? new Date(field.value).toISOString().split("T")[0]
+                            : ""
+                        }
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value
+                              ? new Date(e.target.value)
+                              : undefined,
+                          )
+                        }
+                      />
+                    </FormControl>
+                    {cycleStart && cycleEnd && (
+                      <p className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1">
+                        <CalendarClock className="h-3.5 w-3.5 shrink-0" />
+                        Current cycle: {format(
+                          cycleStart,
+                          "MMM d, yyyy",
+                        )} – {format(cycleEnd, "MMM d, yyyy")}
+                      </p>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
             />
             {form.formState.errors.root && (
               <p className="text-sm text-destructive">

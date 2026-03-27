@@ -46,7 +46,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useCreateParticipation } from "@/hooks/participations/useParticipations";
 import { useAllEvents } from "@/hooks/events/useEvents";
-import { useUsers } from "@/hooks/users/useUsers";
+import { useSearchUsers } from "@/hooks/users/useUsers";
 import { LeaveType } from "@/types/leave-type";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -294,21 +294,25 @@ function CoTravelerPicker({
   selected: Omit<User, "password">[];
   onChange: (users: Omit<User, "password">[]) => void;
 }) {
-  const { data: response } = useUsers();
   const { data: session } = useSession();
   const [searchQ, setSearchQ] = React.useState("");
+  const [debouncedQ, setDebouncedQ] = React.useState("");
 
-  const allUsers = React.useMemo(() => {
-    const users = response?.data ?? [];
-    return users.filter((u) => u.id !== session?.user?.id);
-  }, [response, session]);
+  React.useEffect(() => {
+    const t = setTimeout(() => setDebouncedQ(searchQ), 300);
+    return () => clearTimeout(t);
+  }, [searchQ]);
 
-  const filtered = allUsers.filter(
-    (u) =>
-      !selected.some((s) => s.id === u.id) &&
-      (u.name?.toLowerCase().includes(searchQ.toLowerCase()) ||
-        u.email?.toLowerCase().includes(searchQ.toLowerCase())),
-  );
+  const { data: results, isLoading } = useSearchUsers(debouncedQ);
+
+  const filtered = React.useMemo(() => {
+    if (!results) return [];
+    return results.filter(
+      (u) =>
+        u.id !== session?.user?.id &&
+        !selected.some((s) => s.id === u.id),
+    );
+  }, [results, session, selected]);
 
   return (
     <div className="space-y-3">
@@ -343,9 +347,15 @@ function CoTravelerPicker({
           onChange={(e) => setSearchQ(e.target.value)}
         />
       </div>
-      {searchQ && (
+      {searchQ && debouncedQ && (
         <div className="border rounded-lg max-h-48 overflow-y-auto divide-y">
-          {filtered.length === 0 ? (
+          {isLoading ? (
+            <div className="p-3 space-y-2">
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-10 rounded-lg" />
+              ))}
+            </div>
+          ) : filtered.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
               No users found
             </p>

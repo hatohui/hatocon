@@ -9,6 +9,14 @@
 * 🟢 You can import this file directly.
 */
 
+export const EventVisibility = {
+  PUBLIC: 'PUBLIC',
+  PRIVATE: 'PRIVATE'
+} as const
+
+export type EventVisibility = (typeof EventVisibility)[keyof typeof EventVisibility]
+
+
 export const LeaveType = {
   ANNUAL: 'ANNUAL',
   SICK: 'SICK',

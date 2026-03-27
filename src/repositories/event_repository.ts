@@ -3,17 +3,28 @@ import { EventCreateDTO } from "@/types/event.d";
 
 const eventRepository = {
   getById: async (id: string) => {
-    return db.event.findUnique({ where: { id } });
+    return db.event.findUnique({
+      where: { id },
+      include: {
+        createdByUser: { select: { id: true, name: true, image: true } },
+        invitees: { select: { userId: true } },
+      },
+    });
   },
 
-  getInRange: async (from: Date, to: Date, createdBy?: string) => {
+  getInRange: async (from: Date, to: Date, userId?: string) => {
     return db.event.findMany({
       where: {
         isApproved: true,
         isDeleted: false,
         startAt: { lte: to },
         endAt: { gte: from },
-        ...(createdBy ? { createdBy } : {}),
+        OR: [
+          { visibility: "PUBLIC" },
+          ...(userId
+            ? [{ createdBy: userId }, { invitees: { some: { userId } } }]
+            : []),
+        ],
       },
       orderBy: { startAt: "asc" },
     });
@@ -23,7 +34,7 @@ const eventRepository = {
     q?: string;
     from?: Date;
     to?: Date;
-    createdBy?: string;
+    userId?: string;
     limit?: number;
   }) => {
     return db.event.findMany({
@@ -33,7 +44,15 @@ const eventRepository = {
         ...(opts.q ? { title: { contains: opts.q, mode: "insensitive" } } : {}),
         ...(opts.from ? { endAt: { gte: opts.from } } : {}),
         ...(opts.to ? { startAt: { lte: opts.to } } : {}),
-        ...(opts.createdBy ? { createdBy: opts.createdBy } : {}),
+        OR: [
+          { visibility: "PUBLIC" },
+          ...(opts.userId
+            ? [
+                { createdBy: opts.userId },
+                { invitees: { some: { userId: opts.userId } } },
+              ]
+            : []),
+        ],
       },
       orderBy: { startAt: "asc" },
       take: opts.limit ?? 100,
@@ -43,15 +62,24 @@ const eventRepository = {
     });
   },
 
-  getUpcoming: async (limit = 10) => {
+  getUpcoming: async (limit = 10, userId?: string) => {
     return db.event.findMany({
       where: {
         isApproved: true,
         isDeleted: false,
         startAt: { gt: new Date() },
+        OR: [
+          { visibility: "PUBLIC" },
+          ...(userId
+            ? [{ createdBy: userId }, { invitees: { some: { userId } } }]
+            : []),
+        ],
       },
       orderBy: { startAt: "asc" },
       take: limit,
+      include: {
+        createdByUser: { select: { id: true, name: true, image: true } },
+      },
     });
   },
 
@@ -60,13 +88,24 @@ const eventRepository = {
     data: EventCreateDTO,
     isApproved = false,
   ) => {
+    const { inviteeIds, ...eventData } = data;
     return db.event.create({
       data: {
-        ...data,
+        ...eventData,
         startAt: new Date(data.startAt),
         endAt: new Date(data.endAt),
         createdBy,
         isApproved,
+        ...(inviteeIds && inviteeIds.length > 0
+          ? {
+              invitees: {
+                createMany: {
+                  data: inviteeIds.map((userId) => ({ userId })),
+                  skipDuplicates: true,
+                },
+              },
+            }
+          : {}),
       },
     });
   },
@@ -94,13 +133,27 @@ const eventRepository = {
   },
 
   update: async (id: string, data: Partial<EventCreateDTO>) => {
+    const { inviteeIds, ...eventData } = data;
+    const updateData: Record<string, unknown> = {
+      ...eventData,
+      ...(eventData.startAt ? { startAt: new Date(eventData.startAt) } : {}),
+      ...(eventData.endAt ? { endAt: new Date(eventData.endAt) } : {}),
+    };
+
+    if (inviteeIds !== undefined) {
+      // Replace all invitees
+      await db.eventInvitee.deleteMany({ where: { eventId: id } });
+      if (inviteeIds.length > 0) {
+        await db.eventInvitee.createMany({
+          data: inviteeIds.map((userId) => ({ eventId: id, userId })),
+          skipDuplicates: true,
+        });
+      }
+    }
+
     return db.event.update({
       where: { id },
-      data: {
-        ...data,
-        ...(data.startAt ? { startAt: new Date(data.startAt) } : {}),
-        ...(data.endAt ? { endAt: new Date(data.endAt) } : {}),
-      },
+      data: updateData,
     });
   },
 
@@ -108,6 +161,13 @@ const eventRepository = {
     return db.event.update({
       where: { id },
       data: { isDeleted: true, deletedAt: new Date() },
+    });
+  },
+
+  getInvitees: async (eventId: string) => {
+    return db.eventInvitee.findMany({
+      where: { eventId },
+      select: { userId: true },
     });
   },
 };

@@ -1,4 +1,4 @@
-import type { Event } from "@prisma/client";
+import type { Event, EventVisibility } from "@prisma/client";
 
 export type EventCreateDTO = {
   title: string;
@@ -10,6 +10,8 @@ export type EventCreateDTO = {
   locationUrl?: string;
   reference?: string;
   isYearly?: boolean;
+  visibility?: EventVisibility;
+  inviteeIds?: string[];
 };
 
 export type EventUpdateDTO = Partial<EventCreateDTO>;

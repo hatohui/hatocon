@@ -2,8 +2,14 @@ import { UserDTO } from "@/types/user";
 import { User } from "@prisma/client";
 import axios from "axios";
 
+type ApiOk<T> = { data: T };
+
 const userService = {
-  getAll: () => axios.get<Omit<User, "password">[]>("/api/users"),
+  getAll: () => axios.get<ApiOk<Omit<User, "password">[]>>("/api/users"),
+  search: (query: string) =>
+    axios
+      .get<ApiOk<Omit<User, "password">[]>>(`/api/users?search=${encodeURIComponent(query)}`)
+      .then((r) => r.data.data),
   getById: (id: string) =>
     axios.get<Omit<User, "password">>(`/api/users/${id}`),
   create: (user: UserDTO) =>

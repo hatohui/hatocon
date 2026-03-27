@@ -90,10 +90,22 @@ const useDeleteEvent = () => {
   });
 };
 
+const useUpdateOwnEvent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: EventUpdateDTO }) =>
+      eventService.updateOwn(id, data).then((r) => r.data.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+    },
+  });
+};
+
 export {
   useUpcomingEvents,
   useAllEvents,
   useCreateEvent,
+  useUpdateOwnEvent,
   useAdminEvents,
   useApproveEvent,
   useUpdateEvent,

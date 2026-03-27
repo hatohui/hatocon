@@ -93,6 +93,7 @@ model Event {
   description String?
   isApproved  Boolean @default(false)
   isYearly    Boolean @default(false)
+  visibility  EventVisibility @default(PUBLIC)
 
   startAt DateTime
   endAt   DateTime
@@ -110,6 +111,7 @@ model Event {
   deletedAt DateTime?
 
   participations Participation[]
+  invitees       EventInvitee[]
   createdByUser  User            @relation(fields: [createdBy], references: [id])
 
   @@index([title])
@@ -158,6 +160,24 @@ model Holiday {
   isGlobal    Boolean  @default(false)
 
   @@index([country])
+}
+
+model EventInvitee {
+  id      String @id @default(uuid())
+  eventId String
+  userId  String
+
+  createdAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+  @@index([userId])
+}
+
+enum EventVisibility {
+  PUBLIC
+  PRIVATE
 }
 
 enum LeaveType {

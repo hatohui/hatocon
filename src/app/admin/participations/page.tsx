@@ -32,6 +32,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Search, Trash2, CalendarDays, Users, ImageIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
 
 type ApiOk<T> = { data: T };
 
@@ -129,17 +130,19 @@ export default function AdminParticipationsPage() {
 
       {/* Stats cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Total Users
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{stats?.totalUsers ?? "—"}</p>
-          </CardContent>
-        </Card>
+        <Link href="/admin/job-profiles">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                Total Users
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">{stats?.totalUsers ?? "—"}</p>
+            </CardContent>
+          </Card>
+        </Link>
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
@@ -153,20 +156,22 @@ export default function AdminParticipationsPage() {
             </p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <CalendarDays className="h-4 w-4" />
-              Events
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">
-              {stats ? `${stats.approvedEvents}/${stats.totalEvents}` : "—"}
-            </p>
-            <p className="text-xs text-muted-foreground">approved / total</p>
-          </CardContent>
-        </Card>
+        <Link href="/admin/events">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <CalendarDays className="h-4 w-4" />
+                Events
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">
+                {stats ? `${stats.approvedEvents}/${stats.totalEvents}` : "—"}
+              </p>
+              <p className="text-xs text-muted-foreground">approved / total</p>
+            </CardContent>
+          </Card>
+        </Link>
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">

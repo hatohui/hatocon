@@ -5,11 +5,13 @@ import { eventSchema } from "@/validations/eventSchema";
 import type { NextRequest } from "next/server";
 
 const GET = async (req: NextRequest) => {
+  const session = await auth();
+  const userId = session?.user?.id;
+
   const { searchParams } = req.nextUrl;
   const fromParam = searchParams.get("from");
   const toParam = searchParams.get("to");
   const q = searchParams.get("q") ?? undefined;
-  const createdBy = searchParams.get("createdBy") ?? undefined;
   const limitParam = searchParams.get("limit");
   const limit = limitParam ? parseInt(limitParam, 10) : undefined;
 
@@ -25,7 +27,7 @@ const GET = async (req: NextRequest) => {
     q,
     from,
     to,
-    createdBy,
+    userId,
     limit,
   });
 

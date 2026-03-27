@@ -35,6 +35,20 @@ const userRepository = {
     const users = await db.user.findMany();
     return users;
   },
+  searchUsers: async (query: string, limit = 20) => {
+    const users = await db.user.findMany({
+      where: {
+        OR: [
+          { name: { contains: query, mode: "insensitive" } },
+          { email: { contains: query, mode: "insensitive" } },
+          { id: { equals: query } },
+        ],
+      },
+      omit: { password: true },
+      take: limit,
+    });
+    return users;
+  },
 };
 
 export default userRepository;

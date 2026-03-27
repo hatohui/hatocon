@@ -5,17 +5,22 @@ import axios from "axios";
 type ApiOk<T> = { data: T };
 
 const eventService = {
-  getInRange: (from: Date | string, to: Date | string, createdBy?: string) => {
+  getInRange: (from: Date | string, to: Date | string) => {
     const params = new URLSearchParams({
       from: new Date(from).toISOString(),
       to: new Date(to).toISOString(),
-      ...(createdBy ? { createdBy } : {}),
     });
     return axios.get<ApiOk<Event[]>>(`/api/events?${params}`);
   },
 
+  getById: (id: string) =>
+    axios.get<ApiOk<Event>>(`/api/events/${id}`),
+
   create: (data: EventCreateDTO) =>
     axios.post<ApiOk<Event>>("/api/events", data),
+
+  updateOwn: (id: string, data: EventUpdateDTO) =>
+    axios.patch<ApiOk<Event>>(`/api/events/${id}`, data),
 
   getAllAdmin: (opts: { q?: string; approved?: "true" | "false" } = {}) => {
     const params = new URLSearchParams();

@@ -31,6 +31,7 @@ export type EventMinAggregateOutputType = {
   description: string | null
   isApproved: boolean | null
   isYearly: boolean | null
+  visibility: $Enums.EventVisibility | null
   startAt: Date | null
   endAt: Date | null
   location: string | null
@@ -50,6 +51,7 @@ export type EventMaxAggregateOutputType = {
   description: string | null
   isApproved: boolean | null
   isYearly: boolean | null
+  visibility: $Enums.EventVisibility | null
   startAt: Date | null
   endAt: Date | null
   location: string | null
@@ -69,6 +71,7 @@ export type EventCountAggregateOutputType = {
   description: number
   isApproved: number
   isYearly: number
+  visibility: number
   startAt: number
   endAt: number
   location: number
@@ -90,6 +93,7 @@ export type EventMinAggregateInputType = {
   description?: true
   isApproved?: true
   isYearly?: true
+  visibility?: true
   startAt?: true
   endAt?: true
   location?: true
@@ -109,6 +113,7 @@ export type EventMaxAggregateInputType = {
   description?: true
   isApproved?: true
   isYearly?: true
+  visibility?: true
   startAt?: true
   endAt?: true
   location?: true
@@ -128,6 +133,7 @@ export type EventCountAggregateInputType = {
   description?: true
   isApproved?: true
   isYearly?: true
+  visibility?: true
   startAt?: true
   endAt?: true
   location?: true
@@ -220,6 +226,7 @@ export type EventGroupByOutputType = {
   description: string | null
   isApproved: boolean
   isYearly: boolean
+  visibility: $Enums.EventVisibility
   startAt: Date
   endAt: Date
   location: string | null
@@ -260,6 +267,7 @@ export type EventWhereInput = {
   description?: Prisma.StringNullableFilter<"Event"> | string | null
   isApproved?: Prisma.BoolFilter<"Event"> | boolean
   isYearly?: Prisma.BoolFilter<"Event"> | boolean
+  visibility?: Prisma.EnumEventVisibilityFilter<"Event"> | $Enums.EventVisibility
   startAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   endAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   location?: Prisma.StringNullableFilter<"Event"> | string | null
@@ -271,6 +279,7 @@ export type EventWhereInput = {
   isDeleted?: Prisma.BoolFilter<"Event"> | boolean
   deletedAt?: Prisma.DateTimeNullableFilter<"Event"> | Date | string | null
   participations?: Prisma.ParticipationListRelationFilter
+  invitees?: Prisma.EventInviteeListRelationFilter
   createdByUser?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
@@ -281,6 +290,7 @@ export type EventOrderByWithRelationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   isApproved?: Prisma.SortOrder
   isYearly?: Prisma.SortOrder
+  visibility?: Prisma.SortOrder
   startAt?: Prisma.SortOrder
   endAt?: Prisma.SortOrder
   location?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -292,6 +302,7 @@ export type EventOrderByWithRelationInput = {
   isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   participations?: Prisma.ParticipationOrderByRelationAggregateInput
+  invitees?: Prisma.EventInviteeOrderByRelationAggregateInput
   createdByUser?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -305,6 +316,7 @@ export type EventWhereUniqueInput = Prisma.AtLeast<{
   description?: Prisma.StringNullableFilter<"Event"> | string | null
   isApproved?: Prisma.BoolFilter<"Event"> | boolean
   isYearly?: Prisma.BoolFilter<"Event"> | boolean
+  visibility?: Prisma.EnumEventVisibilityFilter<"Event"> | $Enums.EventVisibility
   startAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   endAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   location?: Prisma.StringNullableFilter<"Event"> | string | null
@@ -316,6 +328,7 @@ export type EventWhereUniqueInput = Prisma.AtLeast<{
   isDeleted?: Prisma.BoolFilter<"Event"> | boolean
   deletedAt?: Prisma.DateTimeNullableFilter<"Event"> | Date | string | null
   participations?: Prisma.ParticipationListRelationFilter
+  invitees?: Prisma.EventInviteeListRelationFilter
   createdByUser?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
@@ -326,6 +339,7 @@ export type EventOrderByWithAggregationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   isApproved?: Prisma.SortOrder
   isYearly?: Prisma.SortOrder
+  visibility?: Prisma.SortOrder
   startAt?: Prisma.SortOrder
   endAt?: Prisma.SortOrder
   location?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -351,6 +365,7 @@ export type EventScalarWhereWithAggregatesInput = {
   description?: Prisma.StringNullableWithAggregatesFilter<"Event"> | string | null
   isApproved?: Prisma.BoolWithAggregatesFilter<"Event"> | boolean
   isYearly?: Prisma.BoolWithAggregatesFilter<"Event"> | boolean
+  visibility?: Prisma.EnumEventVisibilityWithAggregatesFilter<"Event"> | $Enums.EventVisibility
   startAt?: Prisma.DateTimeWithAggregatesFilter<"Event"> | Date | string
   endAt?: Prisma.DateTimeWithAggregatesFilter<"Event"> | Date | string
   location?: Prisma.StringNullableWithAggregatesFilter<"Event"> | string | null
@@ -370,6 +385,7 @@ export type EventCreateInput = {
   description?: string | null
   isApproved?: boolean
   isYearly?: boolean
+  visibility?: $Enums.EventVisibility
   startAt: Date | string
   endAt: Date | string
   location?: string | null
@@ -380,6 +396,7 @@ export type EventCreateInput = {
   isDeleted?: boolean
   deletedAt?: Date | string | null
   participations?: Prisma.ParticipationCreateNestedManyWithoutEventInput
+  invitees?: Prisma.EventInviteeCreateNestedManyWithoutEventInput
   createdByUser: Prisma.UserCreateNestedOneWithoutEventsInput
 }
 
@@ -390,6 +407,7 @@ export type EventUncheckedCreateInput = {
   description?: string | null
   isApproved?: boolean
   isYearly?: boolean
+  visibility?: $Enums.EventVisibility
   startAt: Date | string
   endAt: Date | string
   location?: string | null
@@ -401,6 +419,7 @@ export type EventUncheckedCreateInput = {
   isDeleted?: boolean
   deletedAt?: Date | string | null
   participations?: Prisma.ParticipationUncheckedCreateNestedManyWithoutEventInput
+  invitees?: Prisma.EventInviteeUncheckedCreateNestedManyWithoutEventInput
 }
 
 export type EventUpdateInput = {
@@ -410,6 +429,7 @@ export type EventUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isYearly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  visibility?: Prisma.EnumEventVisibilityFieldUpdateOperationsInput | $Enums.EventVisibility
   startAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -420,6 +440,7 @@ export type EventUpdateInput = {
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   participations?: Prisma.ParticipationUpdateManyWithoutEventNestedInput
+  invitees?: Prisma.EventInviteeUpdateManyWithoutEventNestedInput
   createdByUser?: Prisma.UserUpdateOneRequiredWithoutEventsNestedInput
 }
 
@@ -430,6 +451,7 @@ export type EventUncheckedUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isYearly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  visibility?: Prisma.EnumEventVisibilityFieldUpdateOperationsInput | $Enums.EventVisibility
   startAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -441,6 +463,7 @@ export type EventUncheckedUpdateInput = {
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   participations?: Prisma.ParticipationUncheckedUpdateManyWithoutEventNestedInput
+  invitees?: Prisma.EventInviteeUncheckedUpdateManyWithoutEventNestedInput
 }
 
 export type EventCreateManyInput = {
@@ -450,6 +473,7 @@ export type EventCreateManyInput = {
   description?: string | null
   isApproved?: boolean
   isYearly?: boolean
+  visibility?: $Enums.EventVisibility
   startAt: Date | string
   endAt: Date | string
   location?: string | null
@@ -469,6 +493,7 @@ export type EventUpdateManyMutationInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isYearly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  visibility?: Prisma.EnumEventVisibilityFieldUpdateOperationsInput | $Enums.EventVisibility
   startAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -487,6 +512,7 @@ export type EventUncheckedUpdateManyInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isYearly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  visibility?: Prisma.EnumEventVisibilityFieldUpdateOperationsInput | $Enums.EventVisibility
   startAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -516,6 +542,7 @@ export type EventCountOrderByAggregateInput = {
   description?: Prisma.SortOrder
   isApproved?: Prisma.SortOrder
   isYearly?: Prisma.SortOrder
+  visibility?: Prisma.SortOrder
   startAt?: Prisma.SortOrder
   endAt?: Prisma.SortOrder
   location?: Prisma.SortOrder
@@ -535,6 +562,7 @@ export type EventMaxOrderByAggregateInput = {
   description?: Prisma.SortOrder
   isApproved?: Prisma.SortOrder
   isYearly?: Prisma.SortOrder
+  visibility?: Prisma.SortOrder
   startAt?: Prisma.SortOrder
   endAt?: Prisma.SortOrder
   location?: Prisma.SortOrder
@@ -554,6 +582,7 @@ export type EventMinOrderByAggregateInput = {
   description?: Prisma.SortOrder
   isApproved?: Prisma.SortOrder
   isYearly?: Prisma.SortOrder
+  visibility?: Prisma.SortOrder
   startAt?: Prisma.SortOrder
   endAt?: Prisma.SortOrder
   location?: Prisma.SortOrder
@@ -569,6 +598,11 @@ export type EventMinOrderByAggregateInput = {
 export type EventNullableScalarRelationFilter = {
   is?: Prisma.EventWhereInput | null
   isNot?: Prisma.EventWhereInput | null
+}
+
+export type EventScalarRelationFilter = {
+  is?: Prisma.EventWhereInput
+  isNot?: Prisma.EventWhereInput
 }
 
 export type EventCreateNestedManyWithoutCreatedByUserInput = {
@@ -613,6 +647,10 @@ export type EventUncheckedUpdateManyWithoutCreatedByUserNestedInput = {
   deleteMany?: Prisma.EventScalarWhereInput | Prisma.EventScalarWhereInput[]
 }
 
+export type EnumEventVisibilityFieldUpdateOperationsInput = {
+  set?: $Enums.EventVisibility
+}
+
 export type EventCreateNestedOneWithoutParticipationsInput = {
   create?: Prisma.XOR<Prisma.EventCreateWithoutParticipationsInput, Prisma.EventUncheckedCreateWithoutParticipationsInput>
   connectOrCreate?: Prisma.EventCreateOrConnectWithoutParticipationsInput
@@ -629,6 +667,20 @@ export type EventUpdateOneWithoutParticipationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.EventUpdateToOneWithWhereWithoutParticipationsInput, Prisma.EventUpdateWithoutParticipationsInput>, Prisma.EventUncheckedUpdateWithoutParticipationsInput>
 }
 
+export type EventCreateNestedOneWithoutInviteesInput = {
+  create?: Prisma.XOR<Prisma.EventCreateWithoutInviteesInput, Prisma.EventUncheckedCreateWithoutInviteesInput>
+  connectOrCreate?: Prisma.EventCreateOrConnectWithoutInviteesInput
+  connect?: Prisma.EventWhereUniqueInput
+}
+
+export type EventUpdateOneRequiredWithoutInviteesNestedInput = {
+  create?: Prisma.XOR<Prisma.EventCreateWithoutInviteesInput, Prisma.EventUncheckedCreateWithoutInviteesInput>
+  connectOrCreate?: Prisma.EventCreateOrConnectWithoutInviteesInput
+  upsert?: Prisma.EventUpsertWithoutInviteesInput
+  connect?: Prisma.EventWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.EventUpdateToOneWithWhereWithoutInviteesInput, Prisma.EventUpdateWithoutInviteesInput>, Prisma.EventUncheckedUpdateWithoutInviteesInput>
+}
+
 export type EventCreateWithoutCreatedByUserInput = {
   id?: string
   title: string
@@ -636,6 +688,7 @@ export type EventCreateWithoutCreatedByUserInput = {
   description?: string | null
   isApproved?: boolean
   isYearly?: boolean
+  visibility?: $Enums.EventVisibility
   startAt: Date | string
   endAt: Date | string
   location?: string | null
@@ -646,6 +699,7 @@ export type EventCreateWithoutCreatedByUserInput = {
   isDeleted?: boolean
   deletedAt?: Date | string | null
   participations?: Prisma.ParticipationCreateNestedManyWithoutEventInput
+  invitees?: Prisma.EventInviteeCreateNestedManyWithoutEventInput
 }
 
 export type EventUncheckedCreateWithoutCreatedByUserInput = {
@@ -655,6 +709,7 @@ export type EventUncheckedCreateWithoutCreatedByUserInput = {
   description?: string | null
   isApproved?: boolean
   isYearly?: boolean
+  visibility?: $Enums.EventVisibility
   startAt: Date | string
   endAt: Date | string
   location?: string | null
@@ -665,6 +720,7 @@ export type EventUncheckedCreateWithoutCreatedByUserInput = {
   isDeleted?: boolean
   deletedAt?: Date | string | null
   participations?: Prisma.ParticipationUncheckedCreateNestedManyWithoutEventInput
+  invitees?: Prisma.EventInviteeUncheckedCreateNestedManyWithoutEventInput
 }
 
 export type EventCreateOrConnectWithoutCreatedByUserInput = {
@@ -703,6 +759,7 @@ export type EventScalarWhereInput = {
   description?: Prisma.StringNullableFilter<"Event"> | string | null
   isApproved?: Prisma.BoolFilter<"Event"> | boolean
   isYearly?: Prisma.BoolFilter<"Event"> | boolean
+  visibility?: Prisma.EnumEventVisibilityFilter<"Event"> | $Enums.EventVisibility
   startAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   endAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   location?: Prisma.StringNullableFilter<"Event"> | string | null
@@ -722,6 +779,7 @@ export type EventCreateWithoutParticipationsInput = {
   description?: string | null
   isApproved?: boolean
   isYearly?: boolean
+  visibility?: $Enums.EventVisibility
   startAt: Date | string
   endAt: Date | string
   location?: string | null
@@ -731,6 +789,7 @@ export type EventCreateWithoutParticipationsInput = {
   updatedAt?: Date | string
   isDeleted?: boolean
   deletedAt?: Date | string | null
+  invitees?: Prisma.EventInviteeCreateNestedManyWithoutEventInput
   createdByUser: Prisma.UserCreateNestedOneWithoutEventsInput
 }
 
@@ -741,6 +800,7 @@ export type EventUncheckedCreateWithoutParticipationsInput = {
   description?: string | null
   isApproved?: boolean
   isYearly?: boolean
+  visibility?: $Enums.EventVisibility
   startAt: Date | string
   endAt: Date | string
   location?: string | null
@@ -751,6 +811,7 @@ export type EventUncheckedCreateWithoutParticipationsInput = {
   createdBy: string
   isDeleted?: boolean
   deletedAt?: Date | string | null
+  invitees?: Prisma.EventInviteeUncheckedCreateNestedManyWithoutEventInput
 }
 
 export type EventCreateOrConnectWithoutParticipationsInput = {
@@ -776,6 +837,7 @@ export type EventUpdateWithoutParticipationsInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isYearly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  visibility?: Prisma.EnumEventVisibilityFieldUpdateOperationsInput | $Enums.EventVisibility
   startAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -785,6 +847,7 @@ export type EventUpdateWithoutParticipationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  invitees?: Prisma.EventInviteeUpdateManyWithoutEventNestedInput
   createdByUser?: Prisma.UserUpdateOneRequiredWithoutEventsNestedInput
 }
 
@@ -795,6 +858,7 @@ export type EventUncheckedUpdateWithoutParticipationsInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isYearly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  visibility?: Prisma.EnumEventVisibilityFieldUpdateOperationsInput | $Enums.EventVisibility
   startAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -805,6 +869,107 @@ export type EventUncheckedUpdateWithoutParticipationsInput = {
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  invitees?: Prisma.EventInviteeUncheckedUpdateManyWithoutEventNestedInput
+}
+
+export type EventCreateWithoutInviteesInput = {
+  id?: string
+  title: string
+  image?: string | null
+  description?: string | null
+  isApproved?: boolean
+  isYearly?: boolean
+  visibility?: $Enums.EventVisibility
+  startAt: Date | string
+  endAt: Date | string
+  location?: string | null
+  locationUrl?: string | null
+  reference?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDeleted?: boolean
+  deletedAt?: Date | string | null
+  participations?: Prisma.ParticipationCreateNestedManyWithoutEventInput
+  createdByUser: Prisma.UserCreateNestedOneWithoutEventsInput
+}
+
+export type EventUncheckedCreateWithoutInviteesInput = {
+  id?: string
+  title: string
+  image?: string | null
+  description?: string | null
+  isApproved?: boolean
+  isYearly?: boolean
+  visibility?: $Enums.EventVisibility
+  startAt: Date | string
+  endAt: Date | string
+  location?: string | null
+  locationUrl?: string | null
+  reference?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  createdBy: string
+  isDeleted?: boolean
+  deletedAt?: Date | string | null
+  participations?: Prisma.ParticipationUncheckedCreateNestedManyWithoutEventInput
+}
+
+export type EventCreateOrConnectWithoutInviteesInput = {
+  where: Prisma.EventWhereUniqueInput
+  create: Prisma.XOR<Prisma.EventCreateWithoutInviteesInput, Prisma.EventUncheckedCreateWithoutInviteesInput>
+}
+
+export type EventUpsertWithoutInviteesInput = {
+  update: Prisma.XOR<Prisma.EventUpdateWithoutInviteesInput, Prisma.EventUncheckedUpdateWithoutInviteesInput>
+  create: Prisma.XOR<Prisma.EventCreateWithoutInviteesInput, Prisma.EventUncheckedCreateWithoutInviteesInput>
+  where?: Prisma.EventWhereInput
+}
+
+export type EventUpdateToOneWithWhereWithoutInviteesInput = {
+  where?: Prisma.EventWhereInput
+  data: Prisma.XOR<Prisma.EventUpdateWithoutInviteesInput, Prisma.EventUncheckedUpdateWithoutInviteesInput>
+}
+
+export type EventUpdateWithoutInviteesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isYearly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  visibility?: Prisma.EnumEventVisibilityFieldUpdateOperationsInput | $Enums.EventVisibility
+  startAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  participations?: Prisma.ParticipationUpdateManyWithoutEventNestedInput
+  createdByUser?: Prisma.UserUpdateOneRequiredWithoutEventsNestedInput
+}
+
+export type EventUncheckedUpdateWithoutInviteesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isYearly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  visibility?: Prisma.EnumEventVisibilityFieldUpdateOperationsInput | $Enums.EventVisibility
+  startAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdBy?: Prisma.StringFieldUpdateOperationsInput | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  participations?: Prisma.ParticipationUncheckedUpdateManyWithoutEventNestedInput
 }
 
 export type EventCreateManyCreatedByUserInput = {
@@ -814,6 +979,7 @@ export type EventCreateManyCreatedByUserInput = {
   description?: string | null
   isApproved?: boolean
   isYearly?: boolean
+  visibility?: $Enums.EventVisibility
   startAt: Date | string
   endAt: Date | string
   location?: string | null
@@ -832,6 +998,7 @@ export type EventUpdateWithoutCreatedByUserInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isYearly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  visibility?: Prisma.EnumEventVisibilityFieldUpdateOperationsInput | $Enums.EventVisibility
   startAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -842,6 +1009,7 @@ export type EventUpdateWithoutCreatedByUserInput = {
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   participations?: Prisma.ParticipationUpdateManyWithoutEventNestedInput
+  invitees?: Prisma.EventInviteeUpdateManyWithoutEventNestedInput
 }
 
 export type EventUncheckedUpdateWithoutCreatedByUserInput = {
@@ -851,6 +1019,7 @@ export type EventUncheckedUpdateWithoutCreatedByUserInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isYearly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  visibility?: Prisma.EnumEventVisibilityFieldUpdateOperationsInput | $Enums.EventVisibility
   startAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -861,6 +1030,7 @@ export type EventUncheckedUpdateWithoutCreatedByUserInput = {
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   participations?: Prisma.ParticipationUncheckedUpdateManyWithoutEventNestedInput
+  invitees?: Prisma.EventInviteeUncheckedUpdateManyWithoutEventNestedInput
 }
 
 export type EventUncheckedUpdateManyWithoutCreatedByUserInput = {
@@ -870,6 +1040,7 @@ export type EventUncheckedUpdateManyWithoutCreatedByUserInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isYearly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  visibility?: Prisma.EnumEventVisibilityFieldUpdateOperationsInput | $Enums.EventVisibility
   startAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -888,10 +1059,12 @@ export type EventUncheckedUpdateManyWithoutCreatedByUserInput = {
 
 export type EventCountOutputType = {
   participations: number
+  invitees: number
 }
 
 export type EventCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   participations?: boolean | EventCountOutputTypeCountParticipationsArgs
+  invitees?: boolean | EventCountOutputTypeCountInviteesArgs
 }
 
 /**
@@ -911,6 +1084,13 @@ export type EventCountOutputTypeCountParticipationsArgs<ExtArgs extends runtime.
   where?: Prisma.ParticipationWhereInput
 }
 
+/**
+ * EventCountOutputType without action
+ */
+export type EventCountOutputTypeCountInviteesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EventInviteeWhereInput
+}
+
 
 export type EventSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -919,6 +1099,7 @@ export type EventSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   description?: boolean
   isApproved?: boolean
   isYearly?: boolean
+  visibility?: boolean
   startAt?: boolean
   endAt?: boolean
   location?: boolean
@@ -930,6 +1111,7 @@ export type EventSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   isDeleted?: boolean
   deletedAt?: boolean
   participations?: boolean | Prisma.Event$participationsArgs<ExtArgs>
+  invitees?: boolean | Prisma.Event$inviteesArgs<ExtArgs>
   createdByUser?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.EventCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["event"]>
@@ -941,6 +1123,7 @@ export type EventSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   description?: boolean
   isApproved?: boolean
   isYearly?: boolean
+  visibility?: boolean
   startAt?: boolean
   endAt?: boolean
   location?: boolean
@@ -961,6 +1144,7 @@ export type EventSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   description?: boolean
   isApproved?: boolean
   isYearly?: boolean
+  visibility?: boolean
   startAt?: boolean
   endAt?: boolean
   location?: boolean
@@ -981,6 +1165,7 @@ export type EventSelectScalar = {
   description?: boolean
   isApproved?: boolean
   isYearly?: boolean
+  visibility?: boolean
   startAt?: boolean
   endAt?: boolean
   location?: boolean
@@ -993,9 +1178,10 @@ export type EventSelectScalar = {
   deletedAt?: boolean
 }
 
-export type EventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "image" | "description" | "isApproved" | "isYearly" | "startAt" | "endAt" | "location" | "locationUrl" | "reference" | "createdAt" | "updatedAt" | "createdBy" | "isDeleted" | "deletedAt", ExtArgs["result"]["event"]>
+export type EventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "image" | "description" | "isApproved" | "isYearly" | "visibility" | "startAt" | "endAt" | "location" | "locationUrl" | "reference" | "createdAt" | "updatedAt" | "createdBy" | "isDeleted" | "deletedAt", ExtArgs["result"]["event"]>
 export type EventInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   participations?: boolean | Prisma.Event$participationsArgs<ExtArgs>
+  invitees?: boolean | Prisma.Event$inviteesArgs<ExtArgs>
   createdByUser?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.EventCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1010,6 +1196,7 @@ export type $EventPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   name: "Event"
   objects: {
     participations: Prisma.$ParticipationPayload<ExtArgs>[]
+    invitees: Prisma.$EventInviteePayload<ExtArgs>[]
     createdByUser: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1019,6 +1206,7 @@ export type $EventPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     description: string | null
     isApproved: boolean
     isYearly: boolean
+    visibility: $Enums.EventVisibility
     startAt: Date
     endAt: Date
     location: string | null
@@ -1424,6 +1612,7 @@ readonly fields: EventFieldRefs;
 export interface Prisma__EventClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   participations<T extends Prisma.Event$participationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Event$participationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ParticipationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  invitees<T extends Prisma.Event$inviteesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Event$inviteesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EventInviteePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   createdByUser<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1460,6 +1649,7 @@ export interface EventFieldRefs {
   readonly description: Prisma.FieldRef<"Event", 'String'>
   readonly isApproved: Prisma.FieldRef<"Event", 'Boolean'>
   readonly isYearly: Prisma.FieldRef<"Event", 'Boolean'>
+  readonly visibility: Prisma.FieldRef<"Event", 'EventVisibility'>
   readonly startAt: Prisma.FieldRef<"Event", 'DateTime'>
   readonly endAt: Prisma.FieldRef<"Event", 'DateTime'>
   readonly location: Prisma.FieldRef<"Event", 'String'>
@@ -1892,6 +2082,30 @@ export type Event$participationsArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.ParticipationScalarFieldEnum | Prisma.ParticipationScalarFieldEnum[]
+}
+
+/**
+ * Event.invitees
+ */
+export type Event$inviteesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EventInvitee
+   */
+  select?: Prisma.EventInviteeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the EventInvitee
+   */
+  omit?: Prisma.EventInviteeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EventInviteeInclude<ExtArgs> | null
+  where?: Prisma.EventInviteeWhereInput
+  orderBy?: Prisma.EventInviteeOrderByWithRelationInput | Prisma.EventInviteeOrderByWithRelationInput[]
+  cursor?: Prisma.EventInviteeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.EventInviteeScalarFieldEnum | Prisma.EventInviteeScalarFieldEnum[]
 }
 
 /**

@@ -59,7 +59,8 @@ export const ModelName = {
   Event: 'Event',
   Participation: 'Participation',
   ParticipationImage: 'ParticipationImage',
-  Holiday: 'Holiday'
+  Holiday: 'Holiday',
+  EventInvitee: 'EventInvitee'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -156,6 +157,7 @@ export const EventScalarFieldEnum = {
   description: 'description',
   isApproved: 'isApproved',
   isYearly: 'isYearly',
+  visibility: 'visibility',
   startAt: 'startAt',
   endAt: 'endAt',
   location: 'location',
@@ -206,6 +208,16 @@ export const HolidayScalarFieldEnum = {
 } as const
 
 export type HolidayScalarFieldEnum = (typeof HolidayScalarFieldEnum)[keyof typeof HolidayScalarFieldEnum]
+
+
+export const EventInviteeScalarFieldEnum = {
+  id: 'id',
+  eventId: 'eventId',
+  userId: 'userId',
+  createdAt: 'createdAt'
+} as const
+
+export type EventInviteeScalarFieldEnum = (typeof EventInviteeScalarFieldEnum)[keyof typeof EventInviteeScalarFieldEnum]
 
 
 export const SortOrder = {

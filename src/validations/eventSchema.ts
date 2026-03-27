@@ -18,6 +18,8 @@ export const eventBaseSchema = zod.object({
   locationUrl: zod.string().url().optional(),
   reference: zod.string().optional(),
   isYearly: zod.boolean().optional().default(false),
+  visibility: zod.enum(["PUBLIC", "PRIVATE"]).optional().default("PUBLIC"),
+  inviteeIds: zod.array(zod.string().uuid()).optional(),
 });
 
 export const eventSchema = eventBaseSchema.refine(
