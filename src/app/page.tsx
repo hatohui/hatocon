@@ -1,5 +1,6 @@
 import QuickActions from "@/components/home/QuickActions";
 import UpcomingEvents from "@/components/home/UpcomingEvents";
+import UpcomingPlans from "@/components/home/UpcomingPlans";
 import { Card, CardContent } from "@/components/ui/card";
 
 const HomePage = () => {
@@ -12,12 +13,19 @@ const HomePage = () => {
         </CardContent>
       </Card>
 
-      {/* Upcoming Events */}
-      <Card className="min-h-[420px]">
-        <CardContent className="p-6 h-full">
-          <UpcomingEvents />
-        </CardContent>
-      </Card>
+      {/* Two-column: Upcoming Events + Upcoming Plans */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <Card className="min-h-105">
+          <CardContent className="p-6 h-full">
+            <UpcomingEvents />
+          </CardContent>
+        </Card>
+        <Card className="min-h-105">
+          <CardContent className="p-6 h-full">
+            <UpcomingPlans />
+          </CardContent>
+        </Card>
+      </div>
     </main>
   );
 };

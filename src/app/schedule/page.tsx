@@ -26,6 +26,20 @@ import {
   Plane,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+
+function countWeekdays(from: Date, to: Date): number {
+  let count = 0;
+  const cur = new Date(from);
+  cur.setHours(0, 0, 0, 0);
+  const end = new Date(to);
+  end.setHours(0, 0, 0, 0);
+  while (cur <= end) {
+    const d = cur.getDay();
+    if (d !== 0 && d !== 6) count++;
+    cur.setDate(cur.getDate() + 1);
+  }
+  return count;
+}
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -182,8 +196,7 @@ function UpcomingLeaveList({
   return (
     <div className="space-y-3">
       {upcoming.map((p) => {
-        const days =
-          differenceInCalendarDays(new Date(p.to), new Date(p.from)) + 1;
+        const days = countWeekdays(new Date(p.from), new Date(p.to));
         const daysUntil = differenceInCalendarDays(
           new Date(p.from),
           new Date(),
@@ -246,8 +259,7 @@ function LeaveStats({
 }) {
   const { data: balance } = useLeaveBalance();
   const totalDays = participations.reduce(
-    (sum, p) =>
-      sum + differenceInCalendarDays(new Date(p.to), new Date(p.from)) + 1,
+    (sum, p) => sum + countWeekdays(new Date(p.from), new Date(p.to)),
     0,
   );
   const totalTrips = participations.filter((p) => p.event).length;

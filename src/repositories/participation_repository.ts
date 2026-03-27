@@ -2,6 +2,24 @@ import { db } from "@/config/prisma";
 import { ParticipationCreateDTO } from "@/types/participation.d";
 import { LeaveType } from "@prisma/client";
 
+/**
+ * Counts weekdays (Mon–Fri) between two dates inclusive of both endpoints.
+ * `from` and `to` are treated as midnight boundaries (date-only semantics).
+ */
+function countWeekdays(from: Date, to: Date): number {
+  let count = 0;
+  const cursor = new Date(from);
+  cursor.setHours(0, 0, 0, 0);
+  const end = new Date(to);
+  end.setHours(0, 0, 0, 0);
+  while (cursor <= end) {
+    const day = cursor.getDay();
+    if (day !== 0 && day !== 6) count++; // exclude Sunday (0) and Saturday (6)
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return count;
+}
+
 const participationRepository = {
   getById: async (id: string) => {
     return db.participation.findUnique({ where: { id } });
@@ -95,8 +113,7 @@ const participationRepository = {
       select: { from: true, to: true },
     });
     return participations.reduce(
-      (sum, p) =>
-        sum + (p.to.getTime() - p.from.getTime()) / (1000 * 60 * 60 * 24),
+      (sum, p) => sum + countWeekdays(p.from, p.to),
       0,
     );
   },
