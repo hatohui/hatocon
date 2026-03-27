@@ -3,6 +3,13 @@ import { ParticipationCreateDTO } from "@/types/participation.d";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { endOfYear, startOfYear } from "date-fns";
 
+const useParticipationById = (id: string | null) =>
+  useQuery({
+    queryKey: ["participation", id],
+    queryFn: () => participationService.getById(id!).then((r) => r.data.data),
+    enabled: !!id,
+  });
+
 const useHeatmap = () => {
   const from = startOfYear(new Date());
   const to = endOfYear(new Date());
@@ -108,11 +115,32 @@ const useUploadParticipationImage = () => {
       queryClient.invalidateQueries({
         queryKey: ["participation-images", variables.participationId],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["participation"],
+      });
+    },
+  });
+};
+
+const useAddParticipationMember = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      participationId,
+      userId,
+    }: {
+      participationId: string;
+      userId: string;
+    }) => participationService.addMember(participationId, userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["participation"] });
+      queryClient.invalidateQueries({ queryKey: ["participations"] });
     },
   });
 };
 
 export {
+  useParticipationById,
   useHeatmap,
   useLeaveBalance,
   useCreateParticipation,
@@ -121,4 +149,5 @@ export {
   useParticipationImages,
   useDeleteParticipationImage,
   useUploadParticipationImage,
+  useAddParticipationMember,
 };

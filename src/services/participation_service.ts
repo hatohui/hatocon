@@ -3,6 +3,7 @@ import {
   HeatmapEntry,
   LeaveBalance,
   ParticipationCreateDTO,
+  ParticipationDetail,
   ParticipationImageDTO,
   ParticipationWithEvent,
 } from "@/types/participation.d";
@@ -11,6 +12,9 @@ import axios from "axios";
 type ApiOk<T> = { data: T };
 
 const participationService = {
+  getById: (id: string) =>
+    axios.get<ApiOk<ParticipationDetail>>(`/api/participations/${id}`),
+
   getInRange: (from: Date | string, to: Date | string) => {
     const params = new URLSearchParams({
       from: new Date(from).toISOString(),
@@ -54,6 +58,12 @@ const participationService = {
   getLeaveBalance: () =>
     axios.get<ApiOk<LeaveBalance & { cycleFrom: string; cycleTo: string }>>(
       "/api/leave-balance",
+    ),
+
+  addMember: (participationId: string, userId: string) =>
+    axios.post<ApiOk<Participation>>(
+      `/api/participations/${participationId}/members`,
+      { userId },
     ),
 };
 

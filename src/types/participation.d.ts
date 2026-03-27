@@ -30,3 +30,26 @@ export type LeaveBalance = {
 export type ParticipationWithEvent = Participation & {
   event: { id: string; title: string; startAt: Date; endAt: Date } | null;
 };
+
+export type ParticipationParticipant = {
+  id: string;
+  userId: string;
+  user: { id: string; name: string; image: string | null; email: string };
+};
+
+export type ParticipationDetail = Participation & {
+  user: { id: string; name: string; image: string | null; email: string };
+  event: {
+    id: string;
+    title: string;
+    description: string | null;
+    image: string | null;
+    startAt: Date;
+    endAt: Date;
+    location: string | null;
+    locationUrl: string | null;
+    visibility: string;
+  } | null;
+  images: ParticipationImageDTO[];
+  participants: ParticipationParticipant[];
+};

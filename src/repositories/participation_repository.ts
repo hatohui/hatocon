@@ -7,6 +7,45 @@ const participationRepository = {
     return db.participation.findUnique({ where: { id } });
   },
 
+  getByIdDetailed: async (id: string) => {
+    return db.participation.findUnique({
+      where: { id },
+      include: {
+        user: { select: { id: true, name: true, image: true, email: true } },
+        event: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            image: true,
+            startAt: true,
+            endAt: true,
+            location: true,
+            locationUrl: true,
+            visibility: true,
+          },
+        },
+        images: { orderBy: { createdAt: "desc" } },
+      },
+    });
+  },
+
+  getParticipantsByEvent: async (eventId: string) => {
+    return db.participation.findMany({
+      where: { eventId },
+      include: {
+        user: { select: { id: true, name: true, image: true, email: true } },
+      },
+      orderBy: { createdAt: "asc" },
+    });
+  },
+
+  getByUserAndEvent: async (userId: string, eventId: string) => {
+    return db.participation.findFirst({
+      where: { userId, eventId },
+    });
+  },
+
   getByUserId: async (userId: string, from: Date, to: Date) => {
     return db.participation.findMany({
       where: {
@@ -120,7 +159,9 @@ const participationRepository = {
       },
       include: {
         user: { select: { id: true, name: true, image: true, email: true } },
-        event: { select: { id: true, title: true, startAt: true, endAt: true } },
+        event: {
+          select: { id: true, title: true, startAt: true, endAt: true },
+        },
       },
       orderBy: { createdAt: "desc" },
     });

@@ -129,10 +129,19 @@ const useEventById = (id: string | null) =>
     enabled: !!id,
   });
 
+const useMyParticipationForEvent = (eventId: string | null) =>
+  useQuery({
+    queryKey: ["my-participation", eventId],
+    queryFn: () =>
+      eventService.getMyParticipation(eventId!).then((r) => r.data.data),
+    enabled: !!eventId,
+  });
+
 export {
   useUpcomingEvents,
   useAllEvents,
   useEventById,
+  useMyParticipationForEvent,
   useCreateEvent,
   useUpdateOwnEvent,
   useDeleteOwnEvent,

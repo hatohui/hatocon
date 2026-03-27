@@ -1,4 +1,4 @@
-import type { Event } from "@prisma/client";
+import type { Event, Participation } from "@prisma/client";
 import { EventCreateDTO, EventUpdateDTO } from "@/types/event.d";
 import axios from "axios";
 
@@ -13,8 +13,12 @@ const eventService = {
     return axios.get<ApiOk<Event[]>>(`/api/events?${params}`);
   },
 
-  getById: (id: string) =>
-    axios.get<ApiOk<Event>>(`/api/events/${id}`),
+  getById: (id: string) => axios.get<ApiOk<Event>>(`/api/events/${id}`),
+
+  getMyParticipation: (eventId: string) =>
+    axios.get<ApiOk<Participation | null>>(
+      `/api/events/${eventId}/my-participation`,
+    ),
 
   create: (data: EventCreateDTO) =>
     axios.post<ApiOk<Event>>("/api/events", data),
@@ -38,8 +42,7 @@ const eventService = {
   update: (id: string, data: EventUpdateDTO) =>
     axios.patch<ApiOk<Event>>(`/api/admin/events/${id}`, data),
 
-  delete: (id: string) =>
-    axios.delete<ApiOk<void>>(`/api/admin/events/${id}`),
+  delete: (id: string) => axios.delete<ApiOk<void>>(`/api/admin/events/${id}`),
 };
 
 export { eventService };

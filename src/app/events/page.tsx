@@ -40,7 +40,10 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAllEvents } from "@/hooks/events/useEvents";
+import {
+  useAllEvents,
+  useMyParticipationForEvent,
+} from "@/hooks/events/useEvents";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -72,6 +75,9 @@ function EventDetailSheet({
   onClose: () => void;
 }) {
   const { data: session } = useSession();
+  const { data: myParticipation } = useMyParticipationForEvent(
+    event?.id ?? null,
+  );
   const start = event ? new Date(event.startAt) : null;
   const end = event ? new Date(event.endAt) : null;
   const canEdit =
@@ -183,12 +189,61 @@ function EventDetailSheet({
 
               <Separator />
 
-              <Button className="w-full gap-2" asChild>
-                <Link href={`/leave/new?eventId=${event.id}`}>
-                  <Plane className="h-4 w-4" />
-                  Create a Plan for This Event
+              {myParticipation ? (
+                <Link
+                  href={`/participations/${myParticipation.id}`}
+                  className="block"
+                >
+                  <div className="rounded-lg border bg-muted/50 p-4 space-y-2 hover:bg-muted transition-colors">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold flex items-center gap-1.5">
+                        <Plane className="h-4 w-4 text-primary" />
+                        Your Plan
+                      </span>
+                      <Badge
+                        variant="secondary"
+                        className={cn(
+                          "text-[10px]",
+                          myParticipation.leaveType === "ANNUAL"
+                            ? "bg-blue-100 text-blue-800"
+                            : myParticipation.leaveType === "SICK"
+                              ? "bg-amber-100 text-amber-800"
+                              : "bg-gray-100 text-gray-800",
+                        )}
+                      >
+                        {myParticipation.leaveType.charAt(0) +
+                          myParticipation.leaveType.slice(1).toLowerCase()}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Calendar className="h-3 w-3" />
+                      <span>
+                        {format(new Date(myParticipation.from), "MMM d")} –{" "}
+                        {format(new Date(myParticipation.to), "MMM d, yyyy")}
+                      </span>
+                      <span className="text-muted-foreground">
+                        ·{" "}
+                        {Math.ceil(
+                          (new Date(myParticipation.to).getTime() -
+                            new Date(myParticipation.from).getTime()) /
+                            (1000 * 60 * 60 * 24),
+                        ) + 1}{" "}
+                        days
+                      </span>
+                    </div>
+                    <p className="text-xs text-primary font-medium">
+                      View details →
+                    </p>
+                  </div>
                 </Link>
-              </Button>
+              ) : (
+                <Button className="w-full gap-2" asChild>
+                  <Link href={`/leave/new?eventId=${event.id}`}>
+                    <Plane className="h-4 w-4" />
+                    Create a Plan for This Event
+                  </Link>
+                </Button>
+              )}
             </div>
           </>
         )}
