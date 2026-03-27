@@ -6,9 +6,14 @@ import {
   ChevronRight,
   Plane,
   CalendarClock,
+  Calendar,
+  ClipboardList,
+  Settings,
+  Wand2,
 } from "lucide-react";
 import { format, addYears } from "date-fns";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -50,48 +55,103 @@ function BalanceBar({
 }
 
 export default function QuickActions() {
+  const { data: session } = useSession();
   const { data: balance, isLoading } = useLeaveBalance();
 
+  const firstName = session?.user?.name?.split(" ")[0] || "there";
+
   return (
-    <>
-      <div className="flex flex-col h-full">
-        <div className="flex items-center gap-2 mb-4">
-          <Zap className="h-4 w-4 text-muted-foreground" />
-          <h2 className="font-semibold text-sm">Quick Actions</h2>
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[2fr_1fr]">
+      {/* LEFT SIDE: Greeting + Quick Actions */}
+      <div className="space-y-5">
+        <div className="space-y-1">
+          <h2 className="text-2xl font-bold tracking-tight">
+            Hello, <span className="text-primary">{firstName}</span>!
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Here's what you can do today
+          </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-2">
+        {/* Quick Actions Grid - 3 columns */}
+        <div className="grid grid-cols-3 gap-3">
           <Button
             variant="outline"
             size="sm"
-            className="flex-col h-auto py-3 gap-1.5 text-xs"
+            className="flex-col h-auto py-4 gap-2 text-xs hover:bg-primary/5 transition-colors"
             asChild
           >
             <Link href="/leave/new">
-              <Plane className="h-4 w-4" />
-              Create A Plan
+              <Plane className="h-5 w-5" />
+              <span>Create A Plan</span>
             </Link>
           </Button>
           <Button
             variant="outline"
             size="sm"
-            className="flex-col h-auto py-3 gap-1.5 text-xs"
+            className="flex-col h-auto py-4 gap-2 text-xs hover:bg-primary/5 transition-colors"
             asChild
           >
             <Link href="/events/new">
-              <CalendarPlus className="h-4 w-4" />
-              Create Event
+              <CalendarPlus className="h-5 w-5" />
+              <span>Create Event</span>
+            </Link>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-col h-auto py-4 gap-2 text-xs hover:bg-primary/5 transition-colors"
+            asChild
+          >
+            <Link href="/participations">
+              <ClipboardList className="h-5 w-5" />
+              <span>My Plans</span>
+            </Link>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-col h-auto py-4 gap-2 text-xs hover:bg-primary/5 transition-colors"
+            asChild
+          >
+            <Link href="/schedule">
+              <Calendar className="h-5 w-5" />
+              <span>Schedule</span>
+            </Link>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-col h-auto py-4 gap-2 text-xs hover:bg-primary/5 transition-colors"
+            asChild
+          >
+            <Link href="/events">
+              <CalendarClock className="h-5 w-5" />
+              <span>All Events</span>
+            </Link>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-col h-auto py-4 gap-2 text-xs hover:bg-primary/5 transition-colors"
+            asChild
+          >
+            <Link href="/settings/profile">
+              <Settings className="h-5 w-5" />
+              <span>Settings</span>
             </Link>
           </Button>
         </div>
+      </div>
 
-        <Separator className="my-4" />
-
-        <div className="space-y-1 mb-2">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Leave Balance
-            </p>
+      {/* RIGHT SIDE: Leave Balance */}
+      <div className="space-y-4">
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Wand2 className="h-4 w-4 text-muted-foreground" />
+              <h3 className="font-semibold text-sm">Leave Balance</h3>
+            </div>
             <Button
               variant="ghost"
               size="sm"
@@ -108,7 +168,7 @@ export default function QuickActions() {
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <CalendarClock className="h-3 w-3 shrink-0" />
               <span>
-                Cycle: {format(new Date(balance.cycleFrom), "MMM d, yyyy")} –{" "}
+                Cycle: {format(new Date(balance.cycleFrom), "MMM d")} –{" "}
                 {format(
                   addYears(new Date(balance.cycleFrom), 1),
                   "MMM d, yyyy",
@@ -117,6 +177,8 @@ export default function QuickActions() {
             </div>
           )}
         </div>
+
+        <Separator className="my-3" />
 
         {isLoading ? (
           <div className="space-y-3">
@@ -154,6 +216,6 @@ export default function QuickActions() {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }

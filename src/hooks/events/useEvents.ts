@@ -15,14 +15,22 @@ const useUpcomingEvents = () =>
         .then((r) => r.data.data),
   });
 
-const useAllEvents = (opts: {
-  q?: string;
-  from?: Date;
-  to?: Date;
-  limit?: number;
-} = {}) => {
+const useAllEvents = (
+  opts: {
+    q?: string;
+    from?: Date;
+    to?: Date;
+    limit?: number;
+  } = {},
+) => {
   return useQuery({
-    queryKey: ["events", "all", opts.q, opts.from?.toISOString(), opts.to?.toISOString()],
+    queryKey: [
+      "events",
+      "all",
+      opts.q,
+      opts.from?.toISOString(),
+      opts.to?.toISOString(),
+    ],
     queryFn: () => {
       const params = new URLSearchParams();
       if (opts.q) params.set("q", opts.q);
@@ -48,18 +56,20 @@ const useCreateEvent = () => {
 };
 
 // Admin hooks
-const useAdminEvents = (opts: { q?: string; approved?: "true" | "false" } = {}) => {
+const useAdminEvents = (
+  opts: { q?: string; approved?: "true" | "false" } = {},
+) => {
   return useQuery({
     queryKey: ["admin", "events", opts.q, opts.approved],
-    queryFn: () =>
-      eventService.getAllAdmin(opts).then((r) => r.data.data),
+    queryFn: () => eventService.getAllAdmin(opts).then((r) => r.data.data),
   });
 };
 
 const useApproveEvent = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => eventService.approve(id).then((r) => r.data.data),
+    mutationFn: (id: string) =>
+      eventService.approve(id).then((r) => r.data.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "events"] });
       queryClient.invalidateQueries({ queryKey: ["events"] });
@@ -101,14 +111,33 @@ const useUpdateOwnEvent = () => {
   });
 };
 
+const useDeleteOwnEvent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => eventService.deleteOwn(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+    },
+  });
+};
+
+const useEventById = (id: string | null) =>
+  useQuery({
+    queryKey: ["events", "detail", id],
+    queryFn: () =>
+      axios.get<ApiOk<Event>>(`/api/events/${id}`).then((r) => r.data.data),
+    enabled: !!id,
+  });
+
 export {
   useUpcomingEvents,
   useAllEvents,
+  useEventById,
   useCreateEvent,
   useUpdateOwnEvent,
+  useDeleteOwnEvent,
   useAdminEvents,
   useApproveEvent,
   useUpdateEvent,
   useDeleteEvent,
 };
-

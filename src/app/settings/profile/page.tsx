@@ -30,47 +30,7 @@ import {
   useUploadAvatar,
 } from "@/hooks/users/useMe";
 import { Camera, Loader2 } from "lucide-react";
-
-const MAX_DIMENSION = 256;
-const MAX_BYTES = 200 * 1024;
-
-function compressAvatar(file: File): Promise<File> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      const scale = Math.min(
-        1,
-        MAX_DIMENSION / Math.max(img.width, img.height),
-      );
-      const w = Math.round(img.width * scale);
-      const h = Math.round(img.height * scale);
-      const canvas = document.createElement("canvas");
-      canvas.width = w;
-      canvas.height = h;
-      canvas.getContext("2d")!.drawImage(img, 0, 0, w, h);
-      canvas.toBlob(
-        (blob) => {
-          if (!blob) return reject(new Error("Compression failed"));
-          if (blob.size > MAX_BYTES)
-            return reject(
-              new Error(
-                "Image is too large even after compression. Please choose a smaller photo.",
-              ),
-            );
-          resolve(
-            new File([blob], file.name.replace(/\.[^.]+$/, ".webp"), {
-              type: "image/webp",
-            }),
-          );
-        },
-        "image/webp",
-        0.85,
-      );
-    };
-    img.onerror = () => reject(new Error("Could not read image"));
-    img.src = URL.createObjectURL(file);
-  });
-}
+import ImageCropDialog from "@/components/ImageCropDialog";
 
 const profileSchema = zod.object({
   name: zod.string().min(1, "Name is required"),
@@ -106,8 +66,7 @@ function AvatarSection() {
   const { data: me } = useMe();
   const uploadAvatar = useUploadAvatar();
   const fileRef = useRef<HTMLInputElement>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-  const [compressError, setCompressError] = useState<string | null>(null);
+  const [cropFile, setCropFile] = useState<File | null>(null);
 
   const initials = me?.name
     ?.split(" ")
@@ -115,23 +74,17 @@ function AvatarSection() {
     .join("")
     .toUpperCase();
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (fileRef.current) fileRef.current.value = "";
     if (!file) return;
-    setCompressError(null);
-    setPreview(URL.createObjectURL(file));
-    let compressed: File;
-    try {
-      compressed = await compressAvatar(file);
-    } catch (err) {
-      setPreview(null);
-      setCompressError((err as Error).message);
-      return;
-    }
-    uploadAvatar.mutate(compressed, {
-      onSettled: () => setPreview(null),
-    });
+    setCropFile(file);
+  };
+
+  const handleCropComplete = (cropped: File | null) => {
+    setCropFile(null);
+    if (!cropped) return;
+    uploadAvatar.mutate(cropped);
   };
 
   return (
@@ -143,7 +96,7 @@ function AvatarSection() {
       <CardContent className="flex items-center gap-6">
         <div className="relative">
           <Avatar className="h-20 w-20">
-            <AvatarImage src={preview ?? me?.image ?? undefined} />
+            <AvatarImage src={me?.image ?? undefined} />
             <AvatarFallback className="text-xl">{initials}</AvatarFallback>
           </Avatar>
           {uploadAvatar.isPending && (
@@ -169,13 +122,20 @@ function AvatarSection() {
             <Camera className="mr-2 h-4 w-4" />
             Change photo
           </Button>
-          {(compressError || uploadAvatar.isError) && (
+          {uploadAvatar.isError && (
             <p className="text-sm text-destructive">
-              {compressError ?? "Upload failed. Try again."}
+              Upload failed. Try again.
             </p>
           )}
         </div>
       </CardContent>
+      <ImageCropDialog
+        file={cropFile}
+        aspect={1}
+        maxWidth={256}
+        quality={0.85}
+        onComplete={handleCropComplete}
+      />
     </Card>
   );
 }

@@ -2,18 +2,28 @@
 
 import * as React from "react";
 import { format, formatDistanceToNow } from "date-fns";
-import { CalendarDays, MapPin, Clock, Plus, ArrowRight } from "lucide-react";
+import {
+  CalendarDays,
+  MapPin,
+  Clock,
+  Pencil,
+  Plus,
+  ArrowRight,
+} from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { useUpcomingEvents } from "@/hooks/events/useEvents";
+import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 export default function UpcomingEvents() {
   const { data: events, isLoading } = useUpcomingEvents();
+  const { data: session } = useSession();
+  const navigate = useRouter();
 
   return (
     <div className="flex flex-col h-full">
@@ -87,15 +97,16 @@ export default function UpcomingEvents() {
               );
 
               return (
-                <div
+                <Link
                   key={event.id}
+                  href={`/events?selected=${event.id}`}
                   className={cn(
-                    "py-4 px-1 hover:bg-muted/30 rounded-lg transition-colors group",
+                    "block py-4 px-1 hover:bg-muted/30 rounded-lg transition-colors group",
                   )}
                 >
                   <div className="flex items-start justify-between gap-3">
                     {/* Date badge */}
-                    <div className="flex-shrink-0 w-12 text-center">
+                    <div className="shrink-0 w-12 text-center">
                       <div className="bg-primary/10 rounded-lg px-1 py-1.5">
                         <p className="text-[10px] font-medium text-primary uppercase">
                           {format(new Date(event.startAt), "MMM")}
@@ -121,7 +132,7 @@ export default function UpcomingEvents() {
                           {duration === 1 ? "1 day" : `${duration} days`}
                         </span>
                         {event.location && (
-                          <span className="flex items-center gap-1 text-xs text-muted-foreground truncate max-w-[160px]">
+                          <span className="flex items-center gap-1 text-xs text-muted-foreground truncate max-w-40">
                             <MapPin className="h-3 w-3 shrink-0" />
                             {event.location}
                           </span>
@@ -132,9 +143,26 @@ export default function UpcomingEvents() {
                       </p>
                     </div>
 
-                    <ArrowRight className="h-4 w-4 text-muted-foreground/0 group-hover:text-muted-foreground/40 transition-colors shrink-0 mt-0.5" />
+                    <div className="flex items-center gap-1 shrink-0 mt-0.5">
+                      {session?.user?.id === event.createdBy && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                          asChild
+                          onClick={(e: React.MouseEvent) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            navigate.push(`/events/${event.id}/edit`);
+                          }}
+                        >
+                          <Pencil className="h-3 w-3" />
+                        </Button>
+                      )}
+                      <ArrowRight className="h-4 w-4 text-muted-foreground/0 group-hover:text-muted-foreground/40 transition-colors" />
+                    </div>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>

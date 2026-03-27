@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
+import { Suspense } from "react";
 import { useRouter } from "next/navigation";
-import { format, isWeekend } from "date-fns";
+import { format } from "date-fns";
 import type { Event, User } from "@prisma/client";
 import {
   ArrowLeft,
@@ -28,14 +29,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Popover,
@@ -45,12 +38,13 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useCreateParticipation } from "@/hooks/participations/useParticipations";
-import { useAllEvents } from "@/hooks/events/useEvents";
+import { useAllEvents, useEventById } from "@/hooks/events/useEvents";
 import { useSearchUsers } from "@/hooks/users/useUsers";
 import { LeaveType } from "@/types/leave-type";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 
 // ─── Event Picker ─────────────────────────────────────────────────────────────
 
@@ -249,7 +243,6 @@ function DatePickerField({
   onChange: (d: Date | undefined) => void;
   fromDate?: Date;
 }) {
-  const isWknd = value ? isWeekend(value) : false;
   return (
     <div className="space-y-1.5">
       <Label>{label}</Label>
@@ -260,7 +253,6 @@ function DatePickerField({
             className={cn(
               "w-full justify-start text-left font-normal",
               !value && "text-muted-foreground",
-              isWknd && "border-orange-400",
             )}
           >
             <CalendarDays className="mr-2 h-4 w-4" />
@@ -276,11 +268,6 @@ function DatePickerField({
           />
         </PopoverContent>
       </Popover>
-      {isWknd && (
-        <p className="text-xs text-orange-500">
-          Heads up — this falls on a weekend.
-        </p>
-      )}
     </div>
   );
 }
@@ -308,9 +295,7 @@ function CoTravelerPicker({
   const filtered = React.useMemo(() => {
     if (!results) return [];
     return results.filter(
-      (u) =>
-        u.id !== session?.user?.id &&
-        !selected.some((s) => s.id === u.id),
+      (u) => u.id !== session?.user?.id && !selected.some((s) => s.id === u.id),
     );
   }, [results, session, selected]);
 
@@ -393,18 +378,30 @@ function CoTravelerPicker({
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function CreatePlanPage() {
+function CreatePlanPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const eventIdParam = searchParams.get("eventId");
   const { mutateAsync: createParticipation, isPending } =
     useCreateParticipation();
 
   const [selectedEvent, setSelectedEvent] = React.useState<Event | null>(null);
   const [from, setFrom] = React.useState<Date | undefined>();
   const [to, setTo] = React.useState<Date | undefined>();
-  const [leaveType, setLeaveType] = React.useState<string>("");
+  const [leaveType, setLeaveType] = React.useState<string>(LeaveType.ANNUAL);
   const [coTravelers, setCoTravelers] = React.useState<
     Omit<User, "password">[]
   >([]);
+
+  // Pre-populate from query param
+  const { data: prefillEvent } = useEventById(eventIdParam);
+  React.useEffect(() => {
+    if (prefillEvent && !selectedEvent) {
+      setSelectedEvent(prefillEvent as Event);
+      setFrom(new Date(prefillEvent.startAt));
+      setTo(new Date(prefillEvent.endAt));
+    }
+  }, [prefillEvent, selectedEvent]);
 
   // Auto-fill dates when an event is selected
   const handleEventSelect = (event: Event | null) => {
@@ -489,29 +486,12 @@ export default function CreatePlanPage() {
         {/* Travel details */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">Travel Details</CardTitle>
+            <CardTitle className="text-base">Travel Dates</CardTitle>
             <CardDescription>
-              Set the leave type and pick your travel dates.
+              Pick your travel dates. Leave will be logged as annual leave.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
-            {/* Leave type */}
-            <div className="space-y-1.5">
-              <Label htmlFor="leaveType">Leave Type</Label>
-              <Select value={leaveType} onValueChange={setLeaveType} required>
-                <SelectTrigger id="leaveType" className="w-full">
-                  <SelectValue placeholder="Select leave type…" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={LeaveType.ANNUAL}>Annual Leave</SelectItem>
-                  <SelectItem value={LeaveType.SICK}>Sick Leave</SelectItem>
-                  <SelectItem value={LeaveType.UNPAID}>Unpaid Leave</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <Separator />
-
             {/* Date pickers */}
             <div className="grid grid-cols-2 gap-4">
               <DatePickerField
@@ -573,5 +553,13 @@ export default function CreatePlanPage() {
         </div>
       </form>
     </main>
+  );
+}
+
+export default function CreatePlanPage() {
+  return (
+    <Suspense>
+      <CreatePlanPageInner />
+    </Suspense>
   );
 }

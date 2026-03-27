@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { Suspense } from "react";
 import Image from "next/image";
 import {
   addMonths,
@@ -21,6 +22,7 @@ import {
   List,
   MapPin,
   Pencil,
+  Plane,
   Plus,
   Search,
   SlidersHorizontal,
@@ -41,6 +43,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAllEvents } from "@/hooks/events/useEvents";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   Select,
@@ -177,6 +180,15 @@ function EventDetailSheet({
                   </div>
                 </>
               )}
+
+              <Separator />
+
+              <Button className="w-full gap-2" asChild>
+                <Link href={`/leave/new?eventId=${event.id}`}>
+                  <Plane className="h-4 w-4" />
+                  Create a Plan for This Event
+                </Link>
+              </Button>
             </div>
           </>
         )}
@@ -187,14 +199,35 @@ function EventDetailSheet({
 
 // ─── Event Card ───────────────────────────────────────────────────────────────
 
-function EventCard({ event, onClick }: { event: Event; onClick?: () => void }) {
+function EventCard({
+  event,
+  onClick,
+  isOwner,
+}: {
+  event: Event;
+  onClick?: () => void;
+  isOwner?: boolean;
+}) {
   const start = new Date(event.startAt);
   const end = new Date(event.endAt);
   return (
     <Card
-      className="hover:shadow-md transition-shadow cursor-pointer overflow-hidden"
+      className="hover:shadow-md transition-shadow cursor-pointer overflow-hidden relative group"
       onClick={onClick}
     >
+      {isOwner && (
+        <Button
+          variant="secondary"
+          size="icon"
+          className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+          asChild
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Link href={`/events/${event.id}/edit`}>
+            <Pencil className="h-3.5 w-3.5" />
+          </Link>
+        </Button>
+      )}
       {event.image && (
         <div className="relative w-full aspect-video">
           <Image
@@ -238,10 +271,12 @@ function ListView({
   events,
   isLoading,
   onSelect,
+  userId,
 }: {
   events: Event[] | undefined;
   isLoading: boolean;
   onSelect: (e: Event) => void;
+  userId?: string;
 }) {
   if (isLoading) {
     return (
@@ -268,7 +303,12 @@ function ListView({
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {events.map((e) => (
-        <EventCard key={e.id} event={e} onClick={() => onSelect(e)} />
+        <EventCard
+          key={e.id}
+          event={e}
+          onClick={() => onSelect(e)}
+          isOwner={!!userId && e.createdBy === userId}
+        />
       ))}
     </div>
   );
@@ -641,7 +681,12 @@ const DATE_RANGES = [
   { label: "Next 30 days", days: 30 },
 ];
 
-export default function EventsPage() {
+function EventsPageInner() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const { data: session } = useSession();
+  const userId = session?.user?.id;
   const [q, setQ] = React.useState("");
   const [debouncedQ, setDebouncedQ] = React.useState("");
   const [rangeDays, setRangeDays] = React.useState(365);
@@ -660,6 +705,27 @@ export default function EventsPage() {
     from,
     to,
   });
+
+  // Auto-open event from ?selected= query param
+  React.useEffect(() => {
+    const selectedId = searchParams.get("selected");
+    if (!selectedId || !events) return;
+    if (selectedEvent?.id === selectedId) return;
+
+    const found = events.find((e) => e.id === selectedId);
+    if (found) setSelectedEvent(found);
+  }, [searchParams, events, selectedEvent?.id]);
+
+  const handleCloseDetailSheet = React.useCallback(() => {
+    setSelectedEvent(null);
+
+    if (!searchParams.has("selected")) return;
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("selected");
+    const next = params.toString();
+    router.replace(next ? `${pathname}?${next}` : pathname, { scroll: false });
+  }, [searchParams, router, pathname]);
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-10 space-y-6">
@@ -735,6 +801,7 @@ export default function EventsPage() {
             events={events}
             isLoading={isLoading}
             onSelect={setSelectedEvent}
+            userId={userId}
           />
         </TabsContent>
 
@@ -753,8 +820,16 @@ export default function EventsPage() {
 
       <EventDetailSheet
         event={selectedEvent}
-        onClose={() => setSelectedEvent(null)}
+        onClose={handleCloseDetailSheet}
       />
     </main>
+  );
+}
+
+export default function EventsPage() {
+  return (
+    <Suspense>
+      <EventsPageInner />
+    </Suspense>
   );
 }

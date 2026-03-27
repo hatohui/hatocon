@@ -21,10 +21,11 @@ import {
 } from "@/components/ui/sheet";
 import {
   CalendarDays,
+  CalendarRange,
+  ClipboardList,
   LayoutDashboard,
   LogOut,
   Menu,
-  Plane,
   Settings,
 } from "lucide-react";
 import AppIcon from "./common/AppIcon";
@@ -34,7 +35,8 @@ import { useState } from "react";
 
 const NAV_LINKS = [
   { href: "/events", label: "Events", icon: CalendarDays },
-  { href: "/leave/new", label: "Create A Plan", icon: Plane },
+  { href: "/schedule", label: "Schedule", icon: CalendarRange },
+  { href: "/participations", label: "My Plans", icon: ClipboardList },
 ];
 
 export default function Navbar() {

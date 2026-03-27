@@ -89,13 +89,15 @@ const eventRepository = {
     isApproved = false,
   ) => {
     const { inviteeIds, ...eventData } = data;
+    // Private events are auto-approved (no public review needed)
+    const approved = isApproved || data.visibility === "PRIVATE";
     return db.event.create({
       data: {
         ...eventData,
         startAt: new Date(data.startAt),
         endAt: new Date(data.endAt),
         createdBy,
-        isApproved,
+        isApproved: approved,
         ...(inviteeIds && inviteeIds.length > 0
           ? {
               invitees: {

@@ -6,6 +6,7 @@ import {
   OK,
   Unauthorized,
 } from "@/common/response";
+import { db } from "@/config/prisma";
 import eventRepository from "@/repositories/event_repository";
 import { eventBaseSchema } from "@/validations/eventSchema";
 import type { NextRequest } from "next/server";
@@ -28,7 +29,20 @@ const GET = async (_req: NextRequest, ctx: Context) => {
     if (!isOwner && !isInvitee && !isAdmin) return NotFound();
   }
 
-  return OK(event);
+  const inviteeIds = event.invitees.map((i) => i.userId);
+  const inviteeUsers =
+    inviteeIds.length > 0
+      ? await db.user.findMany({
+          where: { id: { in: inviteeIds } },
+          omit: { password: true },
+          orderBy: { name: "asc" },
+        })
+      : [];
+
+  return OK({
+    ...event,
+    inviteeUsers,
+  });
 };
 
 const PATCH = async (req: NextRequest, ctx: Context) => {
@@ -49,8 +63,42 @@ const PATCH = async (req: NextRequest, ctx: Context) => {
     return BadRequest(result.error.issues.map((i) => i.message).join(", "));
   }
 
-  const updated = await eventRepository.update(id, result.data);
+  const updatePayload: typeof result.data & { isApproved?: boolean } = {
+    ...result.data,
+  };
+
+  // Non-admin users changing private -> public must go through approval again.
+  if (
+    !isAdmin &&
+    event.visibility === "PRIVATE" &&
+    result.data.visibility === "PUBLIC"
+  ) {
+    updatePayload.isApproved = false;
+  }
+
+  // Private events are immediately visible to owner/invitees.
+  if (result.data.visibility === "PRIVATE") {
+    updatePayload.isApproved = true;
+  }
+
+  const updated = await eventRepository.update(id, updatePayload);
   return OK(updated);
 };
 
-export { GET, PATCH };
+const DELETE = async (_req: NextRequest, ctx: Context) => {
+  const session = await auth();
+  if (!session?.user?.id) return Unauthorized();
+
+  const { id } = await ctx.params;
+  const event = await eventRepository.getById(id);
+  if (!event || event.isDeleted) return NotFound();
+
+  const isOwner = event.createdBy === session.user.id;
+  const isAdmin = session.user.isAdmin;
+  if (!isOwner && !isAdmin) return Forbidden();
+
+  await eventRepository.softDelete(id);
+  return OK({ id });
+};
+
+export { GET, PATCH, DELETE };

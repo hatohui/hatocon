@@ -54,6 +54,7 @@ import {
   UserPlus,
   X,
 } from "lucide-react";
+import ImageCropDialog from "@/components/ImageCropDialog";
 
 const schema = z
   .object({
@@ -207,6 +208,7 @@ export default function CreateEventPage() {
   const createEvent = useCreateEvent();
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = React.useState(false);
+  const [cropFile, setCropFile] = React.useState<File | null>(null);
   const [invitees, setInvitees] = React.useState<Omit<User, "password">[]>([]);
 
   const form = useForm<FormValues>({
@@ -280,6 +282,11 @@ export default function CreateEventPage() {
     } finally {
       setUploading(false);
     }
+  };
+
+  const handleCropComplete = (cropped: File | null) => {
+    setCropFile(null);
+    if (cropped) handleImageUpload(cropped);
   };
 
   const dateRange = formatDateRange(watched.startAt ?? "", watched.endAt ?? "");
@@ -392,7 +399,7 @@ export default function CreateEventPage() {
                             className="hidden"
                             onChange={(e) => {
                               const file = e.target.files?.[0];
-                              if (file) handleImageUpload(file);
+                              if (file) setCropFile(file);
                               e.target.value = "";
                             }}
                           />
@@ -664,6 +671,14 @@ export default function CreateEventPage() {
           </Card>
         </div>
       </div>
+
+      <ImageCropDialog
+        file={cropFile}
+        aspect={16 / 9}
+        maxWidth={1200}
+        quality={0.85}
+        onComplete={handleCropComplete}
+      />
     </main>
   );
 }

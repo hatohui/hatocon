@@ -22,6 +22,9 @@ const eventService = {
   updateOwn: (id: string, data: EventUpdateDTO) =>
     axios.patch<ApiOk<Event>>(`/api/events/${id}`, data),
 
+  deleteOwn: (id: string) =>
+    axios.delete<ApiOk<{ id: string }>>(`/api/events/${id}`),
+
   getAllAdmin: (opts: { q?: string; approved?: "true" | "false" } = {}) => {
     const params = new URLSearchParams();
     if (opts.q) params.set("q", opts.q);
