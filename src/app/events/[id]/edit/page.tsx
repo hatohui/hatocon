@@ -366,7 +366,7 @@ function EditEventForm({ event }: { event: EventEditResponse }) {
   };
 
   const handleDelete = () => {
-    deleteEvent.mutate(params.id, {
+    deleteEvent.mutate(event.id, {
       onSuccess: () => {
         toast.success("Event deleted");
         router.push("/events");

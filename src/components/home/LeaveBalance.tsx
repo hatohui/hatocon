@@ -30,7 +30,6 @@ const LeaveBalance = () => {
               Adjust
               <ChevronRight className="h-3 w-3" />
             </Link>
-            Cycle Start
           </Button>
         </div>
         {isLoading ? (
