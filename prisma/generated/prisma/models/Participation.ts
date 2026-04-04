@@ -217,6 +217,7 @@ export type ParticipationWhereInput = {
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   event?: Prisma.XOR<Prisma.EventNullableScalarRelationFilter, Prisma.EventWhereInput> | null
   images?: Prisma.ParticipationImageListRelationFilter
+  activities?: Prisma.ActivityListRelationFilter
 }
 
 export type ParticipationOrderByWithRelationInput = {
@@ -232,6 +233,7 @@ export type ParticipationOrderByWithRelationInput = {
   user?: Prisma.UserOrderByWithRelationInput
   event?: Prisma.EventOrderByWithRelationInput
   images?: Prisma.ParticipationImageOrderByRelationAggregateInput
+  activities?: Prisma.ActivityOrderByRelationAggregateInput
 }
 
 export type ParticipationWhereUniqueInput = Prisma.AtLeast<{
@@ -252,6 +254,7 @@ export type ParticipationWhereUniqueInput = Prisma.AtLeast<{
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   event?: Prisma.XOR<Prisma.EventNullableScalarRelationFilter, Prisma.EventWhereInput> | null
   images?: Prisma.ParticipationImageListRelationFilter
+  activities?: Prisma.ActivityListRelationFilter
 }, "id" | "userId_eventId" | "userId_from_to">
 
 export type ParticipationOrderByWithAggregationInput = {
@@ -295,6 +298,7 @@ export type ParticipationCreateInput = {
   user: Prisma.UserCreateNestedOneWithoutParticipationsInput
   event?: Prisma.EventCreateNestedOneWithoutParticipationsInput
   images?: Prisma.ParticipationImageCreateNestedManyWithoutParticipationInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutParticipationInput
 }
 
 export type ParticipationUncheckedCreateInput = {
@@ -308,6 +312,7 @@ export type ParticipationUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   images?: Prisma.ParticipationImageUncheckedCreateNestedManyWithoutParticipationInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutParticipationInput
 }
 
 export type ParticipationUpdateInput = {
@@ -321,6 +326,7 @@ export type ParticipationUpdateInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutParticipationsNestedInput
   event?: Prisma.EventUpdateOneWithoutParticipationsNestedInput
   images?: Prisma.ParticipationImageUpdateManyWithoutParticipationNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutParticipationNestedInput
 }
 
 export type ParticipationUncheckedUpdateInput = {
@@ -334,6 +340,7 @@ export type ParticipationUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   images?: Prisma.ParticipationImageUncheckedUpdateManyWithoutParticipationNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutParticipationNestedInput
 }
 
 export type ParticipationCreateManyInput = {
@@ -534,6 +541,20 @@ export type ParticipationUpdateOneRequiredWithoutImagesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ParticipationUpdateToOneWithWhereWithoutImagesInput, Prisma.ParticipationUpdateWithoutImagesInput>, Prisma.ParticipationUncheckedUpdateWithoutImagesInput>
 }
 
+export type ParticipationCreateNestedOneWithoutActivitiesInput = {
+  create?: Prisma.XOR<Prisma.ParticipationCreateWithoutActivitiesInput, Prisma.ParticipationUncheckedCreateWithoutActivitiesInput>
+  connectOrCreate?: Prisma.ParticipationCreateOrConnectWithoutActivitiesInput
+  connect?: Prisma.ParticipationWhereUniqueInput
+}
+
+export type ParticipationUpdateOneRequiredWithoutActivitiesNestedInput = {
+  create?: Prisma.XOR<Prisma.ParticipationCreateWithoutActivitiesInput, Prisma.ParticipationUncheckedCreateWithoutActivitiesInput>
+  connectOrCreate?: Prisma.ParticipationCreateOrConnectWithoutActivitiesInput
+  upsert?: Prisma.ParticipationUpsertWithoutActivitiesInput
+  connect?: Prisma.ParticipationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ParticipationUpdateToOneWithWhereWithoutActivitiesInput, Prisma.ParticipationUpdateWithoutActivitiesInput>, Prisma.ParticipationUncheckedUpdateWithoutActivitiesInput>
+}
+
 export type ParticipationCreateWithoutUserInput = {
   id?: string
   from: Date | string
@@ -544,6 +565,7 @@ export type ParticipationCreateWithoutUserInput = {
   updatedAt?: Date | string
   event?: Prisma.EventCreateNestedOneWithoutParticipationsInput
   images?: Prisma.ParticipationImageCreateNestedManyWithoutParticipationInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutParticipationInput
 }
 
 export type ParticipationUncheckedCreateWithoutUserInput = {
@@ -556,6 +578,7 @@ export type ParticipationUncheckedCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   images?: Prisma.ParticipationImageUncheckedCreateNestedManyWithoutParticipationInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutParticipationInput
 }
 
 export type ParticipationCreateOrConnectWithoutUserInput = {
@@ -609,6 +632,7 @@ export type ParticipationCreateWithoutEventInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutParticipationsInput
   images?: Prisma.ParticipationImageCreateNestedManyWithoutParticipationInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutParticipationInput
 }
 
 export type ParticipationUncheckedCreateWithoutEventInput = {
@@ -621,6 +645,7 @@ export type ParticipationUncheckedCreateWithoutEventInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   images?: Prisma.ParticipationImageUncheckedCreateNestedManyWithoutParticipationInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutParticipationInput
 }
 
 export type ParticipationCreateOrConnectWithoutEventInput = {
@@ -659,6 +684,7 @@ export type ParticipationCreateWithoutImagesInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutParticipationsInput
   event?: Prisma.EventCreateNestedOneWithoutParticipationsInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutParticipationInput
 }
 
 export type ParticipationUncheckedCreateWithoutImagesInput = {
@@ -671,6 +697,7 @@ export type ParticipationUncheckedCreateWithoutImagesInput = {
   createdBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutParticipationInput
 }
 
 export type ParticipationCreateOrConnectWithoutImagesInput = {
@@ -699,6 +726,7 @@ export type ParticipationUpdateWithoutImagesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutParticipationsNestedInput
   event?: Prisma.EventUpdateOneWithoutParticipationsNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutParticipationNestedInput
 }
 
 export type ParticipationUncheckedUpdateWithoutImagesInput = {
@@ -711,6 +739,75 @@ export type ParticipationUncheckedUpdateWithoutImagesInput = {
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutParticipationNestedInput
+}
+
+export type ParticipationCreateWithoutActivitiesInput = {
+  id?: string
+  from: Date | string
+  to: Date | string
+  leaveType: $Enums.LeaveType
+  createdBy?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutParticipationsInput
+  event?: Prisma.EventCreateNestedOneWithoutParticipationsInput
+  images?: Prisma.ParticipationImageCreateNestedManyWithoutParticipationInput
+}
+
+export type ParticipationUncheckedCreateWithoutActivitiesInput = {
+  id?: string
+  userId: string
+  eventId?: string | null
+  from: Date | string
+  to: Date | string
+  leaveType: $Enums.LeaveType
+  createdBy?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  images?: Prisma.ParticipationImageUncheckedCreateNestedManyWithoutParticipationInput
+}
+
+export type ParticipationCreateOrConnectWithoutActivitiesInput = {
+  where: Prisma.ParticipationWhereUniqueInput
+  create: Prisma.XOR<Prisma.ParticipationCreateWithoutActivitiesInput, Prisma.ParticipationUncheckedCreateWithoutActivitiesInput>
+}
+
+export type ParticipationUpsertWithoutActivitiesInput = {
+  update: Prisma.XOR<Prisma.ParticipationUpdateWithoutActivitiesInput, Prisma.ParticipationUncheckedUpdateWithoutActivitiesInput>
+  create: Prisma.XOR<Prisma.ParticipationCreateWithoutActivitiesInput, Prisma.ParticipationUncheckedCreateWithoutActivitiesInput>
+  where?: Prisma.ParticipationWhereInput
+}
+
+export type ParticipationUpdateToOneWithWhereWithoutActivitiesInput = {
+  where?: Prisma.ParticipationWhereInput
+  data: Prisma.XOR<Prisma.ParticipationUpdateWithoutActivitiesInput, Prisma.ParticipationUncheckedUpdateWithoutActivitiesInput>
+}
+
+export type ParticipationUpdateWithoutActivitiesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  from?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutParticipationsNestedInput
+  event?: Prisma.EventUpdateOneWithoutParticipationsNestedInput
+  images?: Prisma.ParticipationImageUpdateManyWithoutParticipationNestedInput
+}
+
+export type ParticipationUncheckedUpdateWithoutActivitiesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  eventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  from?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  images?: Prisma.ParticipationImageUncheckedUpdateManyWithoutParticipationNestedInput
 }
 
 export type ParticipationCreateManyUserInput = {
@@ -734,6 +831,7 @@ export type ParticipationUpdateWithoutUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   event?: Prisma.EventUpdateOneWithoutParticipationsNestedInput
   images?: Prisma.ParticipationImageUpdateManyWithoutParticipationNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutParticipationNestedInput
 }
 
 export type ParticipationUncheckedUpdateWithoutUserInput = {
@@ -746,6 +844,7 @@ export type ParticipationUncheckedUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   images?: Prisma.ParticipationImageUncheckedUpdateManyWithoutParticipationNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutParticipationNestedInput
 }
 
 export type ParticipationUncheckedUpdateManyWithoutUserInput = {
@@ -780,6 +879,7 @@ export type ParticipationUpdateWithoutEventInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutParticipationsNestedInput
   images?: Prisma.ParticipationImageUpdateManyWithoutParticipationNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutParticipationNestedInput
 }
 
 export type ParticipationUncheckedUpdateWithoutEventInput = {
@@ -792,6 +892,7 @@ export type ParticipationUncheckedUpdateWithoutEventInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   images?: Prisma.ParticipationImageUncheckedUpdateManyWithoutParticipationNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutParticipationNestedInput
 }
 
 export type ParticipationUncheckedUpdateManyWithoutEventInput = {
@@ -812,10 +913,12 @@ export type ParticipationUncheckedUpdateManyWithoutEventInput = {
 
 export type ParticipationCountOutputType = {
   images: number
+  activities: number
 }
 
 export type ParticipationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   images?: boolean | ParticipationCountOutputTypeCountImagesArgs
+  activities?: boolean | ParticipationCountOutputTypeCountActivitiesArgs
 }
 
 /**
@@ -835,6 +938,13 @@ export type ParticipationCountOutputTypeCountImagesArgs<ExtArgs extends runtime.
   where?: Prisma.ParticipationImageWhereInput
 }
 
+/**
+ * ParticipationCountOutputType without action
+ */
+export type ParticipationCountOutputTypeCountActivitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ActivityWhereInput
+}
+
 
 export type ParticipationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -849,6 +959,7 @@ export type ParticipationSelect<ExtArgs extends runtime.Types.Extensions.Interna
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   event?: boolean | Prisma.Participation$eventArgs<ExtArgs>
   images?: boolean | Prisma.Participation$imagesArgs<ExtArgs>
+  activities?: boolean | Prisma.Participation$activitiesArgs<ExtArgs>
   _count?: boolean | Prisma.ParticipationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["participation"]>
 
@@ -897,6 +1008,7 @@ export type ParticipationInclude<ExtArgs extends runtime.Types.Extensions.Intern
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   event?: boolean | Prisma.Participation$eventArgs<ExtArgs>
   images?: boolean | Prisma.Participation$imagesArgs<ExtArgs>
+  activities?: boolean | Prisma.Participation$activitiesArgs<ExtArgs>
   _count?: boolean | Prisma.ParticipationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ParticipationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -914,6 +1026,7 @@ export type $ParticipationPayload<ExtArgs extends runtime.Types.Extensions.Inter
     user: Prisma.$UserPayload<ExtArgs>
     event: Prisma.$EventPayload<ExtArgs> | null
     images: Prisma.$ParticipationImagePayload<ExtArgs>[]
+    activities: Prisma.$ActivityPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1322,6 +1435,7 @@ export interface Prisma__ParticipationClient<T, Null = never, ExtArgs extends ru
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   event<T extends Prisma.Participation$eventArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Participation$eventArgs<ExtArgs>>): Prisma.Prisma__EventClient<runtime.Types.Result.GetResult<Prisma.$EventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   images<T extends Prisma.Participation$imagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Participation$imagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ParticipationImagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  activities<T extends Prisma.Participation$activitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Participation$activitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ActivityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1801,6 +1915,30 @@ export type Participation$imagesArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.ParticipationImageScalarFieldEnum | Prisma.ParticipationImageScalarFieldEnum[]
+}
+
+/**
+ * Participation.activities
+ */
+export type Participation$activitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Activity
+   */
+  select?: Prisma.ActivitySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Activity
+   */
+  omit?: Prisma.ActivityOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ActivityInclude<ExtArgs> | null
+  where?: Prisma.ActivityWhereInput
+  orderBy?: Prisma.ActivityOrderByWithRelationInput | Prisma.ActivityOrderByWithRelationInput[]
+  cursor?: Prisma.ActivityWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ActivityScalarFieldEnum | Prisma.ActivityScalarFieldEnum[]
 }
 
 /**

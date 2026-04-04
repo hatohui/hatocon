@@ -8,9 +8,16 @@ interface EventListProps {
   isLoading: boolean;
   onSelect: (event: Event) => void;
   userId?: string;
+  participationsByEventId?: Record<string, string>;
 }
 
-const EventList = ({ events, isLoading, onSelect, userId }: EventListProps) => {
+const EventList = ({
+  events,
+  isLoading,
+  onSelect,
+  userId,
+  participationsByEventId,
+}: EventListProps) => {
   if (isLoading) {
     return (
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -41,6 +48,7 @@ const EventList = ({ events, isLoading, onSelect, userId }: EventListProps) => {
           event={e}
           onClick={() => onSelect(e)}
           isOwner={!!userId && e.createdBy === userId}
+          participationId={participationsByEventId?.[e.id]}
         />
       ))}
     </div>

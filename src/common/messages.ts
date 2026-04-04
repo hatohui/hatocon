@@ -57,4 +57,13 @@ export const messages = {
       leaveTypeInvalid: "VALIDATION_PARTICIPATION_LEAVE_TYPE_INVALID",
     },
   },
+  activity: {
+    notFound: "ACTIVITY_NOT_FOUND",
+    validation: {
+      nameRequired: "VALIDATION_ACTIVITY_NAME_REQUIRED",
+      nameMax: "VALIDATION_ACTIVITY_NAME_MAX",
+      fromRequired: "VALIDATION_ACTIVITY_FROM_REQUIRED",
+      toRequired: "VALIDATION_ACTIVITY_TO_REQUIRED",
+    },
+  },
 };

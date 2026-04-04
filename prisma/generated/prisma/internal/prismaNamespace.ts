@@ -392,6 +392,8 @@ export const ModelName = {
   Event: 'Event',
   Participation: 'Participation',
   ParticipationImage: 'ParticipationImage',
+  Activity: 'Activity',
+  ActivityMedia: 'ActivityMedia',
   Holiday: 'Holiday',
   EventInvitee: 'EventInvitee'
 } as const
@@ -409,7 +411,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "account" | "session" | "verificationToken" | "jobProfile" | "event" | "participation" | "participationImage" | "holiday" | "eventInvitee"
+    modelProps: "user" | "account" | "session" | "verificationToken" | "jobProfile" | "event" | "participation" | "participationImage" | "activity" | "activityMedia" | "holiday" | "eventInvitee"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1005,6 +1007,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Activity: {
+      payload: Prisma.$ActivityPayload<ExtArgs>
+      fields: Prisma.ActivityFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ActivityFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ActivityFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityPayload>
+        }
+        findFirst: {
+          args: Prisma.ActivityFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ActivityFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityPayload>
+        }
+        findMany: {
+          args: Prisma.ActivityFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityPayload>[]
+        }
+        create: {
+          args: Prisma.ActivityCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityPayload>
+        }
+        createMany: {
+          args: Prisma.ActivityCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ActivityCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityPayload>[]
+        }
+        delete: {
+          args: Prisma.ActivityDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityPayload>
+        }
+        update: {
+          args: Prisma.ActivityUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityPayload>
+        }
+        deleteMany: {
+          args: Prisma.ActivityDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ActivityUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ActivityUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityPayload>[]
+        }
+        upsert: {
+          args: Prisma.ActivityUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityPayload>
+        }
+        aggregate: {
+          args: Prisma.ActivityAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateActivity>
+        }
+        groupBy: {
+          args: Prisma.ActivityGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ActivityGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ActivityCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ActivityCountAggregateOutputType> | number
+        }
+      }
+    }
+    ActivityMedia: {
+      payload: Prisma.$ActivityMediaPayload<ExtArgs>
+      fields: Prisma.ActivityMediaFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ActivityMediaFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityMediaPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ActivityMediaFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityMediaPayload>
+        }
+        findFirst: {
+          args: Prisma.ActivityMediaFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityMediaPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ActivityMediaFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityMediaPayload>
+        }
+        findMany: {
+          args: Prisma.ActivityMediaFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityMediaPayload>[]
+        }
+        create: {
+          args: Prisma.ActivityMediaCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityMediaPayload>
+        }
+        createMany: {
+          args: Prisma.ActivityMediaCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ActivityMediaCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityMediaPayload>[]
+        }
+        delete: {
+          args: Prisma.ActivityMediaDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityMediaPayload>
+        }
+        update: {
+          args: Prisma.ActivityMediaUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityMediaPayload>
+        }
+        deleteMany: {
+          args: Prisma.ActivityMediaDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ActivityMediaUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ActivityMediaUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityMediaPayload>[]
+        }
+        upsert: {
+          args: Prisma.ActivityMediaUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityMediaPayload>
+        }
+        aggregate: {
+          args: Prisma.ActivityMediaAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateActivityMedia>
+        }
+        groupBy: {
+          args: Prisma.ActivityMediaGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ActivityMediaGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ActivityMediaCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ActivityMediaCountAggregateOutputType> | number
+        }
+      }
+    }
     Holiday: {
       payload: Prisma.$HolidayPayload<ExtArgs>
       fields: Prisma.HolidayFieldRefs
@@ -1312,6 +1462,38 @@ export const ParticipationImageScalarFieldEnum = {
 export type ParticipationImageScalarFieldEnum = (typeof ParticipationImageScalarFieldEnum)[keyof typeof ParticipationImageScalarFieldEnum]
 
 
+export const ActivityScalarFieldEnum = {
+  id: 'id',
+  participationId: 'participationId',
+  name: 'name',
+  from: 'from',
+  to: 'to',
+  location: 'location',
+  locationUrl: 'locationUrl',
+  involvedPeople: 'involvedPeople',
+  note: 'note',
+  imageUrl: 'imageUrl',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  createdBy: 'createdBy'
+} as const
+
+export type ActivityScalarFieldEnum = (typeof ActivityScalarFieldEnum)[keyof typeof ActivityScalarFieldEnum]
+
+
+export const ActivityMediaScalarFieldEnum = {
+  id: 'id',
+  activityId: 'activityId',
+  url: 'url',
+  caption: 'caption',
+  uploadedBy: 'uploadedBy',
+  createdAt: 'createdAt'
+} as const
+
+export type ActivityMediaScalarFieldEnum = (typeof ActivityMediaScalarFieldEnum)[keyof typeof ActivityMediaScalarFieldEnum]
+
+
 export const HolidayScalarFieldEnum = {
   id: 'id',
   date: 'date',
@@ -1556,6 +1738,8 @@ export type GlobalOmitConfig = {
   event?: Prisma.EventOmit
   participation?: Prisma.ParticipationOmit
   participationImage?: Prisma.ParticipationImageOmit
+  activity?: Prisma.ActivityOmit
+  activityMedia?: Prisma.ActivityMediaOmit
   holiday?: Prisma.HolidayOmit
   eventInvitee?: Prisma.EventInviteeOmit
 }

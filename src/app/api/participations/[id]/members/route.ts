@@ -13,6 +13,24 @@ import type { NextRequest } from "next/server";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
+/** GET /api/participations/[id]/members?search=... — search within this participation's members only */
+const GET = async (req: NextRequest, ctx: RouteContext) => {
+  const session = await auth();
+  if (!session?.user?.id) return Unauthorized();
+
+  const { id } = await ctx.params;
+  const participation = await participationRepository.getById(id);
+  if (!participation) return NotFound("Participation not found");
+
+  // Only members or the owner may query this
+  const isMember = await participationRepository.isMember(id, session.user.id);
+  if (!isMember) return Unauthorized();
+
+  const search = req.nextUrl.searchParams.get("search") ?? "";
+  const members = await participationRepository.searchMembers(id, search);
+  return OK(members);
+};
+
 /** POST /api/participations/[id]/members — add a member to the same event participation */
 const POST = async (req: NextRequest, ctx: RouteContext) => {
   const session = await auth();
@@ -57,4 +75,4 @@ const POST = async (req: NextRequest, ctx: RouteContext) => {
   return OK(newParticipation);
 };
 
-export { POST };
+export { GET, POST };

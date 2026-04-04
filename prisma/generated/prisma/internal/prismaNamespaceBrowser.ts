@@ -59,6 +59,8 @@ export const ModelName = {
   Event: 'Event',
   Participation: 'Participation',
   ParticipationImage: 'ParticipationImage',
+  Activity: 'Activity',
+  ActivityMedia: 'ActivityMedia',
   Holiday: 'Holiday',
   EventInvitee: 'EventInvitee'
 } as const
@@ -197,6 +199,38 @@ export const ParticipationImageScalarFieldEnum = {
 } as const
 
 export type ParticipationImageScalarFieldEnum = (typeof ParticipationImageScalarFieldEnum)[keyof typeof ParticipationImageScalarFieldEnum]
+
+
+export const ActivityScalarFieldEnum = {
+  id: 'id',
+  participationId: 'participationId',
+  name: 'name',
+  from: 'from',
+  to: 'to',
+  location: 'location',
+  locationUrl: 'locationUrl',
+  involvedPeople: 'involvedPeople',
+  note: 'note',
+  imageUrl: 'imageUrl',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  createdBy: 'createdBy'
+} as const
+
+export type ActivityScalarFieldEnum = (typeof ActivityScalarFieldEnum)[keyof typeof ActivityScalarFieldEnum]
+
+
+export const ActivityMediaScalarFieldEnum = {
+  id: 'id',
+  activityId: 'activityId',
+  url: 'url',
+  caption: 'caption',
+  uploadedBy: 'uploadedBy',
+  createdAt: 'createdAt'
+} as const
+
+export type ActivityMediaScalarFieldEnum = (typeof ActivityMediaScalarFieldEnum)[keyof typeof ActivityMediaScalarFieldEnum]
 
 
 export const HolidayScalarFieldEnum = {

@@ -37,7 +37,6 @@ import { useState } from "react";
 const NAV_LINKS = [
   { href: "/events", label: "Events", icon: CalendarDays },
   { href: "/schedule", label: "Schedule", icon: CalendarRange },
-  { href: "/participations", label: "My Plans", icon: ClipboardList },
 ];
 
 export default function Navbar() {

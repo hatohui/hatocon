@@ -58,6 +58,16 @@ export type Participation = Prisma.ParticipationModel
  */
 export type ParticipationImage = Prisma.ParticipationImageModel
 /**
+ * Model Activity
+ * 
+ */
+export type Activity = Prisma.ActivityModel
+/**
+ * Model ActivityMedia
+ * 
+ */
+export type ActivityMedia = Prisma.ActivityMediaModel
+/**
  * Model Holiday
  * 
  */

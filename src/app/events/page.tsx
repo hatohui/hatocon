@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAllEvents } from "@/hooks/events/useEvents";
+import { useMyParticipations } from "@/hooks/participations/useParticipations";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -42,6 +43,13 @@ const EventPage = () => {
     to,
   });
 
+  const { data: participations } = useMyParticipations(from, to);
+
+  const participationsByEventId: Record<string, string> = {};
+  participations?.forEach((p) => {
+    if (p.eventId) participationsByEventId[p.eventId] = p.id;
+  });
+
   useEffect(() => {
     const selectedId = searchParams.get("selected");
     if (!selectedId || !events) return;
@@ -61,6 +69,17 @@ const EventPage = () => {
     const next = params.toString();
     router.replace(next ? `${pathname}?${next}` : pathname, { scroll: false });
   }, [searchParams, router, pathname]);
+
+  const activeView = searchParams.get("view") ?? "timeline";
+
+  const handleViewChange = useCallback(
+    (value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("view", value);
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    },
+    [searchParams, router, pathname],
+  );
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-10 space-y-6">
@@ -97,7 +116,7 @@ const EventPage = () => {
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="list">
+      <Tabs value={activeView} onValueChange={handleViewChange}>
         <TabsList className="mb-6">
           <TabsTrigger value="list" className="gap-2">
             <List className="h-4 w-4" />
@@ -119,11 +138,16 @@ const EventPage = () => {
             isLoading={isLoading}
             onSelect={setSelectedEvent}
             userId={userId}
+            participationsByEventId={participationsByEventId}
           />
         </TabsContent>
 
         <TabsContent value="calendar">
-          <EventCalendar q={debouncedQ} onSelect={setSelectedEvent} />
+          <EventCalendar
+            q={debouncedQ}
+            onSelect={setSelectedEvent}
+            participationsByEventId={participationsByEventId}
+          />
         </TabsContent>
 
         <TabsContent value="timeline">
@@ -131,6 +155,7 @@ const EventPage = () => {
             events={events}
             isLoading={isLoading}
             onSelect={setSelectedEvent}
+            participationsByEventId={participationsByEventId}
           />
         </TabsContent>
       </Tabs>

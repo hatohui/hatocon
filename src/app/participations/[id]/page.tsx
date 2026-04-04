@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import {
   differenceInCalendarDays,
   eachDayOfInterval,
@@ -47,12 +48,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
   Popover,
   PopoverContent,
@@ -86,8 +82,14 @@ import {
   useDeleteParticipationImage,
   useAddParticipationMember,
 } from "@/hooks/participations/useParticipations";
+import { useActivities } from "@/hooks/activities/useActivities";
 import { useSearchUsers } from "@/hooks/users/useUsers";
 import { cn } from "@/lib/utils";
+import ActivityTimeline, {
+  ActivityOverviewSection,
+} from "@/components/pages/participation/activity-timeline";
+import MediaGallery from "@/components/pages/participation/media-gallery";
+import ParticipationSettings from "@/components/pages/participation/participation-settings";
 
 const LEAVE_COLOURS: Record<string, string> = {
   ANNUAL: "bg-blue-100 text-blue-800",
@@ -531,30 +533,63 @@ function ParticipationCalendar({
 // ─── Schedule Timeline View ──────────────────────────────────────────────────
 
 function ScheduleTimeline({
+  participationId,
   from,
   to,
   leaveType,
   event,
 }: {
+  participationId: string;
   from: Date;
   to: Date;
   leaveType: string;
   event: {
     title: string;
-    startAt: Date;
-    endAt: Date;
+    startAt: Date | string;
+    endAt: Date | string;
     location?: string | null;
   } | null;
 }) {
   const start = new Date(from);
   const end = new Date(to);
-  const days = eachDayOfInterval({ start, end });
   const totalDays = differenceInCalendarDays(end, start) + 1;
+  const { data: activities } = useActivities(participationId);
+
+  type LogItem = {
+    id: string;
+    from: Date;
+    name: string;
+    isSynthetic?: boolean;
+  };
+
+  const items: LogItem[] = [
+    ...(event
+      ? [
+          {
+            id: "event-start",
+            from: new Date(event.startAt),
+            name: `${event.title} – Starts`,
+            isSynthetic: true,
+          },
+          {
+            id: "event-end",
+            from: new Date(event.endAt),
+            name: `${event.title} – Ends`,
+            isSynthetic: true,
+          },
+        ]
+      : []),
+    ...(activities ?? []).map((a) => ({
+      id: a.id,
+      from: new Date(a.from),
+      name: a.name,
+    })),
+  ].sort((a, b) => a.from.getTime() - b.from.getTime());
 
   return (
     <Card>
       <CardContent className="p-4 space-y-4">
-        {/* Timeline bar */}
+        {/* Progress bar */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span>{format(start, "MMM d, yyyy")}</span>
@@ -563,19 +598,14 @@ function ScheduleTimeline({
             </span>
             <span>{format(end, "MMM d, yyyy")}</span>
           </div>
-          <div className="h-3 rounded-full bg-muted overflow-hidden">
+          <div className="h-2 rounded-full bg-muted overflow-hidden">
             {(() => {
               const now = new Date();
-              if (now < start) {
-                return (
-                  <div className="h-full w-0 rounded-full bg-primary/40" />
-                );
-              }
-              if (now > end) {
+              if (now < start) return <div className="h-full w-0" />;
+              if (now > end)
                 return (
                   <div className="h-full w-full rounded-full bg-primary" />
                 );
-              }
               const elapsed = differenceInCalendarDays(now, start) + 1;
               const pct = Math.min(100, (elapsed / totalDays) * 100);
               return (
@@ -590,60 +620,52 @@ function ScheduleTimeline({
 
         <Separator />
 
-        {/* Day-by-day list */}
-        <div className="space-y-1.5 max-h-64 overflow-y-auto">
-          {days.map((day, i) => {
-            const isToday = isSameDay(day, new Date());
-            const isPast = day < new Date() && !isToday;
-            return (
-              <div
-                key={format(day, "yyyy-MM-dd")}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-1.5 rounded-md text-sm",
-                  isToday && "bg-primary/10 font-medium",
-                  isPast && "text-muted-foreground",
-                )}
-              >
-                <span className="w-5 text-xs text-muted-foreground tabular-nums">
-                  {i + 1}
-                </span>
+        {/* Activity log */}
+        {items.length === 0 ? (
+          <p className="text-xs text-muted-foreground text-center py-2">
+            No activities yet
+          </p>
+        ) : (
+          <div className="space-y-0 max-h-64 overflow-y-auto">
+            {items.map((item) => {
+              const isPast = item.from < new Date();
+              return (
                 <div
+                  key={item.id}
                   className={cn(
-                    "h-2 w-2 rounded-full shrink-0",
-                    LEAVE_DOT_COLOURS[leaveType] ?? "bg-gray-400",
+                    "flex items-center gap-3 px-2 py-1.5 rounded-md text-xs",
+                    isPast && !item.isSynthetic && "text-muted-foreground",
+                    item.isSynthetic && "text-muted-foreground",
                   )}
-                />
-                <span className="flex-1">{format(day, "EEE, MMM d")}</span>
-                {isToday && (
-                  <Badge variant="secondary" className="text-[10px] h-4">
-                    Today
-                  </Badge>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {event && (
-          <>
-            <Separator />
-            <div className="flex items-start gap-3 text-sm">
-              <Plane className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-              <div>
-                <p className="font-medium">{event.title}</p>
-                <p className="text-xs text-muted-foreground">
-                  {format(new Date(event.startAt), "MMM d")} –{" "}
-                  {format(new Date(event.endAt), "MMM d, yyyy")}
-                </p>
-                {event.location && (
-                  <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-                    <MapPin className="h-3 w-3" />
-                    {event.location}
-                  </p>
-                )}
-              </div>
-            </div>
-          </>
+                >
+                  <span className="shrink-0 w-18 tabular-nums font-mono">
+                    {format(item.from, "MMM d")}
+                  </span>
+                  <span className="shrink-0 w-10 tabular-nums text-muted-foreground">
+                    {format(item.from, "HH:mm")}
+                  </span>
+                  {item.isSynthetic ? (
+                    <Plane className="h-2.5 w-2.5 shrink-0 text-muted-foreground" />
+                  ) : (
+                    <div
+                      className={cn(
+                        "h-1.5 w-1.5 rounded-full shrink-0",
+                        LEAVE_DOT_COLOURS[leaveType] ?? "bg-gray-400",
+                      )}
+                    />
+                  )}
+                  <span
+                    className={cn(
+                      "flex-1 truncate",
+                      !item.isSynthetic && "font-medium",
+                    )}
+                  >
+                    {item.name}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
         )}
       </CardContent>
     </Card>
@@ -655,22 +677,17 @@ function ScheduleTimeline({
 export default function ParticipationDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
+  const session = useSession();
   const { data: participation, isLoading } = useParticipationById(params.id);
-  const deleteMutation = useDeleteParticipation();
 
   if (isLoading) {
     return (
       <main className="mx-auto max-w-4xl px-4 py-8 space-y-6">
         <Skeleton className="h-8 w-48" />
-        <div className="grid gap-6 md:grid-cols-3">
-          <div className="md:col-span-2 space-y-4">
-            <Skeleton className="h-48 rounded-xl" />
-            <Skeleton className="h-64 rounded-xl" />
-          </div>
-          <div className="space-y-4">
-            <Skeleton className="h-32 rounded-xl" />
-            <Skeleton className="h-48 rounded-xl" />
-          </div>
+        <div className="space-y-4">
+          <Skeleton className="h-48 rounded-xl" />
+          <Skeleton className="h-10 w-64" />
+          <Skeleton className="h-64 rounded-xl" />
         </div>
       </main>
     );
@@ -696,15 +713,9 @@ export default function ParticipationDetailPage() {
       new Date(participation.from),
     ) + 1;
 
-  const handleDelete = () => {
-    deleteMutation.mutate(participation.id, {
-      onSuccess: () => {
-        toast.success("Plan deleted");
-        router.push("/participations");
-      },
-      onError: () => toast.error("Failed to delete plan"),
-    });
-  };
+  const isOwner = session.data?.user?.id === participation.userId;
+  const currentUserId = session.data?.user?.id ?? "";
+  const members = participation.participants.map((p) => p.user);
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-8 space-y-6">
@@ -743,33 +754,6 @@ export default function ParticipationDetailPage() {
               </span>
             </div>
           </div>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="outline" size="sm" className="text-destructive">
-                <Trash2 className="h-4 w-4 mr-1.5" />
-                Delete
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete this plan?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. Your leave record and any
-                  associated photos will be permanently removed.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleDelete}
-                  disabled={deleteMutation.isPending}
-                  className="bg-destructive text-white hover:bg-destructive/90"
-                >
-                  Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
         </div>
       </div>
 
@@ -832,127 +816,73 @@ export default function ParticipationDetailPage() {
         </Card>
       )}
 
-      {/* Main content grid */}
-      <div className="grid gap-6 md:grid-cols-3">
-        {/* Left column: Gallery + Duration views */}
-        <div className="md:col-span-2 space-y-6">
-          {/* Photo gallery */}
-          <PhotoGallery
-            images={participation.images}
-            participationId={participation.id}
-          />
+      {/* Tabs */}
+      <Tabs defaultValue="overview" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="timeline">Timeline</TabsTrigger>
+          <TabsTrigger value="media">Media</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
+        </TabsList>
 
-          {/* Duration views */}
-          <Tabs defaultValue="calendar">
-            <TabsList>
-              <TabsTrigger value="calendar" className="gap-1.5">
-                <Calendar className="h-3.5 w-3.5" />
-                Calendar
-              </TabsTrigger>
-              <TabsTrigger value="timeline" className="gap-1.5">
-                <Clock className="h-3.5 w-3.5" />
-                Timeline
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="calendar" className="mt-3">
-              <ParticipationCalendar
-                from={new Date(participation.from)}
-                to={new Date(participation.to)}
-                leaveType={participation.leaveType}
+        {/* Overview Tab */}
+        <TabsContent value="overview" className="space-y-6">
+          <div className="grid gap-6 md:grid-cols-3">
+            <div className="md:col-span-2 space-y-6">
+              <PhotoGallery
+                images={participation.images}
+                participationId={participation.id}
               />
-            </TabsContent>
-            <TabsContent value="timeline" className="mt-3">
               <ScheduleTimeline
+                participationId={participation.id}
                 from={new Date(participation.from)}
                 to={new Date(participation.to)}
                 leaveType={participation.leaveType}
                 event={participation.event}
               />
-            </TabsContent>
-          </Tabs>
-        </div>
+            </div>
+            <div className="space-y-6">
+              <ParticipationCalendar
+                from={new Date(participation.from)}
+                to={new Date(participation.to)}
+                leaveType={participation.leaveType}
+              />
+              {participation.eventId &&
+                participation.participants.length > 0 && (
+                  <MembersList
+                    participants={participation.participants}
+                    participationId={participation.id}
+                  />
+                )}
+            </div>
+          </div>
+        </TabsContent>
+        <TabsContent value="timeline">
+          <ActivityTimeline
+            participationId={participation.id}
+            isOwner={isOwner}
+            members={members}
+            event={participation.event}
+          />
+        </TabsContent>
 
-        {/* Right column: Participant info + Members */}
-        <div className="space-y-6">
-          {/* Participant info */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm">Participant</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={participation.user.image ?? undefined} />
-                  <AvatarFallback>
-                    {initials(participation.user.name)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="min-w-0 flex-1">
-                  <p className="font-medium truncate">
-                    {participation.user.name}
-                  </p>
-                  <p className="text-xs text-muted-foreground truncate">
-                    {participation.user.email}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Media Tab */}
+        <TabsContent value="media">
+          <MediaGallery
+            participationId={participation.id}
+            isOwner={isOwner}
+            userId={currentUserId}
+          />
+        </TabsContent>
 
-          {/* Members list (event-linked only) */}
-          {participation.eventId && participation.participants.length > 0 && (
-            <MembersList
-              participants={participation.participants}
-              participationId={participation.id}
-            />
-          )}
-
-          {/* Details card */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm">Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Leave Type</span>
-                <Badge
-                  variant="secondary"
-                  className={LEAVE_COLOURS[participation.leaveType] ?? ""}
-                >
-                  {participation.leaveType.charAt(0) +
-                    participation.leaveType.slice(1).toLowerCase()}
-                </Badge>
-              </div>
-              <Separator />
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Start</span>
-                <span className="font-medium">
-                  {format(new Date(participation.from), "MMM d, yyyy")}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">End</span>
-                <span className="font-medium">
-                  {format(new Date(participation.to), "MMM d, yyyy")}
-                </span>
-              </div>
-              <Separator />
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Duration</span>
-                <span className="font-medium">
-                  {days} {days === 1 ? "day" : "days"}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Created</span>
-                <span className="text-xs">
-                  {format(new Date(participation.createdAt), "MMM d, yyyy")}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+        {/* Settings Tab */}
+        <TabsContent value="settings">
+          <ParticipationSettings
+            participation={participation}
+            isOwner={isOwner}
+          />
+        </TabsContent>
+      </Tabs>
     </main>
   );
 }

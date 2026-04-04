@@ -6,6 +6,7 @@ const useUsers = () =>
     queryKey: ["users"],
     queryFn: userService.getAll,
     retry: 1,
+    staleTime: Infinity,
   });
 
 const useSearchUsers = (query: string) =>

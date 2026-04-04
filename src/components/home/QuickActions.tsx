@@ -37,14 +37,14 @@ const QuickActionsCard = () => {
       label: "My Schedule",
     },
     {
-      href: "/events/new",
-      icon: CalendarPlus,
-      label: "Create Event",
-    },
-    {
       href: "/events",
       icon: CalendarClock,
       label: "All Events",
+    },
+    {
+      href: "/events/new",
+      icon: CalendarPlus,
+      label: "Create Event",
     },
     {
       href: "/settings/profile",

@@ -212,6 +212,68 @@ const participationRepository = {
       include: { participation: { select: { userId: true } } },
     });
   },
+
+  /** Returns true if userId is the owner or a co-participant of the participation */
+  isMember: async (participationId: string, userId: string) => {
+    const participation = await db.participation.findFirst({
+      where: {
+        id: participationId,
+        OR: [
+          { userId },
+          {
+            eventId: { not: null },
+            event: {
+              participations: { some: { userId } },
+            },
+          },
+        ],
+      },
+      select: { id: true },
+    });
+    return participation !== null;
+  },
+
+  /** Returns members of the same event participation, optionally filtered by name/email */
+  searchMembers: async (participationId: string, search: string) => {
+    const participation = await db.participation.findUnique({
+      where: { id: participationId },
+      select: { userId: true, eventId: true },
+    });
+    if (!participation) return [];
+
+    if (!participation.eventId) {
+      // Stand-alone participation — only the owner
+      const user = await db.user.findUnique({
+        where: { id: participation.userId },
+        select: { id: true, name: true, image: true, email: true },
+      });
+      if (!user) return [];
+      const q = search.toLowerCase();
+      if (
+        q &&
+        !user.name.toLowerCase().includes(q) &&
+        !user.email.toLowerCase().includes(q)
+      )
+        return [];
+      return [user];
+    }
+
+    // Event-linked — return all co-participants
+    const participations = await db.participation.findMany({
+      where: { eventId: participation.eventId },
+      select: {
+        user: { select: { id: true, name: true, image: true, email: true } },
+      },
+    });
+
+    const users = participations.map((p) => p.user);
+    if (!search) return users;
+    const q = search.toLowerCase();
+    return users.filter(
+      (u) =>
+        u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q),
+    );
+  },
 };
 
 export default participationRepository;

@@ -9,12 +9,14 @@ interface EventTimeLineProps {
   events: Event[] | undefined;
   isLoading: boolean;
   onSelect: (e: Event) => void;
+  participationsByEventId?: Record<string, string>;
 }
 
 const EventTimeLine = ({
   events,
   isLoading,
   onSelect,
+  participationsByEventId,
 }: EventTimeLineProps): React.ReactElement => {
   if (isLoading) {
     return (
@@ -72,7 +74,11 @@ const EventTimeLine = ({
               <div className="flex items-center justify-center self-stretch">
                 <div className="h-3 w-3 shrink-0 rounded-full border-2 border-primary bg-background z-10" />
               </div>
-              <TimelineEventCard event={event} onSelect={onSelect} />
+              <TimelineEventCard
+                event={event}
+                onSelect={onSelect}
+                participationId={participationsByEventId?.[event.id]}
+              />
             </React.Fragment>
           ))}
         </React.Fragment>

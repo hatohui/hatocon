@@ -1,18 +1,21 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { durationLabel } from "@/lib/utils";
 import { Event } from "@prisma/client";
-import { format } from "date-fns";
+import { differenceInDays, format, startOfDay } from "date-fns";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { MapPin } from "lucide-react";
+import { MapPin, CalendarCheck } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const TimelineEventCard = ({
   event,
   onSelect,
+  participationId,
 }: {
   event: Event;
   onSelect: (e: Event) => void;
+  participationId?: string;
 }): React.ReactElement => {
   const start = new Date(event.startAt);
   const end = new Date(event.endAt);
@@ -40,7 +43,6 @@ const TimelineEventCard = ({
           {event.image && (
             <div className="relative h-14 w-20 rounded-md overflow-hidden shrink-0">
               <div className="h-6 w-2" />
-              asdasdas
               <Image
                 src={event.image}
                 alt={event.title}
@@ -50,11 +52,13 @@ const TimelineEventCard = ({
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <p className="text-shadow-muted-foreground text-xs"> in 2 days</p>
             <div className="flex items-start justify-between gap-2">
               <p className="font-semibold text-sm">{event.title}</p>
               <Badge variant="secondary" className="shrink-0 text-[10px]">
-                {durationLabel(start, end)}
+                in{" "}
+                {differenceInDays(start, startOfDay(new Date())) === 1
+                  ? "1 day"
+                  : `${differenceInDays(start, startOfDay(new Date()))} days`}
               </Badge>
             </div>
             {event.description && (
@@ -67,6 +71,20 @@ const TimelineEventCard = ({
                 <MapPin className="h-3 w-3 shrink-0" />
                 {event.location}
               </span>
+            )}
+            {participationId && (
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="mt-2 h-7 gap-1.5 text-xs"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Link href={`/participations/${participationId}`}>
+                  <CalendarCheck className="h-3 w-3" />
+                  See your plan
+                </Link>
+              </Button>
             )}
           </div>
         </div>

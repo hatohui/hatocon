@@ -18,11 +18,13 @@ import EventCard from "./event-card";
 interface EventCalendarProps {
   q: string;
   onSelect: (e: Event) => void;
+  participationsByEventId?: Record<string, string>;
 }
 
 const EventCalendar = ({
   q,
   onSelect,
+  participationsByEventId,
 }: EventCalendarProps): React.ReactElement => {
   const [currentMonth, setCurrentMonth] = React.useState(startOfToday());
   const [selectedDay, setSelectedDay] = React.useState<Date | null>(null);
@@ -219,7 +221,12 @@ const EventCalendar = ({
           ) : (
             <div className="grid gap-3 sm:grid-cols-2">
               {selectedEvents.map((e) => (
-                <EventCard key={e.id} event={e} onClick={() => onSelect(e)} />
+                <EventCard
+                  key={e.id}
+                  event={e}
+                  onClick={() => onSelect(e)}
+                  participationId={participationsByEventId?.[e.id]}
+                />
               ))}
             </div>
           )}

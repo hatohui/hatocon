@@ -129,9 +129,10 @@ model Participation {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user   User                 @relation(fields: [userId], references: [id])
-  event  Event?               @relation(fields: [eventId], references: [id])
-  images ParticipationImage[]
+  user       User                 @relation(fields: [userId], references: [id])
+  event      Event?               @relation(fields: [eventId], references: [id])
+  images     ParticipationImage[]
+  activities Activity[]
 
   @@index([userId, from, to])
   @@unique([userId, eventId])
@@ -150,6 +151,44 @@ model ParticipationImage {
   participation Participation @relation(fields: [participationId], references: [id], onDelete: Cascade)
 
   @@index([participationId])
+}
+
+model Activity {
+  id              String   @id @default(uuid())
+  participationId String
+  name            String
+  from            DateTime
+  to              DateTime
+  location        String?
+  locationUrl     String?
+  involvedPeople  String[] // array of user IDs
+  note            String?
+  imageUrl        String?
+  sortOrder       Int      @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String
+
+  participation Participation   @relation(fields: [participationId], references: [id], onDelete: Cascade)
+  media         ActivityMedia[]
+
+  @@index([participationId])
+  @@index([participationId, from])
+}
+
+model ActivityMedia {
+  id         String @id @default(uuid())
+  activityId String
+  url        String
+  caption    String?
+  uploadedBy String
+
+  createdAt DateTime @default(now())
+
+  activity Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  @@index([activityId])
 }
 
 model Holiday {

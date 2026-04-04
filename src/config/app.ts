@@ -10,7 +10,7 @@ export const QUOTES = [
   "Bro, your events are calling you!",
   "Infurnity misses you!",
   "Will you be my love?",
-  "Hee hee hee hee hee hee hee hee hee hee hee hee hee hee",
+  "Hee hee hee hee hee hee hee hee hee hee",
   "I am the one who knocks!",
   "Winter is coming!",
   "May the Force be with you!",
@@ -30,4 +30,7 @@ export const QUOTES = [
   "I am Groot.",
   "Bryan is one stinky demon fox :3",
   "Cardspire is my waifu <3",
+  "Skylar is a bitch :3",
+  "Edwin Lim hehehehehee",
+  "Fuck you oayoay",
 ];

@@ -1,19 +1,26 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { format } from "date-fns";
-import { Link, Pencil, Clock, MapPin } from "lucide-react";
+import { CalendarCheck, Link, Pencil, Clock, MapPin } from "lucide-react";
 import type { Event } from "@prisma/client";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { durationLabel } from "@/lib/utils";
+import NextLink from "next/link";
 
 interface EventCardProps {
   event: Event;
   onClick?: () => void;
   isOwner?: boolean;
+  participationId?: string;
 }
 
-const EventCard = ({ event, onClick, isOwner }: EventCardProps) => {
+const EventCard = ({
+  event,
+  onClick,
+  isOwner,
+  participationId,
+}: EventCardProps) => {
   const start = new Date(event.startAt);
   const end = new Date(event.endAt);
   return (
@@ -67,6 +74,20 @@ const EventCard = ({ event, onClick, isOwner }: EventCardProps) => {
               <MapPin className="h-3 w-3 shrink-0" />
               {event.location}
             </span>
+          )}
+          {participationId && (
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="mt-1 h-7 gap-1.5 text-xs"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <NextLink href={`/participations/${participationId}`}>
+                <CalendarCheck className="h-3 w-3" />
+                See your plan
+              </NextLink>
+            </Button>
           )}
         </div>
       </CardContent>
