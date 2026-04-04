@@ -1,8 +1,8 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -29,27 +29,157 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Pencil, Trash2, Search } from "lucide-react";
+import { Trash2, Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { JobProfileWithUser } from "@/types/job-profile";
 
 type ApiOk<T> = { data: T };
 
 const COUNTRY_LABELS: Record<string, string> = { VN: "🇻🇳 VN", SG: "🇸🇬 SG" };
-const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
 const PAGE_SIZE = 20;
+
+function InlineTextCell({
+  value,
+  placeholder,
+  onSave,
+}: {
+  value: string;
+  placeholder?: string;
+  onSave: (val: string) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(value);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const start = () => {
+    setDraft(value);
+    setEditing(true);
+    setTimeout(() => inputRef.current?.select(), 0);
+  };
+
+  const commit = () => {
+    setEditing(false);
+    if (draft.trim() !== value) onSave(draft.trim());
+  };
+
+  const cancel = () => {
+    setDraft(value);
+    setEditing(false);
+  };
+
+  if (editing) {
+    return (
+      <Input
+        ref={inputRef}
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={commit}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") commit();
+          if (e.key === "Escape") cancel();
+        }}
+        className="h-7 w-full min-w-24 px-1.5 text-sm"
+        autoFocus
+      />
+    );
+  }
+
+  return (
+    <span
+      className="block cursor-pointer rounded px-1 py-0.5 hover:bg-muted/60 transition-colors text-sm"
+      onClick={start}
+      title="Click to edit"
+    >
+      {value || (
+        <span className="text-muted-foreground italic">
+          {placeholder ?? "—"}
+        </span>
+      )}
+    </span>
+  );
+}
+
+function InlineNumberCell({
+  value,
+  onSave,
+}: {
+  value: number;
+  onSave: (val: number) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(String(value));
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const start = () => {
+    setDraft(String(value));
+    setEditing(true);
+    setTimeout(() => inputRef.current?.select(), 0);
+  };
+
+  const commit = () => {
+    setEditing(false);
+    const n = parseInt(draft, 10);
+    if (!isNaN(n) && n !== value) onSave(n);
+  };
+
+  const cancel = () => {
+    setDraft(String(value));
+    setEditing(false);
+  };
+
+  if (editing) {
+    return (
+      <Input
+        ref={inputRef}
+        type="number"
+        min={0}
+        max={365}
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={commit}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") commit();
+          if (e.key === "Escape") cancel();
+        }}
+        className="h-7 w-16 px-1.5 text-sm text-center"
+        autoFocus
+      />
+    );
+  }
+
+  return (
+    <span
+      className="block cursor-pointer rounded px-1 py-0.5 hover:bg-muted/60 transition-colors text-sm text-center"
+      onClick={start}
+      title="Click to edit"
+    >
+      {value} d
+    </span>
+  );
+}
 
 export default function AdminJobProfilesPage() {
   const { data: session } = useSession();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
 
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Record<string, unknown> }) =>
+      axios.put(`/api/job-profiles/${id}`, data).then((r) => r.data.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["job-profiles", "admin"] });
+      toast.success("Profile updated");
+    },
+    onError: () => toast.error("Failed to update"),
+  });
+
+  const handleUpdate = (id: string, data: Record<string, unknown>) =>
+    updateMutation.mutate({ id, data });
 
   useEffect(() => {
     if (session && !session.user.isAdmin) router.replace("/");
@@ -89,7 +219,7 @@ export default function AdminJobProfilesPage() {
       (p) =>
         p.user.name?.toLowerCase().includes(q) ||
         p.user.email.toLowerCase().includes(q) ||
-        p.title?.toLowerCase().includes(q)
+        p.title?.toLowerCase().includes(q),
     );
   }, [profiles, debouncedSearch]);
 
@@ -137,88 +267,117 @@ export default function AdminJobProfilesPage() {
               <TableHead>Cycle Start</TableHead>
               <TableHead>Country</TableHead>
               <TableHead>Created</TableHead>
-              <TableHead className="w-24">Actions</TableHead>
+              <TableHead className="w-10" />
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading
-              ? Array.from({ length: 5 }).map((_, i) => (
-                  <TableRow key={i}>
-                    {Array.from({ length: 8 }).map((_, j) => (
-                      <TableCell key={j}>
-                        <Skeleton className="h-5 w-full" />
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              : paged.length === 0
-              ? (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center py-10 text-muted-foreground text-sm">
-                      No job profiles found.
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <TableRow key={i}>
+                  {Array.from({ length: 8 }).map((_, j) => (
+                    <TableCell key={j}>
+                      <Skeleton className="h-5 w-full" />
                     </TableCell>
-                  </TableRow>
-                )
-              : paged.map((profile) => (
-                  <TableRow key={profile.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Avatar className="h-7 w-7">
-                          <AvatarImage src={profile.user.image ?? undefined} />
-                          <AvatarFallback className="text-xs">
-                            {profile.user.name?.[0] ?? profile.user.email[0]}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="text-sm font-medium leading-none">{profile.user.name ?? "—"}</p>
-                          <p className="text-xs text-muted-foreground">{profile.user.email}</p>
-                        </div>
+                  ))}
+                </TableRow>
+              ))
+            ) : paged.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={8}
+                  className="text-center py-10 text-muted-foreground text-sm"
+                >
+                  No job profiles found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              paged.map((profile) => (
+                <TableRow key={profile.id}>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-7 w-7">
+                        <AvatarImage src={profile.user.image ?? undefined} />
+                        <AvatarFallback className="text-xs">
+                          {profile.user.name?.[0] ?? profile.user.email[0]}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="text-sm font-medium leading-none">
+                          {profile.user.name ?? "—"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {profile.user.email}
+                        </p>
                       </div>
-                    </TableCell>
-                    <TableCell className="text-sm">{profile.title ?? "—"}</TableCell>
-                    <TableCell className="text-center text-sm">
-                      {profile.daysOfLeave} d
-                    </TableCell>
-                    <TableCell className="text-center text-sm">
-                      {profile.daysOfSickLeave} d
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      {profile.leaveCycleStart != null
-                        ? `${MONTH_NAMES[(profile.leaveCycleStart - 1) % 12]}`
-                        : "—"}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="text-xs font-normal">
-                        {COUNTRY_LABELS[profile.user.country ?? ""] ?? (profile.user.country ?? "—")}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
-                      {format(new Date(profile.createdAt), "MMM d, yyyy")}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() =>
-                            router.push(`?modal=edit&id=${profile.id}`)
-                          }
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                          onClick={() => setDeleteId(profile.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                    </div>
+                  </TableCell>
+                  <TableCell className="min-w-32">
+                    <InlineTextCell
+                      value={profile.title ?? ""}
+                      placeholder="No title"
+                      onSave={(v) => handleUpdate(profile.id, { title: v })}
+                    />
+                  </TableCell>
+                  <TableCell className="text-center min-w-16">
+                    <InlineNumberCell
+                      value={profile.daysOfLeave}
+                      onSave={(v) =>
+                        handleUpdate(profile.id, { daysOfLeave: v })
+                      }
+                    />
+                  </TableCell>
+                  <TableCell className="text-center min-w-16">
+                    <InlineNumberCell
+                      value={profile.daysOfSickLeave}
+                      onSave={(v) =>
+                        handleUpdate(profile.id, { daysOfSickLeave: v })
+                      }
+                    />
+                  </TableCell>
+                  <TableCell className="min-w-28">
+                    <Input
+                      type="date"
+                      className="h-7 text-xs w-32 px-1.5"
+                      value={
+                        profile.leaveCycleStart != null
+                          ? new Date(profile.leaveCycleStart)
+                              .toISOString()
+                              .slice(0, 10)
+                          : ""
+                      }
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        handleUpdate(profile.id, {
+                          leaveCycleStart: v
+                            ? new Date(v + "T00:00:00.000Z").toISOString()
+                            : null,
+                        });
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="text-xs font-normal">
+                      {COUNTRY_LABELS[profile.user.country ?? ""] ??
+                        profile.user.country ??
+                        "—"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                    {format(new Date(profile.createdAt), "MMM d, yyyy")}
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                      onClick={() => setDeleteId(profile.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

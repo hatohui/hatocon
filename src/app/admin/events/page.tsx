@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import {
@@ -53,7 +53,7 @@ import Image from "next/image";
 import axios from "axios";
 import type { EventWithCreator } from "@/types/event.d";
 
-type TabValue = "pending" | "approved" | "all";
+type TabValue = "all" | "pending" | "approved";
 
 const editSchema = z
   .object({
@@ -87,16 +87,21 @@ function toLocalDatetimeValue(date: Date | string) {
 export default function AdminEventsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [tab, setTab] = useState<TabValue>("pending");
+  const [tab, setTab] = useState<TabValue>("all");
   const [q, setQ] = useState("");
   const [debouncedQ, setDebouncedQ] = useState("");
+  const [page, setPage] = useState(1);
   const [editEvent, setEditEvent] = useState<EventWithCreator | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const PAGE_SIZE = 20;
 
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedQ(q), 300);
+    const t = setTimeout(() => {
+      setDebouncedQ(q);
+      setPage(1);
+    }, 300);
     return () => clearTimeout(t);
   }, [q]);
 
@@ -196,6 +201,23 @@ export default function AdminEventsPage() {
     });
   };
 
+  const onToggleVisibility = (e: React.MouseEvent, event: EventWithCreator) => {
+    e.stopPropagation();
+    const next = event.visibility === "PUBLIC" ? "PRIVATE" : "PUBLIC";
+    updateEvent.mutate(
+      { id: event.id, data: { visibility: next } },
+      { onError: () => toast.error("Failed to update visibility") },
+    );
+  };
+
+  const onToggleYearly = (e: React.MouseEvent, event: EventWithCreator) => {
+    e.stopPropagation();
+    updateEvent.mutate(
+      { id: event.id, data: { isYearly: !event.isYearly } },
+      { onError: () => toast.error("Failed to update") },
+    );
+  };
+
   const onConfirmDelete = () => {
     if (!deleteId) return;
     deleteEvent.mutate(deleteId, {
@@ -217,7 +239,9 @@ export default function AdminEventsPage() {
 
   if (!session?.user.isAdmin) return null;
 
-  const events = (data ?? []) as EventWithCreator[];
+  const allEvents = (data ?? []) as EventWithCreator[];
+  const totalPages = Math.max(1, Math.ceil(allEvents.length / PAGE_SIZE));
+  const events = allEvents.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 p-6">
@@ -227,11 +251,17 @@ export default function AdminEventsPage() {
 
       {/* Filter row */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <Tabs value={tab} onValueChange={(v) => setTab(v as TabValue)}>
+        <Tabs
+          value={tab}
+          onValueChange={(v) => {
+            setTab(v as TabValue);
+            setPage(1);
+          }}
+        >
           <TabsList>
+            <TabsTrigger value="all">All</TabsTrigger>
             <TabsTrigger value="pending">Pending</TabsTrigger>
             <TabsTrigger value="approved">Approved</TabsTrigger>
-            <TabsTrigger value="all">All</TabsTrigger>
           </TabsList>
         </Tabs>
 
@@ -255,6 +285,8 @@ export default function AdminEventsPage() {
               <TableHead>Date</TableHead>
               <TableHead>Created By</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead className="text-center">Visibility</TableHead>
+              <TableHead className="text-center">Yearly</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -262,7 +294,7 @@ export default function AdminEventsPage() {
             {events.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={5}
+                  colSpan={7}
                   className="text-center text-muted-foreground py-8"
                 >
                   No events found
@@ -270,7 +302,7 @@ export default function AdminEventsPage() {
               </TableRow>
             ) : (
               events.map((event) => (
-                <TableRow key={event.id} onClick={() => setEditEvent(event)}>
+                <TableRow key={event.id} onClick={() => openEdit(event)}>
                   <TableCell className="font-medium max-w-xs">
                     <div>
                       <div className="flex items-center gap-2">
@@ -325,6 +357,30 @@ export default function AdminEventsPage() {
                       {event.isApproved ? "Approved" : "Pending"}
                     </Badge>
                   </TableCell>
+                  <TableCell className="text-center">
+                    <div className="flex flex-col items-center gap-0.5">
+                      <Switch
+                        checked={event.visibility === "PUBLIC"}
+                        onClick={(e) => onToggleVisibility(e, event)}
+                        onCheckedChange={() => {}}
+                      />
+                      <span className="text-[10px] text-muted-foreground">
+                        {event.visibility === "PUBLIC" ? "Public" : "Private"}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <div className="flex flex-col items-center gap-0.5">
+                      <Switch
+                        checked={event.isYearly ?? false}
+                        onClick={(e) => onToggleYearly(e, event)}
+                        onCheckedChange={() => {}}
+                      />
+                      <span className="text-[10px] text-muted-foreground">
+                        {event.isYearly ? "Yearly" : "Once"}
+                      </span>
+                    </div>
+                  </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
                       {!event.isApproved && (
@@ -368,6 +424,33 @@ export default function AdminEventsPage() {
           </TableBody>
         </Table>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between text-sm text-muted-foreground">
+          <span>
+            Page {page} of {totalPages} ({allEvents.length} total)
+          </span>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => p - 1)}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page >= totalPages}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Edit Sheet */}
       <Sheet open={!!editEvent} onOpenChange={(o) => !o && setEditEvent(null)}>
