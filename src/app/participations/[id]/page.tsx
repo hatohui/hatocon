@@ -474,6 +474,7 @@ function UpcomingActivities({
   participantUser,
   currentUserId,
   isOwner,
+  showActivityDetails,
   event,
   onViewAll,
 }: {
@@ -483,6 +484,7 @@ function UpcomingActivities({
   participantUser?: { id: string; name: string };
   currentUserId?: string;
   isOwner: boolean;
+  showActivityDetails: boolean;
   event?: {
     title: string;
     startAt: Date | string;
@@ -491,7 +493,9 @@ function UpcomingActivities({
   } | null;
   onViewAll: () => void;
 }) {
-  const { data: activities, isLoading } = useActivities(participationId);
+  const { data: activities, isLoading } = useActivities(
+    showActivityDetails ? participationId : null,
+  );
   const updateDates = useUpdateParticipationDates();
   // which date field is being edited: "from" (arrival) | "to" (departure) | null
   const [editingField, setEditingField] = useState<"from" | "to" | null>(null);
@@ -536,18 +540,22 @@ function UpcomingActivities({
   };
 
   const syntheticEntries: UpcomingEntry[] = [
-    {
-      id: "__arriving",
-      name: arrivalName,
-      from: participationFrom,
-      syntheticKind: "__arriving",
-    },
-    {
-      id: "__departing",
-      name: departureName,
-      from: participationTo,
-      syntheticKind: "__departing",
-    },
+    ...(showActivityDetails
+      ? [
+          {
+            id: "__arriving",
+            name: arrivalName,
+            from: participationFrom,
+            syntheticKind: "__arriving",
+          },
+          {
+            id: "__departing",
+            name: departureName,
+            from: participationTo,
+            syntheticKind: "__departing",
+          },
+        ]
+      : []),
     ...(event
       ? [
           {
@@ -629,8 +637,12 @@ function UpcomingActivities({
                 </div>
                 <div className="h-8 w-px bg-border shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">{a.name}</p>
-                  {a.location && (
+                  <p className="font-medium truncate">
+                    {a.syntheticKind || showActivityDetails
+                      ? a.name
+                      : "Activity"}
+                  </p>
+                  {(a.syntheticKind || showActivityDetails) && a.location && (
                     <p className="text-muted-foreground truncate flex items-center gap-1">
                       <MapPin className="h-2.5 w-2.5 shrink-0" />
                       {a.location}
@@ -1034,6 +1046,9 @@ export default function ParticipationDetailPage() {
                 participantUser={participation.user}
                 currentUserId={currentUserId}
                 isOwner={isOwner}
+                showActivityDetails={
+                  isMemberOfGroup || isAdmin || isActivityVisible
+                }
                 event={participation.event}
                 onViewAll={() => setActiveTab("timeline")}
               />

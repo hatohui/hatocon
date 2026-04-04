@@ -67,8 +67,8 @@ export default function SettingsHolidaysPage() {
   }
 
   // Separate public holidays by country for display
-  const vnHolidays = publicHolidays?.filter((h) => h.country === "VN") ?? [];
-  const sgHolidays = publicHolidays?.filter((h) => h.country === "SG") ?? [];
+  const countryLabel =
+    publicHolidays?.[0]?.country === "SG" ? "Singapore" : "Vietnam";
 
   return (
     <div className="space-y-6">
@@ -167,16 +167,16 @@ export default function SettingsHolidaysPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {vnHolidays.length > 0 && (
+          {publicHolidays && publicHolidays.length > 0 ? (
             <div>
               <h3 className="text-sm font-medium mb-2 flex items-center gap-2">
-                Vietnam
+                {countryLabel}
                 <Badge variant="secondary" className="text-[10px]">
-                  {vnHolidays.length}
+                  {publicHolidays.length}
                 </Badge>
               </h3>
               <div className="space-y-1">
-                {vnHolidays.map((h) => (
+                {publicHolidays.map((h) => (
                   <div
                     key={h.date}
                     className="flex items-center justify-between rounded-md px-3 py-1.5 text-sm"
@@ -189,33 +189,7 @@ export default function SettingsHolidaysPage() {
                 ))}
               </div>
             </div>
-          )}
-
-          {sgHolidays.length > 0 && (
-            <div>
-              <h3 className="text-sm font-medium mb-2 flex items-center gap-2">
-                Singapore
-                <Badge variant="secondary" className="text-[10px]">
-                  {sgHolidays.length}
-                </Badge>
-              </h3>
-              <div className="space-y-1">
-                {sgHolidays.map((h) => (
-                  <div
-                    key={h.date}
-                    className="flex items-center justify-between rounded-md px-3 py-1.5 text-sm"
-                  >
-                    <span>{h.name}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {format(new Date(h.date + "T00:00:00"), "MMM d, yyyy")}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {vnHolidays.length === 0 && sgHolidays.length === 0 && (
+          ) : (
             <p className="text-sm text-muted-foreground">
               No public holidays found for this year.
             </p>

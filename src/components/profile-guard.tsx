@@ -15,7 +15,9 @@ export default function ProfileGuard({
   children: React.ReactNode;
 }) {
   const { status } = useSession();
-  const { data, isLoading, isError, refetch } = useMyJobProfile();
+  const { data, isLoading, isError, refetch } = useMyJobProfile({
+    enabled: status === "authenticated",
+  });
   const [confirmed, setConfirmed] = useState(false);
 
   if (status !== "authenticated") {

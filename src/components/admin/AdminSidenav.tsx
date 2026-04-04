@@ -2,13 +2,31 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Briefcase, Plane } from "lucide-react";
+import {
+  CalendarDays,
+  Briefcase,
+  Plane,
+  Users,
+  LayoutDashboard,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/admin/events", label: "Events", icon: CalendarDays },
-  { href: "/admin/job-profiles", label: "Job Profiles", icon: Briefcase },
-  { href: "/admin/participations", label: "Participations", icon: Plane },
+  { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { href: "/admin/users", label: "Users", icon: Users, exact: false },
+  { href: "/admin/events", label: "Events", icon: CalendarDays, exact: false },
+  {
+    href: "/admin/job-profiles",
+    label: "Job Profiles",
+    icon: Briefcase,
+    exact: false,
+  },
+  {
+    href: "/admin/participations",
+    label: "Participations",
+    icon: Plane,
+    exact: false,
+  },
 ];
 
 export default function AdminSidenav() {
@@ -20,8 +38,10 @@ export default function AdminSidenav() {
         <p className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
           Admin
         </p>
-        {navItems.map(({ href, label, icon: Icon }) => {
-          const isActive = pathname.startsWith(href);
+        {navItems.map(({ href, label, icon: Icon, exact }) => {
+          const isActive = exact
+            ? pathname === href
+            : pathname.startsWith(href);
           return (
             <Link
               key={href}

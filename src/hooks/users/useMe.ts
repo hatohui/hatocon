@@ -11,12 +11,14 @@ type MeResponse = {
   image: string | null;
   hasPassword: boolean;
   isAdmin: boolean;
+  country: string;
 };
 
 type ProfileUpdateDTO = {
   name?: string;
   username?: string;
   image?: string | null;
+  country?: string;
 };
 
 type PasswordChangeDTO = {

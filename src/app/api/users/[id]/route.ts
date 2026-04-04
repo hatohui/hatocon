@@ -54,4 +54,18 @@ const PUT = async (req: NextRequest, ctx: Context) => {
   return OK(updatedUser);
 };
 
-export { GET, PUT };
+const DELETE = async (req: NextRequest, ctx: Context) => {
+  const { id } = await ctx.params;
+
+  const isAdmin = await isAdminAsync();
+  if (!isAdmin) return Unauthorized();
+
+  const session = await auth();
+  if (id === session?.user?.id)
+    return BadRequest("Cannot delete your own account.");
+
+  await userRepository.deleteUser(id);
+  return OK({ id });
+};
+
+export { GET, PUT, DELETE };

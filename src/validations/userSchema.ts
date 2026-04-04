@@ -20,4 +20,5 @@ export const userSchema = zod.object({
     .min(3, messages.user.validation.usernameMin)
     .max(20, messages.user.validation.usernameMax)
     .optional(),
+  country: zod.enum(["VN", "SG"]).optional(),
 });

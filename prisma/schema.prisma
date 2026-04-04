@@ -16,6 +16,7 @@ model User {
   emailVerified DateTime?
   image         String? 
   isAdmin       Boolean   @default(false)
+  country       String    @default("VN")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

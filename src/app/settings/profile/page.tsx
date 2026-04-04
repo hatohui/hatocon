@@ -24,6 +24,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   useMe,
   useUpdateMe,
   useChangePassword,
@@ -40,6 +47,17 @@ const profileSchema = zod.object({
     .min(3, "At least 3 characters")
     .max(20, "At most 20 characters"),
 });
+
+const countrySchema = zod.object({
+  country: zod.enum(["VN", "SG"]),
+});
+
+type CountryValues = zod.infer<typeof countrySchema>;
+
+const COUNTRY_OPTIONS = [
+  { value: "VN", label: "Vietnam" },
+  { value: "SG", label: "Singapore" },
+] as const;
 
 const passwordSchema = zod
   .object({
@@ -222,6 +240,76 @@ function ProfileInfoSection() {
   );
 }
 
+function CountrySection() {
+  const { data: me } = useMe();
+  const updateMe = useUpdateMe();
+
+  const form = useForm<CountryValues>({
+    resolver: zodResolver(countrySchema),
+    values: { country: (me?.country ?? "VN") as "VN" | "SG" },
+  });
+
+  const onSubmit = (values: CountryValues) => {
+    updateMe.mutate(values, {
+      onSuccess: () => form.reset(values),
+    });
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Country</CardTitle>
+        <CardDescription>
+          Your country determines which public holidays apply to your leave
+          balance.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="country"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Country</FormLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {COUNTRY_OPTIONS.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {updateMe.isSuccess && (
+              <p className="text-sm text-green-600">Country updated.</p>
+            )}
+            <Button
+              type="submit"
+              disabled={updateMe.isPending || !form.formState.isDirty}
+            >
+              {updateMe.isPending && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Save changes
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
+  );
+}
+
 function PasswordSection() {
   const changePassword = useChangePassword();
 
@@ -337,6 +425,7 @@ export default function SettingsProfilePage() {
     <div className="space-y-6">
       <AvatarSection />
       <ProfileInfoSection />
+      <CountrySection />
       {me?.hasPassword && <PasswordSection />}
     </div>
   );

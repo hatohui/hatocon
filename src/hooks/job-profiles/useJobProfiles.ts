@@ -5,11 +5,12 @@ import axios from "axios";
 
 const THREE_MONTHS_MS = 90 * 24 * 60 * 60 * 1000;
 
-const useMyJobProfile = () =>
+const useMyJobProfile = (options?: { enabled?: boolean }) =>
   useQuery({
     queryKey: ["job-profile", "me"],
     queryFn: () => jobProfileService.getMine().then((res) => res.data.data),
     retry: false,
+    enabled: options?.enabled ?? true,
   });
 
 const useJobProfiles = () =>

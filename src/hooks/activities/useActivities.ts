@@ -8,6 +8,7 @@ const useActivities = (participationId: string | null) =>
     queryFn: () => activityService.getByParticipation(participationId!),
     enabled: !!participationId,
     staleTime: Infinity,
+    retry: 1,
   });
 
 const useCreateActivity = () => {

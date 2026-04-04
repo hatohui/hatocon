@@ -1,12 +1,13 @@
 "use client";
 
 import { addYears, format } from "date-fns";
-import { Wand2, Link, ChevronRight, CalendarClock } from "lucide-react";
+import { Wand2, ChevronRight, CalendarClock } from "lucide-react";
 import {} from "date-fns";
 import { Skeleton } from "../ui/skeleton";
 import { Button } from "../ui/button";
 import { useLeaveBalance } from "@/hooks/participations/useParticipations";
 import BalanceBar from "../common/BalanceBar";
+import Link from "next/link";
 
 const LeaveBalance = () => {
   const { data: balance, isLoading } = useLeaveBalance();

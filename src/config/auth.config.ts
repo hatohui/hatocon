@@ -19,6 +19,8 @@ export const authConfig: NextAuthConfig = {
         nextUrl.pathname.startsWith("/login") ||
         nextUrl.pathname.startsWith("/api/auth");
       if (isAuthRoute) return true;
+      // API routes handle their own auth/authorization logic
+      if (nextUrl.pathname.startsWith("/api/")) return true;
       return isLoggedIn;
     },
     jwt({ token, user, trigger, session }) {

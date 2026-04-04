@@ -18,6 +18,12 @@ async function countWorkingDays(
   userId: string,
 ): Promise<number> {
   const schedule = await workScheduleRepository.getByUserId(userId);
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: { country: true },
+  });
+  const country = user?.country ?? "VN";
+
   const workDays = schedule
     ? [
         schedule.sunday,
@@ -34,7 +40,7 @@ async function countWorkingDays(
   const [exceptions, customHolidays, publicHolidaySet] = await Promise.all([
     workScheduleRepository.getScheduleExceptions(userId, from, to),
     workScheduleRepository.getCustomHolidays(userId, from, to),
-    getPublicHolidaySet(["VN", "SG"], years),
+    getPublicHolidaySet([country], years),
   ]);
 
   // Build lookup sets for quick date matching
@@ -289,6 +295,82 @@ const participationRepository = {
       },
       orderBy: { createdAt: "desc" },
     });
+  },
+
+  getAllGroupsAdmin: async (
+    opts: {
+      search?: string;
+      eventId?: string;
+      skip?: number;
+      take?: number;
+    } = {},
+  ) => {
+    const where = {
+      ...(opts.eventId ? { eventId: opts.eventId } : {}),
+      ...(opts.search
+        ? {
+            OR: [
+              { name: { contains: opts.search, mode: "insensitive" as const } },
+              {
+                event: {
+                  title: {
+                    contains: opts.search,
+                    mode: "insensitive" as const,
+                  },
+                },
+              },
+              {
+                participations: {
+                  some: {
+                    user: {
+                      OR: [
+                        {
+                          name: {
+                            contains: opts.search,
+                            mode: "insensitive" as const,
+                          },
+                        },
+                        {
+                          email: {
+                            contains: opts.search,
+                            mode: "insensitive" as const,
+                          },
+                        },
+                      ],
+                    },
+                  },
+                },
+              },
+            ],
+          }
+        : {}),
+    };
+
+    const [total, groups] = await Promise.all([
+      db.participationGroup.count({ where }),
+      db.participationGroup.findMany({
+        where,
+        include: {
+          event: {
+            select: { id: true, title: true, startAt: true, endAt: true },
+          },
+          participations: {
+            include: {
+              user: {
+                select: { id: true, name: true, image: true, email: true },
+              },
+            },
+            orderBy: { createdAt: "asc" },
+          },
+          _count: { select: { images: true, activities: true } },
+        },
+        orderBy: { createdAt: "desc" },
+        skip: opts.skip ?? 0,
+        take: opts.take ?? 20,
+      }),
+    ]);
+
+    return { total, groups };
   },
 
   updateDates: async (id: string, data: { from: Date; to: Date }) => {

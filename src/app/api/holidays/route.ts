@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { OK, Unauthorized } from "@/common/response";
 import { getPublicHolidaysForYear } from "@/lib/holidays";
+import { db } from "@/config/prisma";
 import type { NextRequest } from "next/server";
 
 const GET = async (req: NextRequest) => {
@@ -15,6 +16,12 @@ const GET = async (req: NextRequest) => {
     return OK([]);
   }
 
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { country: true },
+  });
+  const country = user?.country ?? "VN";
+
   const fromYear = new Date(from).getFullYear();
   const toYear = new Date(to).getFullYear();
   const years = Array.from(
@@ -23,9 +30,7 @@ const GET = async (req: NextRequest) => {
   );
 
   const results = await Promise.all(
-    ["VN", "SG"].flatMap((country) =>
-      years.map((year) => getPublicHolidaysForYear(country, year)),
-    ),
+    years.map((year) => getPublicHolidaysForYear(country, year)),
   );
 
   const fromStr = from.slice(0, 10);

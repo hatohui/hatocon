@@ -13,6 +13,7 @@ const profileUpdateSchema = zod.object({
     .max(20)
     .optional(),
   image: zod.string().url().nullable().optional(),
+  country: zod.enum(["VN", "SG"]).optional(),
 });
 
 const GET = async () => {
