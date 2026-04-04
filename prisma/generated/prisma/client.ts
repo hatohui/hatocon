@@ -101,3 +101,18 @@ export type Holiday = Prisma.HolidayModel
  * 
  */
 export type EventInvitee = Prisma.EventInviteeModel
+/**
+ * Model ParticipationGroup
+ * 
+ */
+export type ParticipationGroup = Prisma.ParticipationGroupModel
+/**
+ * Model JoinRequest
+ * 
+ */
+export type JoinRequest = Prisma.JoinRequestModel
+/**
+ * Model Notification
+ * 
+ */
+export type Notification = Prisma.NotificationModel

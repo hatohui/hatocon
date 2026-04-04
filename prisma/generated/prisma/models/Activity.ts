@@ -36,7 +36,7 @@ export type ActivitySumAggregateOutputType = {
 
 export type ActivityMinAggregateOutputType = {
   id: string | null
-  participationId: string | null
+  participationGroupId: string | null
   name: string | null
   from: Date | null
   to: Date | null
@@ -52,7 +52,7 @@ export type ActivityMinAggregateOutputType = {
 
 export type ActivityMaxAggregateOutputType = {
   id: string | null
-  participationId: string | null
+  participationGroupId: string | null
   name: string | null
   from: Date | null
   to: Date | null
@@ -68,7 +68,7 @@ export type ActivityMaxAggregateOutputType = {
 
 export type ActivityCountAggregateOutputType = {
   id: number
-  participationId: number
+  participationGroupId: number
   name: number
   from: number
   to: number
@@ -95,7 +95,7 @@ export type ActivitySumAggregateInputType = {
 
 export type ActivityMinAggregateInputType = {
   id?: true
-  participationId?: true
+  participationGroupId?: true
   name?: true
   from?: true
   to?: true
@@ -111,7 +111,7 @@ export type ActivityMinAggregateInputType = {
 
 export type ActivityMaxAggregateInputType = {
   id?: true
-  participationId?: true
+  participationGroupId?: true
   name?: true
   from?: true
   to?: true
@@ -127,7 +127,7 @@ export type ActivityMaxAggregateInputType = {
 
 export type ActivityCountAggregateInputType = {
   id?: true
-  participationId?: true
+  participationGroupId?: true
   name?: true
   from?: true
   to?: true
@@ -231,7 +231,7 @@ export type ActivityGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 
 export type ActivityGroupByOutputType = {
   id: string
-  participationId: string
+  participationGroupId: string
   name: string
   from: Date
   to: Date
@@ -271,7 +271,7 @@ export type ActivityWhereInput = {
   OR?: Prisma.ActivityWhereInput[]
   NOT?: Prisma.ActivityWhereInput | Prisma.ActivityWhereInput[]
   id?: Prisma.StringFilter<"Activity"> | string
-  participationId?: Prisma.StringFilter<"Activity"> | string
+  participationGroupId?: Prisma.StringFilter<"Activity"> | string
   name?: Prisma.StringFilter<"Activity"> | string
   from?: Prisma.DateTimeFilter<"Activity"> | Date | string
   to?: Prisma.DateTimeFilter<"Activity"> | Date | string
@@ -284,13 +284,13 @@ export type ActivityWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Activity"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Activity"> | Date | string
   createdBy?: Prisma.StringFilter<"Activity"> | string
-  participation?: Prisma.XOR<Prisma.ParticipationScalarRelationFilter, Prisma.ParticipationWhereInput>
+  group?: Prisma.XOR<Prisma.ParticipationGroupScalarRelationFilter, Prisma.ParticipationGroupWhereInput>
   media?: Prisma.ActivityMediaListRelationFilter
 }
 
 export type ActivityOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  participationId?: Prisma.SortOrder
+  participationGroupId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   from?: Prisma.SortOrder
   to?: Prisma.SortOrder
@@ -303,7 +303,7 @@ export type ActivityOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   createdBy?: Prisma.SortOrder
-  participation?: Prisma.ParticipationOrderByWithRelationInput
+  group?: Prisma.ParticipationGroupOrderByWithRelationInput
   media?: Prisma.ActivityMediaOrderByRelationAggregateInput
 }
 
@@ -312,7 +312,7 @@ export type ActivityWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.ActivityWhereInput | Prisma.ActivityWhereInput[]
   OR?: Prisma.ActivityWhereInput[]
   NOT?: Prisma.ActivityWhereInput | Prisma.ActivityWhereInput[]
-  participationId?: Prisma.StringFilter<"Activity"> | string
+  participationGroupId?: Prisma.StringFilter<"Activity"> | string
   name?: Prisma.StringFilter<"Activity"> | string
   from?: Prisma.DateTimeFilter<"Activity"> | Date | string
   to?: Prisma.DateTimeFilter<"Activity"> | Date | string
@@ -325,13 +325,13 @@ export type ActivityWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Activity"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Activity"> | Date | string
   createdBy?: Prisma.StringFilter<"Activity"> | string
-  participation?: Prisma.XOR<Prisma.ParticipationScalarRelationFilter, Prisma.ParticipationWhereInput>
+  group?: Prisma.XOR<Prisma.ParticipationGroupScalarRelationFilter, Prisma.ParticipationGroupWhereInput>
   media?: Prisma.ActivityMediaListRelationFilter
 }, "id">
 
 export type ActivityOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  participationId?: Prisma.SortOrder
+  participationGroupId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   from?: Prisma.SortOrder
   to?: Prisma.SortOrder
@@ -356,7 +356,7 @@ export type ActivityScalarWhereWithAggregatesInput = {
   OR?: Prisma.ActivityScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ActivityScalarWhereWithAggregatesInput | Prisma.ActivityScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Activity"> | string
-  participationId?: Prisma.StringWithAggregatesFilter<"Activity"> | string
+  participationGroupId?: Prisma.StringWithAggregatesFilter<"Activity"> | string
   name?: Prisma.StringWithAggregatesFilter<"Activity"> | string
   from?: Prisma.DateTimeWithAggregatesFilter<"Activity"> | Date | string
   to?: Prisma.DateTimeWithAggregatesFilter<"Activity"> | Date | string
@@ -385,13 +385,13 @@ export type ActivityCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   createdBy: string
-  participation: Prisma.ParticipationCreateNestedOneWithoutActivitiesInput
+  group: Prisma.ParticipationGroupCreateNestedOneWithoutActivitiesInput
   media?: Prisma.ActivityMediaCreateNestedManyWithoutActivityInput
 }
 
 export type ActivityUncheckedCreateInput = {
   id?: string
-  participationId: string
+  participationGroupId: string
   name: string
   from: Date | string
   to: Date | string
@@ -421,13 +421,13 @@ export type ActivityUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
-  participation?: Prisma.ParticipationUpdateOneRequiredWithoutActivitiesNestedInput
+  group?: Prisma.ParticipationGroupUpdateOneRequiredWithoutActivitiesNestedInput
   media?: Prisma.ActivityMediaUpdateManyWithoutActivityNestedInput
 }
 
 export type ActivityUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  participationId?: Prisma.StringFieldUpdateOperationsInput | string
+  participationGroupId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   from?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -445,7 +445,7 @@ export type ActivityUncheckedUpdateInput = {
 
 export type ActivityCreateManyInput = {
   id?: string
-  participationId: string
+  participationGroupId: string
   name: string
   from: Date | string
   to: Date | string
@@ -478,7 +478,7 @@ export type ActivityUpdateManyMutationInput = {
 
 export type ActivityUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  participationId?: Prisma.StringFieldUpdateOperationsInput | string
+  participationGroupId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   from?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -493,16 +493,6 @@ export type ActivityUncheckedUpdateManyInput = {
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
-export type ActivityListRelationFilter = {
-  every?: Prisma.ActivityWhereInput
-  some?: Prisma.ActivityWhereInput
-  none?: Prisma.ActivityWhereInput
-}
-
-export type ActivityOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder
-}
-
 export type StringNullableListFilter<$PrismaModel = never> = {
   equals?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null
   has?: string | Prisma.StringFieldRefInput<$PrismaModel> | null
@@ -513,7 +503,7 @@ export type StringNullableListFilter<$PrismaModel = never> = {
 
 export type ActivityCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  participationId?: Prisma.SortOrder
+  participationGroupId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   from?: Prisma.SortOrder
   to?: Prisma.SortOrder
@@ -534,7 +524,7 @@ export type ActivityAvgOrderByAggregateInput = {
 
 export type ActivityMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  participationId?: Prisma.SortOrder
+  participationGroupId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   from?: Prisma.SortOrder
   to?: Prisma.SortOrder
@@ -550,7 +540,7 @@ export type ActivityMaxOrderByAggregateInput = {
 
 export type ActivityMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  participationId?: Prisma.SortOrder
+  participationGroupId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   from?: Prisma.SortOrder
   to?: Prisma.SortOrder
@@ -573,46 +563,14 @@ export type ActivityScalarRelationFilter = {
   isNot?: Prisma.ActivityWhereInput
 }
 
-export type ActivityCreateNestedManyWithoutParticipationInput = {
-  create?: Prisma.XOR<Prisma.ActivityCreateWithoutParticipationInput, Prisma.ActivityUncheckedCreateWithoutParticipationInput> | Prisma.ActivityCreateWithoutParticipationInput[] | Prisma.ActivityUncheckedCreateWithoutParticipationInput[]
-  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutParticipationInput | Prisma.ActivityCreateOrConnectWithoutParticipationInput[]
-  createMany?: Prisma.ActivityCreateManyParticipationInputEnvelope
-  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+export type ActivityListRelationFilter = {
+  every?: Prisma.ActivityWhereInput
+  some?: Prisma.ActivityWhereInput
+  none?: Prisma.ActivityWhereInput
 }
 
-export type ActivityUncheckedCreateNestedManyWithoutParticipationInput = {
-  create?: Prisma.XOR<Prisma.ActivityCreateWithoutParticipationInput, Prisma.ActivityUncheckedCreateWithoutParticipationInput> | Prisma.ActivityCreateWithoutParticipationInput[] | Prisma.ActivityUncheckedCreateWithoutParticipationInput[]
-  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutParticipationInput | Prisma.ActivityCreateOrConnectWithoutParticipationInput[]
-  createMany?: Prisma.ActivityCreateManyParticipationInputEnvelope
-  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-}
-
-export type ActivityUpdateManyWithoutParticipationNestedInput = {
-  create?: Prisma.XOR<Prisma.ActivityCreateWithoutParticipationInput, Prisma.ActivityUncheckedCreateWithoutParticipationInput> | Prisma.ActivityCreateWithoutParticipationInput[] | Prisma.ActivityUncheckedCreateWithoutParticipationInput[]
-  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutParticipationInput | Prisma.ActivityCreateOrConnectWithoutParticipationInput[]
-  upsert?: Prisma.ActivityUpsertWithWhereUniqueWithoutParticipationInput | Prisma.ActivityUpsertWithWhereUniqueWithoutParticipationInput[]
-  createMany?: Prisma.ActivityCreateManyParticipationInputEnvelope
-  set?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  disconnect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  delete?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  update?: Prisma.ActivityUpdateWithWhereUniqueWithoutParticipationInput | Prisma.ActivityUpdateWithWhereUniqueWithoutParticipationInput[]
-  updateMany?: Prisma.ActivityUpdateManyWithWhereWithoutParticipationInput | Prisma.ActivityUpdateManyWithWhereWithoutParticipationInput[]
-  deleteMany?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
-}
-
-export type ActivityUncheckedUpdateManyWithoutParticipationNestedInput = {
-  create?: Prisma.XOR<Prisma.ActivityCreateWithoutParticipationInput, Prisma.ActivityUncheckedCreateWithoutParticipationInput> | Prisma.ActivityCreateWithoutParticipationInput[] | Prisma.ActivityUncheckedCreateWithoutParticipationInput[]
-  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutParticipationInput | Prisma.ActivityCreateOrConnectWithoutParticipationInput[]
-  upsert?: Prisma.ActivityUpsertWithWhereUniqueWithoutParticipationInput | Prisma.ActivityUpsertWithWhereUniqueWithoutParticipationInput[]
-  createMany?: Prisma.ActivityCreateManyParticipationInputEnvelope
-  set?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  disconnect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  delete?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  update?: Prisma.ActivityUpdateWithWhereUniqueWithoutParticipationInput | Prisma.ActivityUpdateWithWhereUniqueWithoutParticipationInput[]
-  updateMany?: Prisma.ActivityUpdateManyWithWhereWithoutParticipationInput | Prisma.ActivityUpdateManyWithWhereWithoutParticipationInput[]
-  deleteMany?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
+export type ActivityOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type ActivityCreateinvolvedPeopleInput = {
@@ -638,84 +596,46 @@ export type ActivityUpdateOneRequiredWithoutMediaNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ActivityUpdateToOneWithWhereWithoutMediaInput, Prisma.ActivityUpdateWithoutMediaInput>, Prisma.ActivityUncheckedUpdateWithoutMediaInput>
 }
 
-export type ActivityCreateWithoutParticipationInput = {
-  id?: string
-  name: string
-  from: Date | string
-  to: Date | string
-  location?: string | null
-  locationUrl?: string | null
-  involvedPeople?: Prisma.ActivityCreateinvolvedPeopleInput | string[]
-  note?: string | null
-  imageUrl?: string | null
-  sortOrder?: number
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  createdBy: string
-  media?: Prisma.ActivityMediaCreateNestedManyWithoutActivityInput
+export type ActivityCreateNestedManyWithoutGroupInput = {
+  create?: Prisma.XOR<Prisma.ActivityCreateWithoutGroupInput, Prisma.ActivityUncheckedCreateWithoutGroupInput> | Prisma.ActivityCreateWithoutGroupInput[] | Prisma.ActivityUncheckedCreateWithoutGroupInput[]
+  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutGroupInput | Prisma.ActivityCreateOrConnectWithoutGroupInput[]
+  createMany?: Prisma.ActivityCreateManyGroupInputEnvelope
+  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
 }
 
-export type ActivityUncheckedCreateWithoutParticipationInput = {
-  id?: string
-  name: string
-  from: Date | string
-  to: Date | string
-  location?: string | null
-  locationUrl?: string | null
-  involvedPeople?: Prisma.ActivityCreateinvolvedPeopleInput | string[]
-  note?: string | null
-  imageUrl?: string | null
-  sortOrder?: number
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  createdBy: string
-  media?: Prisma.ActivityMediaUncheckedCreateNestedManyWithoutActivityInput
+export type ActivityUncheckedCreateNestedManyWithoutGroupInput = {
+  create?: Prisma.XOR<Prisma.ActivityCreateWithoutGroupInput, Prisma.ActivityUncheckedCreateWithoutGroupInput> | Prisma.ActivityCreateWithoutGroupInput[] | Prisma.ActivityUncheckedCreateWithoutGroupInput[]
+  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutGroupInput | Prisma.ActivityCreateOrConnectWithoutGroupInput[]
+  createMany?: Prisma.ActivityCreateManyGroupInputEnvelope
+  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
 }
 
-export type ActivityCreateOrConnectWithoutParticipationInput = {
-  where: Prisma.ActivityWhereUniqueInput
-  create: Prisma.XOR<Prisma.ActivityCreateWithoutParticipationInput, Prisma.ActivityUncheckedCreateWithoutParticipationInput>
+export type ActivityUpdateManyWithoutGroupNestedInput = {
+  create?: Prisma.XOR<Prisma.ActivityCreateWithoutGroupInput, Prisma.ActivityUncheckedCreateWithoutGroupInput> | Prisma.ActivityCreateWithoutGroupInput[] | Prisma.ActivityUncheckedCreateWithoutGroupInput[]
+  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutGroupInput | Prisma.ActivityCreateOrConnectWithoutGroupInput[]
+  upsert?: Prisma.ActivityUpsertWithWhereUniqueWithoutGroupInput | Prisma.ActivityUpsertWithWhereUniqueWithoutGroupInput[]
+  createMany?: Prisma.ActivityCreateManyGroupInputEnvelope
+  set?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  disconnect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  delete?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  update?: Prisma.ActivityUpdateWithWhereUniqueWithoutGroupInput | Prisma.ActivityUpdateWithWhereUniqueWithoutGroupInput[]
+  updateMany?: Prisma.ActivityUpdateManyWithWhereWithoutGroupInput | Prisma.ActivityUpdateManyWithWhereWithoutGroupInput[]
+  deleteMany?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
 }
 
-export type ActivityCreateManyParticipationInputEnvelope = {
-  data: Prisma.ActivityCreateManyParticipationInput | Prisma.ActivityCreateManyParticipationInput[]
-  skipDuplicates?: boolean
-}
-
-export type ActivityUpsertWithWhereUniqueWithoutParticipationInput = {
-  where: Prisma.ActivityWhereUniqueInput
-  update: Prisma.XOR<Prisma.ActivityUpdateWithoutParticipationInput, Prisma.ActivityUncheckedUpdateWithoutParticipationInput>
-  create: Prisma.XOR<Prisma.ActivityCreateWithoutParticipationInput, Prisma.ActivityUncheckedCreateWithoutParticipationInput>
-}
-
-export type ActivityUpdateWithWhereUniqueWithoutParticipationInput = {
-  where: Prisma.ActivityWhereUniqueInput
-  data: Prisma.XOR<Prisma.ActivityUpdateWithoutParticipationInput, Prisma.ActivityUncheckedUpdateWithoutParticipationInput>
-}
-
-export type ActivityUpdateManyWithWhereWithoutParticipationInput = {
-  where: Prisma.ActivityScalarWhereInput
-  data: Prisma.XOR<Prisma.ActivityUpdateManyMutationInput, Prisma.ActivityUncheckedUpdateManyWithoutParticipationInput>
-}
-
-export type ActivityScalarWhereInput = {
-  AND?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
-  OR?: Prisma.ActivityScalarWhereInput[]
-  NOT?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
-  id?: Prisma.StringFilter<"Activity"> | string
-  participationId?: Prisma.StringFilter<"Activity"> | string
-  name?: Prisma.StringFilter<"Activity"> | string
-  from?: Prisma.DateTimeFilter<"Activity"> | Date | string
-  to?: Prisma.DateTimeFilter<"Activity"> | Date | string
-  location?: Prisma.StringNullableFilter<"Activity"> | string | null
-  locationUrl?: Prisma.StringNullableFilter<"Activity"> | string | null
-  involvedPeople?: Prisma.StringNullableListFilter<"Activity">
-  note?: Prisma.StringNullableFilter<"Activity"> | string | null
-  imageUrl?: Prisma.StringNullableFilter<"Activity"> | string | null
-  sortOrder?: Prisma.IntFilter<"Activity"> | number
-  createdAt?: Prisma.DateTimeFilter<"Activity"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Activity"> | Date | string
-  createdBy?: Prisma.StringFilter<"Activity"> | string
+export type ActivityUncheckedUpdateManyWithoutGroupNestedInput = {
+  create?: Prisma.XOR<Prisma.ActivityCreateWithoutGroupInput, Prisma.ActivityUncheckedCreateWithoutGroupInput> | Prisma.ActivityCreateWithoutGroupInput[] | Prisma.ActivityUncheckedCreateWithoutGroupInput[]
+  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutGroupInput | Prisma.ActivityCreateOrConnectWithoutGroupInput[]
+  upsert?: Prisma.ActivityUpsertWithWhereUniqueWithoutGroupInput | Prisma.ActivityUpsertWithWhereUniqueWithoutGroupInput[]
+  createMany?: Prisma.ActivityCreateManyGroupInputEnvelope
+  set?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  disconnect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  delete?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  update?: Prisma.ActivityUpdateWithWhereUniqueWithoutGroupInput | Prisma.ActivityUpdateWithWhereUniqueWithoutGroupInput[]
+  updateMany?: Prisma.ActivityUpdateManyWithWhereWithoutGroupInput | Prisma.ActivityUpdateManyWithWhereWithoutGroupInput[]
+  deleteMany?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
 }
 
 export type ActivityCreateWithoutMediaInput = {
@@ -732,12 +652,12 @@ export type ActivityCreateWithoutMediaInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   createdBy: string
-  participation: Prisma.ParticipationCreateNestedOneWithoutActivitiesInput
+  group: Prisma.ParticipationGroupCreateNestedOneWithoutActivitiesInput
 }
 
 export type ActivityUncheckedCreateWithoutMediaInput = {
   id?: string
-  participationId: string
+  participationGroupId: string
   name: string
   from: Date | string
   to: Date | string
@@ -782,12 +702,12 @@ export type ActivityUpdateWithoutMediaInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
-  participation?: Prisma.ParticipationUpdateOneRequiredWithoutActivitiesNestedInput
+  group?: Prisma.ParticipationGroupUpdateOneRequiredWithoutActivitiesNestedInput
 }
 
 export type ActivityUncheckedUpdateWithoutMediaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  participationId?: Prisma.StringFieldUpdateOperationsInput | string
+  participationGroupId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   from?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -802,7 +722,87 @@ export type ActivityUncheckedUpdateWithoutMediaInput = {
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
-export type ActivityCreateManyParticipationInput = {
+export type ActivityCreateWithoutGroupInput = {
+  id?: string
+  name: string
+  from: Date | string
+  to: Date | string
+  location?: string | null
+  locationUrl?: string | null
+  involvedPeople?: Prisma.ActivityCreateinvolvedPeopleInput | string[]
+  note?: string | null
+  imageUrl?: string | null
+  sortOrder?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  createdBy: string
+  media?: Prisma.ActivityMediaCreateNestedManyWithoutActivityInput
+}
+
+export type ActivityUncheckedCreateWithoutGroupInput = {
+  id?: string
+  name: string
+  from: Date | string
+  to: Date | string
+  location?: string | null
+  locationUrl?: string | null
+  involvedPeople?: Prisma.ActivityCreateinvolvedPeopleInput | string[]
+  note?: string | null
+  imageUrl?: string | null
+  sortOrder?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  createdBy: string
+  media?: Prisma.ActivityMediaUncheckedCreateNestedManyWithoutActivityInput
+}
+
+export type ActivityCreateOrConnectWithoutGroupInput = {
+  where: Prisma.ActivityWhereUniqueInput
+  create: Prisma.XOR<Prisma.ActivityCreateWithoutGroupInput, Prisma.ActivityUncheckedCreateWithoutGroupInput>
+}
+
+export type ActivityCreateManyGroupInputEnvelope = {
+  data: Prisma.ActivityCreateManyGroupInput | Prisma.ActivityCreateManyGroupInput[]
+  skipDuplicates?: boolean
+}
+
+export type ActivityUpsertWithWhereUniqueWithoutGroupInput = {
+  where: Prisma.ActivityWhereUniqueInput
+  update: Prisma.XOR<Prisma.ActivityUpdateWithoutGroupInput, Prisma.ActivityUncheckedUpdateWithoutGroupInput>
+  create: Prisma.XOR<Prisma.ActivityCreateWithoutGroupInput, Prisma.ActivityUncheckedCreateWithoutGroupInput>
+}
+
+export type ActivityUpdateWithWhereUniqueWithoutGroupInput = {
+  where: Prisma.ActivityWhereUniqueInput
+  data: Prisma.XOR<Prisma.ActivityUpdateWithoutGroupInput, Prisma.ActivityUncheckedUpdateWithoutGroupInput>
+}
+
+export type ActivityUpdateManyWithWhereWithoutGroupInput = {
+  where: Prisma.ActivityScalarWhereInput
+  data: Prisma.XOR<Prisma.ActivityUpdateManyMutationInput, Prisma.ActivityUncheckedUpdateManyWithoutGroupInput>
+}
+
+export type ActivityScalarWhereInput = {
+  AND?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
+  OR?: Prisma.ActivityScalarWhereInput[]
+  NOT?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
+  id?: Prisma.StringFilter<"Activity"> | string
+  participationGroupId?: Prisma.StringFilter<"Activity"> | string
+  name?: Prisma.StringFilter<"Activity"> | string
+  from?: Prisma.DateTimeFilter<"Activity"> | Date | string
+  to?: Prisma.DateTimeFilter<"Activity"> | Date | string
+  location?: Prisma.StringNullableFilter<"Activity"> | string | null
+  locationUrl?: Prisma.StringNullableFilter<"Activity"> | string | null
+  involvedPeople?: Prisma.StringNullableListFilter<"Activity">
+  note?: Prisma.StringNullableFilter<"Activity"> | string | null
+  imageUrl?: Prisma.StringNullableFilter<"Activity"> | string | null
+  sortOrder?: Prisma.IntFilter<"Activity"> | number
+  createdAt?: Prisma.DateTimeFilter<"Activity"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Activity"> | Date | string
+  createdBy?: Prisma.StringFilter<"Activity"> | string
+}
+
+export type ActivityCreateManyGroupInput = {
   id?: string
   name: string
   from: Date | string
@@ -818,7 +818,7 @@ export type ActivityCreateManyParticipationInput = {
   createdBy: string
 }
 
-export type ActivityUpdateWithoutParticipationInput = {
+export type ActivityUpdateWithoutGroupInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   from?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -835,7 +835,7 @@ export type ActivityUpdateWithoutParticipationInput = {
   media?: Prisma.ActivityMediaUpdateManyWithoutActivityNestedInput
 }
 
-export type ActivityUncheckedUpdateWithoutParticipationInput = {
+export type ActivityUncheckedUpdateWithoutGroupInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   from?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -852,7 +852,7 @@ export type ActivityUncheckedUpdateWithoutParticipationInput = {
   media?: Prisma.ActivityMediaUncheckedUpdateManyWithoutActivityNestedInput
 }
 
-export type ActivityUncheckedUpdateManyWithoutParticipationInput = {
+export type ActivityUncheckedUpdateManyWithoutGroupInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   from?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -901,7 +901,7 @@ export type ActivityCountOutputTypeCountMediaArgs<ExtArgs extends runtime.Types.
 
 export type ActivitySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  participationId?: boolean
+  participationGroupId?: boolean
   name?: boolean
   from?: boolean
   to?: boolean
@@ -914,14 +914,14 @@ export type ActivitySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   createdAt?: boolean
   updatedAt?: boolean
   createdBy?: boolean
-  participation?: boolean | Prisma.ParticipationDefaultArgs<ExtArgs>
+  group?: boolean | Prisma.ParticipationGroupDefaultArgs<ExtArgs>
   media?: boolean | Prisma.Activity$mediaArgs<ExtArgs>
   _count?: boolean | Prisma.ActivityCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["activity"]>
 
 export type ActivitySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  participationId?: boolean
+  participationGroupId?: boolean
   name?: boolean
   from?: boolean
   to?: boolean
@@ -934,12 +934,12 @@ export type ActivitySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   createdAt?: boolean
   updatedAt?: boolean
   createdBy?: boolean
-  participation?: boolean | Prisma.ParticipationDefaultArgs<ExtArgs>
+  group?: boolean | Prisma.ParticipationGroupDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["activity"]>
 
 export type ActivitySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  participationId?: boolean
+  participationGroupId?: boolean
   name?: boolean
   from?: boolean
   to?: boolean
@@ -952,12 +952,12 @@ export type ActivitySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   createdAt?: boolean
   updatedAt?: boolean
   createdBy?: boolean
-  participation?: boolean | Prisma.ParticipationDefaultArgs<ExtArgs>
+  group?: boolean | Prisma.ParticipationGroupDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["activity"]>
 
 export type ActivitySelectScalar = {
   id?: boolean
-  participationId?: boolean
+  participationGroupId?: boolean
   name?: boolean
   from?: boolean
   to?: boolean
@@ -972,28 +972,28 @@ export type ActivitySelectScalar = {
   createdBy?: boolean
 }
 
-export type ActivityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "participationId" | "name" | "from" | "to" | "location" | "locationUrl" | "involvedPeople" | "note" | "imageUrl" | "sortOrder" | "createdAt" | "updatedAt" | "createdBy", ExtArgs["result"]["activity"]>
+export type ActivityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "participationGroupId" | "name" | "from" | "to" | "location" | "locationUrl" | "involvedPeople" | "note" | "imageUrl" | "sortOrder" | "createdAt" | "updatedAt" | "createdBy", ExtArgs["result"]["activity"]>
 export type ActivityInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  participation?: boolean | Prisma.ParticipationDefaultArgs<ExtArgs>
+  group?: boolean | Prisma.ParticipationGroupDefaultArgs<ExtArgs>
   media?: boolean | Prisma.Activity$mediaArgs<ExtArgs>
   _count?: boolean | Prisma.ActivityCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ActivityIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  participation?: boolean | Prisma.ParticipationDefaultArgs<ExtArgs>
+  group?: boolean | Prisma.ParticipationGroupDefaultArgs<ExtArgs>
 }
 export type ActivityIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  participation?: boolean | Prisma.ParticipationDefaultArgs<ExtArgs>
+  group?: boolean | Prisma.ParticipationGroupDefaultArgs<ExtArgs>
 }
 
 export type $ActivityPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Activity"
   objects: {
-    participation: Prisma.$ParticipationPayload<ExtArgs>
+    group: Prisma.$ParticipationGroupPayload<ExtArgs>
     media: Prisma.$ActivityMediaPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    participationId: string
+    participationGroupId: string
     name: string
     from: Date
     to: Date
@@ -1400,7 +1400,7 @@ readonly fields: ActivityFieldRefs;
  */
 export interface Prisma__ActivityClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  participation<T extends Prisma.ParticipationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ParticipationDefaultArgs<ExtArgs>>): Prisma.Prisma__ParticipationClient<runtime.Types.Result.GetResult<Prisma.$ParticipationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  group<T extends Prisma.ParticipationGroupDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ParticipationGroupDefaultArgs<ExtArgs>>): Prisma.Prisma__ParticipationGroupClient<runtime.Types.Result.GetResult<Prisma.$ParticipationGroupPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   media<T extends Prisma.Activity$mediaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Activity$mediaArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ActivityMediaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1432,7 +1432,7 @@ export interface Prisma__ActivityClient<T, Null = never, ExtArgs extends runtime
  */
 export interface ActivityFieldRefs {
   readonly id: Prisma.FieldRef<"Activity", 'String'>
-  readonly participationId: Prisma.FieldRef<"Activity", 'String'>
+  readonly participationGroupId: Prisma.FieldRef<"Activity", 'String'>
   readonly name: Prisma.FieldRef<"Activity", 'String'>
   readonly from: Prisma.FieldRef<"Activity", 'DateTime'>
   readonly to: Prisma.FieldRef<"Activity", 'DateTime'>

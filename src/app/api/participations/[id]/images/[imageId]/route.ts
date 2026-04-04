@@ -16,9 +16,9 @@ const DELETE = async (_req: NextRequest, ctx: RouteContext) => {
   const image = await participationRepository.getImageById(imageId);
   if (!image) return NotFound("Image not found");
 
-  // Only the participation owner can delete
-  if (image.participation.userId !== session.user.id && !session.user.isAdmin) {
-    return Forbidden("You can only delete your own participation images");
+  // Only the group owner can delete
+  if (image.group.ownerId !== session.user.id && !session.user.isAdmin) {
+    return Forbidden("You can only delete images in groups you own");
   }
 
   await participationRepository.deleteImage(imageId);

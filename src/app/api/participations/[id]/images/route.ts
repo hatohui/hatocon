@@ -19,7 +19,7 @@ const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
 
 type RouteContext = { params: Promise<{ id: string }> };
 
-/** GET /api/participations/[id]/images — list images for a participation */
+/** GET /api/participations/[id]/images — list images for a participation's group */
 const GET = async (_req: NextRequest, ctx: RouteContext) => {
   const session = await auth();
   if (!session?.user?.id) return Unauthorized();
@@ -27,11 +27,19 @@ const GET = async (_req: NextRequest, ctx: RouteContext) => {
   const { id } = await ctx.params;
   const participation = await participationRepository.getById(id);
   if (!participation) return NotFound("Participation not found");
-  if (participation.userId !== session.user.id && !session.user.isAdmin) {
-    return Forbidden("You can only view your own participation images");
+
+  const isMember = await participationRepository.isMember(id, session.user.id);
+  if (!isMember && !session.user.isAdmin) {
+    return Forbidden("You can only view images for groups you belong to");
   }
 
-  const images = await participationRepository.getImages(id);
+  const group = await participationRepository.getOrCreateGroupForParticipation(
+    id,
+    participation.userId,
+  );
+  if (!group) return OK([]);
+
+  const images = await participationRepository.getImages(group.id);
   return OK(images);
 };
 
@@ -43,9 +51,17 @@ const POST = async (req: NextRequest, ctx: RouteContext) => {
   const { id } = await ctx.params;
   const participation = await participationRepository.getById(id);
   if (!participation) return NotFound("Participation not found");
-  if (participation.userId !== session.user.id) {
-    return Forbidden("You can only upload images to your own participations");
+
+  const isMember = await participationRepository.isMember(id, session.user.id);
+  if (!isMember) {
+    return Forbidden("You can only upload images to groups you belong to");
   }
+
+  const group = await participationRepository.getOrCreateGroupForParticipation(
+    id,
+    participation.userId,
+  );
+  if (!group) return BadRequest("Could not resolve group");
 
   const { contentType, contentLength, caption } = await req.json();
 
@@ -57,7 +73,7 @@ const POST = async (req: NextRequest, ctx: RouteContext) => {
   }
 
   const ext = contentType.split("/")[1];
-  const key = `participations/${id}/${randomUUID()}.${ext}`;
+  const key = `groups/${group.id}/${randomUUID()}.${ext}`;
 
   const command = new PutObjectCommand({
     Bucket: process.env.R2_BUCKET_NAME!,
@@ -68,7 +84,11 @@ const POST = async (req: NextRequest, ctx: RouteContext) => {
   const uploadUrl = await getSignedUrl(r2, command, { expiresIn: 300 });
   const publicUrl = `${process.env.R2_PUBLIC_URL}/${key}`;
 
-  const image = await participationRepository.addImage(id, publicUrl, caption);
+  const image = await participationRepository.addImage(
+    group.id,
+    publicUrl,
+    caption,
+  );
 
   return Created({ uploadUrl, image });
 };

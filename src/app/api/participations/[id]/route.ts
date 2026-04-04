@@ -9,23 +9,40 @@ type RouteContext = { params: Promise<{ id: string }> };
 /** GET /api/participations/[id] — get participation detail */
 const GET = async (_req: NextRequest, ctx: RouteContext) => {
   const session = await auth();
-  if (!session?.user?.id) return Unauthorized();
 
   const { id } = await ctx.params;
   const participation = await participationRepository.getByIdDetailed(id);
   if (!participation) return NotFound("Participation not found");
 
-  // Get co-participants if linked to an event
+  // If not logged in, only allow if the group is public
+  const isPublic = participation.group?.isPublic ?? false;
+  if (!session?.user?.id && !isPublic) return Unauthorized();
+
+  // Get co-participants from the group if exists
   let participants: Awaited<
-    ReturnType<typeof participationRepository.getParticipantsByEvent>
+    ReturnType<typeof participationRepository.getParticipantsByGroup>
   > = [];
-  if (participation.eventId) {
-    participants = await participationRepository.getParticipantsByEvent(
-      participation.eventId,
+  let group = participation.group;
+
+  if (participation.groupId) {
+    participants = await participationRepository.getParticipantsByGroup(
+      participation.groupId,
     );
+  } else if (participation.eventId) {
+    // Fallback: get or create group
+    const rawGroup = await participationRepository.getOrCreateGroupForParticipation(
+      id,
+      participation.userId,
+    );
+    if (rawGroup) {
+      group = { ...rawGroup, images: [] };
+      participants = await participationRepository.getParticipantsByGroup(
+        rawGroup.id,
+      );
+    }
   }
 
-  return OK({ ...participation, participants });
+  return OK({ ...participation, participants, group });
 };
 
 /** DELETE /api/participations/[id] — delete own participation */

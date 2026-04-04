@@ -22,18 +22,23 @@ const PUT = async (req: NextRequest, ctx: RouteContext) => {
   const participation = await participationRepository.getById(id);
   if (!participation) return NotFound(messages.participation.notFound);
 
-  if (participation.userId !== session.user.id && !session.user.isAdmin) {
-    return Forbidden(
-      "You can only reorder activities in your own participations",
-    );
+  const isMember = await participationRepository.isMember(id, session.user.id);
+  if (!isMember && !session.user.isAdmin) {
+    return Forbidden("You can only reorder activities in your own group");
   }
+
+  const group = await participationRepository.getOrCreateGroupForParticipation(
+    id,
+    participation.userId,
+  );
+  if (!group) return NotFound("Could not resolve group");
 
   const { orderedIds } = await req.json();
   if (!Array.isArray(orderedIds) || orderedIds.length === 0) {
     return BadRequest("orderedIds must be a non-empty array");
   }
 
-  await activityRepository.reorder(id, orderedIds);
+  await activityRepository.reorder(group.id, orderedIds);
   return OK({ success: true });
 };
 

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
 
 type MeResponse = {
   id: string;
@@ -24,12 +25,16 @@ type PasswordChangeDTO = {
   confirmPassword: string;
 };
 
-const useMe = () =>
-  useQuery({
+const useMe = () => {
+  const enabled = usePathname() !== "/login";
+
+  return useQuery({
     queryKey: ["me"],
     queryFn: () =>
       axios.get<{ data: MeResponse }>("/api/me").then((r) => r.data.data),
+    enabled: enabled,
   });
+};
 
 const useUpdateMe = () => {
   const queryClient = useQueryClient();

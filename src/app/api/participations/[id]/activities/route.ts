@@ -24,7 +24,14 @@ const GET = async (_req: NextRequest, ctx: RouteContext) => {
   const participation = await participationRepository.getById(id);
   if (!participation) return NotFound(messages.participation.notFound);
 
-  const activities = await activityRepository.getByParticipation(id);
+  // Resolve group to get activities
+  const group = await participationRepository.getOrCreateGroupForParticipation(
+    id,
+    participation.userId,
+  );
+  if (!group) return OK([]);
+
+  const activities = await activityRepository.getByGroup(group.id);
   return OK(activities);
 };
 
@@ -37,9 +44,17 @@ const POST = async (req: NextRequest, ctx: RouteContext) => {
   const participation = await participationRepository.getById(id);
   if (!participation) return NotFound(messages.participation.notFound);
 
-  if (participation.userId !== session.user.id && !session.user.isAdmin) {
-    return Forbidden("You can only add activities to your own participations");
+  // Check membership (must be a group member)
+  const isMember = await participationRepository.isMember(id, session.user.id);
+  if (!isMember && !session.user.isAdmin) {
+    return Forbidden("You can only add activities to your own group");
   }
+
+  const group = await participationRepository.getOrCreateGroupForParticipation(
+    id,
+    participation.userId,
+  );
+  if (!group) return NotFound("Could not resolve group");
 
   const data = await req.json();
   const result = activitySchema.safeParse(data);
@@ -48,7 +63,7 @@ const POST = async (req: NextRequest, ctx: RouteContext) => {
   }
 
   const activity = await activityRepository.create(
-    id,
+    group.id,
     session.user.id,
     result.data,
   );

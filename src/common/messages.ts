@@ -66,4 +66,19 @@ export const messages = {
       toRequired: "VALIDATION_ACTIVITY_TO_REQUIRED",
     },
   },
+  participationGroup: {
+    notFound: "PARTICIPATION_GROUP_NOT_FOUND",
+    notOwner: "PARTICIPATION_GROUP_NOT_OWNER",
+    notMember: "PARTICIPATION_GROUP_NOT_MEMBER",
+    cannotKickOwner: "CANNOT_KICK_OWNER",
+    cannotTransferToSelf: "CANNOT_TRANSFER_TO_SELF",
+    targetNotMember: "TARGET_NOT_MEMBER",
+    inviteNotAllowed: "MEMBER_INVITE_NOT_ALLOWED",
+    alreadyMember: "ALREADY_MEMBER",
+    joinRequestExists: "JOIN_REQUEST_ALREADY_EXISTS",
+    joinRequestNotFound: "JOIN_REQUEST_NOT_FOUND",
+  },
+  notification: {
+    notFound: "NOTIFICATION_NOT_FOUND",
+  },
 };

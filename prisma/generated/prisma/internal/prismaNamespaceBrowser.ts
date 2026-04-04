@@ -62,7 +62,10 @@ export const ModelName = {
   Activity: 'Activity',
   ActivityMedia: 'ActivityMedia',
   Holiday: 'Holiday',
-  EventInvitee: 'EventInvitee'
+  EventInvitee: 'EventInvitee',
+  ParticipationGroup: 'ParticipationGroup',
+  JoinRequest: 'JoinRequest',
+  Notification: 'Notification'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -179,6 +182,7 @@ export const ParticipationScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   eventId: 'eventId',
+  groupId: 'groupId',
   from: 'from',
   to: 'to',
   leaveType: 'leaveType',
@@ -192,7 +196,7 @@ export type ParticipationScalarFieldEnum = (typeof ParticipationScalarFieldEnum)
 
 export const ParticipationImageScalarFieldEnum = {
   id: 'id',
-  participationId: 'participationId',
+  groupId: 'groupId',
   url: 'url',
   caption: 'caption',
   createdAt: 'createdAt'
@@ -203,7 +207,7 @@ export type ParticipationImageScalarFieldEnum = (typeof ParticipationImageScalar
 
 export const ActivityScalarFieldEnum = {
   id: 'id',
-  participationId: 'participationId',
+  participationGroupId: 'participationGroupId',
   name: 'name',
   from: 'from',
   to: 'to',
@@ -254,12 +258,59 @@ export const EventInviteeScalarFieldEnum = {
 export type EventInviteeScalarFieldEnum = (typeof EventInviteeScalarFieldEnum)[keyof typeof EventInviteeScalarFieldEnum]
 
 
+export const ParticipationGroupScalarFieldEnum = {
+  id: 'id',
+  eventId: 'eventId',
+  ownerId: 'ownerId',
+  name: 'name',
+  isMemberInviteAllowed: 'isMemberInviteAllowed',
+  isPublic: 'isPublic',
+  isActivityPublicVisible: 'isActivityPublicVisible',
+  isMemberListPublicVisible: 'isMemberListPublicVisible',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ParticipationGroupScalarFieldEnum = (typeof ParticipationGroupScalarFieldEnum)[keyof typeof ParticipationGroupScalarFieldEnum]
+
+
+export const JoinRequestScalarFieldEnum = {
+  id: 'id',
+  groupId: 'groupId',
+  userId: 'userId',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JoinRequestScalarFieldEnum = (typeof JoinRequestScalarFieldEnum)[keyof typeof JoinRequestScalarFieldEnum]
+
+
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  type: 'type',
+  data: 'data',
+  isRead: 'isRead',
+  createdAt: 'createdAt'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -276,4 +327,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 

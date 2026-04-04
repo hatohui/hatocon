@@ -7,6 +7,11 @@ import {
   ParticipationImageDTO,
   ParticipationWithEvent,
 } from "@/types/participation.d";
+import type {
+  JoinRequestDTO,
+  ParticipationGroupDTO,
+  ParticipationGroupSettingsUpdate,
+} from "@/types/notification.d";
 import axios from "axios";
 
 type ApiOk<T> = { data: T };
@@ -64,6 +69,48 @@ const participationService = {
     axios.post<ApiOk<Participation>>(
       `/api/participations/${participationId}/members`,
       { userId },
+    ),
+
+  // ─── Group Settings ──────────────────────────────────────────────
+
+  getSettings: (participationId: string) =>
+    axios.get<ApiOk<ParticipationGroupDTO>>(
+      `/api/participations/${participationId}/settings`,
+    ),
+
+  updateSettings: (
+    participationId: string,
+    data: ParticipationGroupSettingsUpdate,
+  ) =>
+    axios.patch<ApiOk<ParticipationGroupDTO>>(
+      `/api/participations/${participationId}/settings`,
+      data,
+    ),
+
+  kickMember: (participationId: string, userId: string) =>
+    axios.post(`/api/participations/${participationId}/kick`, { userId }),
+
+  transferOwnership: (participationId: string, userId: string) =>
+    axios.post(`/api/participations/${participationId}/transfer`, { userId }),
+
+  // ─── Join Requests ───────────────────────────────────────────────
+
+  getJoinRequests: (participationId: string) =>
+    axios.get<ApiOk<JoinRequestDTO[]>>(
+      `/api/participations/${participationId}/join-requests`,
+    ),
+
+  requestToJoin: (participationId: string) =>
+    axios.post(`/api/participations/${participationId}/join-requests`),
+
+  approveJoinRequest: (participationId: string, requestId: string) =>
+    axios.post(
+      `/api/participations/${participationId}/join-requests/${requestId}/approve`,
+    ),
+
+  rejectJoinRequest: (participationId: string, requestId: string) =>
+    axios.post(
+      `/api/participations/${participationId}/join-requests/${requestId}/reject`,
     ),
 };
 

@@ -9,22 +9,22 @@ const activityRepository = {
     });
   },
 
-  getByParticipation: async (participationId: string) => {
+  getByGroup: async (groupId: string) => {
     return db.activity.findMany({
-      where: { participationId },
+      where: { participationGroupId: groupId },
       include: { media: { orderBy: { createdAt: "desc" } } },
       orderBy: [{ from: "asc" }, { sortOrder: "asc" }],
     });
   },
 
   create: async (
-    participationId: string,
+    groupId: string,
     createdBy: string,
     data: ActivityCreateDTO,
   ) => {
     return db.activity.create({
       data: {
-        participationId,
+        participationGroupId: groupId,
         createdBy,
         name: data.name,
         from: new Date(data.from),
@@ -70,7 +70,7 @@ const activityRepository = {
     return db.activity.delete({ where: { id } });
   },
 
-  reorder: async (participationId: string, orderedIds: string[]) => {
+  reorder: async (groupId: string, orderedIds: string[]) => {
     const updates = orderedIds.map((id, index) =>
       db.activity.update({
         where: { id },
@@ -88,14 +88,14 @@ const activityRepository = {
     });
   },
 
-  getAllMediaByParticipation: async (
-    participationId: string,
+  getAllMediaByGroup: async (
+    groupId: string,
     activityId?: string,
     uploadedBy?: string,
   ) => {
     return db.activityMedia.findMany({
       where: {
-        activity: { participationId },
+        activity: { participationGroupId: groupId },
         ...(activityId ? { activityId } : {}),
         ...(uploadedBy ? { uploadedBy } : {}),
       },
@@ -126,7 +126,7 @@ const activityRepository = {
       where: { id: mediaId },
       include: {
         activity: {
-          select: { participationId: true, createdBy: true },
+          select: { participationGroupId: true, createdBy: true },
         },
       },
     });

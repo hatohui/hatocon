@@ -227,6 +227,8 @@ export type UserWhereInput = {
   jobProfile?: Prisma.XOR<Prisma.JobProfileNullableScalarRelationFilter, Prisma.JobProfileWhereInput> | null
   participations?: Prisma.ParticipationListRelationFilter
   events?: Prisma.EventListRelationFilter
+  notifications?: Prisma.NotificationListRelationFilter
+  joinRequests?: Prisma.JoinRequestListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -245,6 +247,8 @@ export type UserOrderByWithRelationInput = {
   jobProfile?: Prisma.JobProfileOrderByWithRelationInput
   participations?: Prisma.ParticipationOrderByRelationAggregateInput
   events?: Prisma.EventOrderByRelationAggregateInput
+  notifications?: Prisma.NotificationOrderByRelationAggregateInput
+  joinRequests?: Prisma.JoinRequestOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -266,6 +270,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   jobProfile?: Prisma.XOR<Prisma.JobProfileNullableScalarRelationFilter, Prisma.JobProfileWhereInput> | null
   participations?: Prisma.ParticipationListRelationFilter
   events?: Prisma.EventListRelationFilter
+  notifications?: Prisma.NotificationListRelationFilter
+  joinRequests?: Prisma.JoinRequestListRelationFilter
 }, "id" | "username" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -316,6 +322,8 @@ export type UserCreateInput = {
   jobProfile?: Prisma.JobProfileCreateNestedOneWithoutUserInput
   participations?: Prisma.ParticipationCreateNestedManyWithoutUserInput
   events?: Prisma.EventCreateNestedManyWithoutCreatedByUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  joinRequests?: Prisma.JoinRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -334,6 +342,8 @@ export type UserUncheckedCreateInput = {
   jobProfile?: Prisma.JobProfileUncheckedCreateNestedOneWithoutUserInput
   participations?: Prisma.ParticipationUncheckedCreateNestedManyWithoutUserInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutCreatedByUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  joinRequests?: Prisma.JoinRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -352,6 +362,8 @@ export type UserUpdateInput = {
   jobProfile?: Prisma.JobProfileUpdateOneWithoutUserNestedInput
   participations?: Prisma.ParticipationUpdateManyWithoutUserNestedInput
   events?: Prisma.EventUpdateManyWithoutCreatedByUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  joinRequests?: Prisma.JoinRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -370,6 +382,8 @@ export type UserUncheckedUpdateInput = {
   jobProfile?: Prisma.JobProfileUncheckedUpdateOneWithoutUserNestedInput
   participations?: Prisma.ParticipationUncheckedUpdateManyWithoutUserNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  joinRequests?: Prisma.JoinRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -545,6 +559,34 @@ export type UserUpdateOneRequiredWithoutParticipationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutParticipationsInput, Prisma.UserUpdateWithoutParticipationsInput>, Prisma.UserUncheckedUpdateWithoutParticipationsInput>
 }
 
+export type UserCreateNestedOneWithoutJoinRequestsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutJoinRequestsInput, Prisma.UserUncheckedCreateWithoutJoinRequestsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutJoinRequestsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutJoinRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutJoinRequestsInput, Prisma.UserUncheckedCreateWithoutJoinRequestsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutJoinRequestsInput
+  upsert?: Prisma.UserUpsertWithoutJoinRequestsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutJoinRequestsInput, Prisma.UserUpdateWithoutJoinRequestsInput>, Prisma.UserUncheckedUpdateWithoutJoinRequestsInput>
+}
+
+export type UserCreateNestedOneWithoutNotificationsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutNotificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutNotificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutNotificationsInput
+  upsert?: Prisma.UserUpsertWithoutNotificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutNotificationsInput, Prisma.UserUpdateWithoutNotificationsInput>, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
+}
+
 export type UserCreateWithoutAccountsInput = {
   id?: string
   name: string
@@ -560,6 +602,8 @@ export type UserCreateWithoutAccountsInput = {
   jobProfile?: Prisma.JobProfileCreateNestedOneWithoutUserInput
   participations?: Prisma.ParticipationCreateNestedManyWithoutUserInput
   events?: Prisma.EventCreateNestedManyWithoutCreatedByUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  joinRequests?: Prisma.JoinRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAccountsInput = {
@@ -577,6 +621,8 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   jobProfile?: Prisma.JobProfileUncheckedCreateNestedOneWithoutUserInput
   participations?: Prisma.ParticipationUncheckedCreateNestedManyWithoutUserInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutCreatedByUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  joinRequests?: Prisma.JoinRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAccountsInput = {
@@ -610,6 +656,8 @@ export type UserUpdateWithoutAccountsInput = {
   jobProfile?: Prisma.JobProfileUpdateOneWithoutUserNestedInput
   participations?: Prisma.ParticipationUpdateManyWithoutUserNestedInput
   events?: Prisma.EventUpdateManyWithoutCreatedByUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  joinRequests?: Prisma.JoinRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -627,6 +675,8 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   jobProfile?: Prisma.JobProfileUncheckedUpdateOneWithoutUserNestedInput
   participations?: Prisma.ParticipationUncheckedUpdateManyWithoutUserNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  joinRequests?: Prisma.JoinRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSessionsInput = {
@@ -644,6 +694,8 @@ export type UserCreateWithoutSessionsInput = {
   jobProfile?: Prisma.JobProfileCreateNestedOneWithoutUserInput
   participations?: Prisma.ParticipationCreateNestedManyWithoutUserInput
   events?: Prisma.EventCreateNestedManyWithoutCreatedByUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  joinRequests?: Prisma.JoinRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -661,6 +713,8 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   jobProfile?: Prisma.JobProfileUncheckedCreateNestedOneWithoutUserInput
   participations?: Prisma.ParticipationUncheckedCreateNestedManyWithoutUserInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutCreatedByUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  joinRequests?: Prisma.JoinRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -694,6 +748,8 @@ export type UserUpdateWithoutSessionsInput = {
   jobProfile?: Prisma.JobProfileUpdateOneWithoutUserNestedInput
   participations?: Prisma.ParticipationUpdateManyWithoutUserNestedInput
   events?: Prisma.EventUpdateManyWithoutCreatedByUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  joinRequests?: Prisma.JoinRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -711,6 +767,8 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   jobProfile?: Prisma.JobProfileUncheckedUpdateOneWithoutUserNestedInput
   participations?: Prisma.ParticipationUncheckedUpdateManyWithoutUserNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  joinRequests?: Prisma.JoinRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutJobProfileInput = {
@@ -728,6 +786,8 @@ export type UserCreateWithoutJobProfileInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   participations?: Prisma.ParticipationCreateNestedManyWithoutUserInput
   events?: Prisma.EventCreateNestedManyWithoutCreatedByUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  joinRequests?: Prisma.JoinRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutJobProfileInput = {
@@ -745,6 +805,8 @@ export type UserUncheckedCreateWithoutJobProfileInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   participations?: Prisma.ParticipationUncheckedCreateNestedManyWithoutUserInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutCreatedByUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  joinRequests?: Prisma.JoinRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutJobProfileInput = {
@@ -778,6 +840,8 @@ export type UserUpdateWithoutJobProfileInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   participations?: Prisma.ParticipationUpdateManyWithoutUserNestedInput
   events?: Prisma.EventUpdateManyWithoutCreatedByUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  joinRequests?: Prisma.JoinRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutJobProfileInput = {
@@ -795,6 +859,8 @@ export type UserUncheckedUpdateWithoutJobProfileInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   participations?: Prisma.ParticipationUncheckedUpdateManyWithoutUserNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  joinRequests?: Prisma.JoinRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutEventsInput = {
@@ -812,6 +878,8 @@ export type UserCreateWithoutEventsInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   jobProfile?: Prisma.JobProfileCreateNestedOneWithoutUserInput
   participations?: Prisma.ParticipationCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  joinRequests?: Prisma.JoinRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEventsInput = {
@@ -829,6 +897,8 @@ export type UserUncheckedCreateWithoutEventsInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   jobProfile?: Prisma.JobProfileUncheckedCreateNestedOneWithoutUserInput
   participations?: Prisma.ParticipationUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  joinRequests?: Prisma.JoinRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEventsInput = {
@@ -862,6 +932,8 @@ export type UserUpdateWithoutEventsInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   jobProfile?: Prisma.JobProfileUpdateOneWithoutUserNestedInput
   participations?: Prisma.ParticipationUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  joinRequests?: Prisma.JoinRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEventsInput = {
@@ -879,6 +951,8 @@ export type UserUncheckedUpdateWithoutEventsInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   jobProfile?: Prisma.JobProfileUncheckedUpdateOneWithoutUserNestedInput
   participations?: Prisma.ParticipationUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  joinRequests?: Prisma.JoinRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutParticipationsInput = {
@@ -896,6 +970,8 @@ export type UserCreateWithoutParticipationsInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   jobProfile?: Prisma.JobProfileCreateNestedOneWithoutUserInput
   events?: Prisma.EventCreateNestedManyWithoutCreatedByUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  joinRequests?: Prisma.JoinRequestCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutParticipationsInput = {
@@ -913,6 +989,8 @@ export type UserUncheckedCreateWithoutParticipationsInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   jobProfile?: Prisma.JobProfileUncheckedCreateNestedOneWithoutUserInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutCreatedByUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  joinRequests?: Prisma.JoinRequestUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutParticipationsInput = {
@@ -946,6 +1024,8 @@ export type UserUpdateWithoutParticipationsInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   jobProfile?: Prisma.JobProfileUpdateOneWithoutUserNestedInput
   events?: Prisma.EventUpdateManyWithoutCreatedByUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  joinRequests?: Prisma.JoinRequestUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutParticipationsInput = {
@@ -963,6 +1043,192 @@ export type UserUncheckedUpdateWithoutParticipationsInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   jobProfile?: Prisma.JobProfileUncheckedUpdateOneWithoutUserNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  joinRequests?: Prisma.JoinRequestUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutJoinRequestsInput = {
+  id?: string
+  name: string
+  username: string
+  password?: string | null
+  email: string
+  emailVerified?: Date | string | null
+  image?: string | null
+  isAdmin?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  jobProfile?: Prisma.JobProfileCreateNestedOneWithoutUserInput
+  participations?: Prisma.ParticipationCreateNestedManyWithoutUserInput
+  events?: Prisma.EventCreateNestedManyWithoutCreatedByUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutJoinRequestsInput = {
+  id?: string
+  name: string
+  username: string
+  password?: string | null
+  email: string
+  emailVerified?: Date | string | null
+  image?: string | null
+  isAdmin?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  jobProfile?: Prisma.JobProfileUncheckedCreateNestedOneWithoutUserInput
+  participations?: Prisma.ParticipationUncheckedCreateNestedManyWithoutUserInput
+  events?: Prisma.EventUncheckedCreateNestedManyWithoutCreatedByUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutJoinRequestsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutJoinRequestsInput, Prisma.UserUncheckedCreateWithoutJoinRequestsInput>
+}
+
+export type UserUpsertWithoutJoinRequestsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutJoinRequestsInput, Prisma.UserUncheckedUpdateWithoutJoinRequestsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutJoinRequestsInput, Prisma.UserUncheckedCreateWithoutJoinRequestsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutJoinRequestsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutJoinRequestsInput, Prisma.UserUncheckedUpdateWithoutJoinRequestsInput>
+}
+
+export type UserUpdateWithoutJoinRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  jobProfile?: Prisma.JobProfileUpdateOneWithoutUserNestedInput
+  participations?: Prisma.ParticipationUpdateManyWithoutUserNestedInput
+  events?: Prisma.EventUpdateManyWithoutCreatedByUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutJoinRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  jobProfile?: Prisma.JobProfileUncheckedUpdateOneWithoutUserNestedInput
+  participations?: Prisma.ParticipationUncheckedUpdateManyWithoutUserNestedInput
+  events?: Prisma.EventUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutNotificationsInput = {
+  id?: string
+  name: string
+  username: string
+  password?: string | null
+  email: string
+  emailVerified?: Date | string | null
+  image?: string | null
+  isAdmin?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  jobProfile?: Prisma.JobProfileCreateNestedOneWithoutUserInput
+  participations?: Prisma.ParticipationCreateNestedManyWithoutUserInput
+  events?: Prisma.EventCreateNestedManyWithoutCreatedByUserInput
+  joinRequests?: Prisma.JoinRequestCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutNotificationsInput = {
+  id?: string
+  name: string
+  username: string
+  password?: string | null
+  email: string
+  emailVerified?: Date | string | null
+  image?: string | null
+  isAdmin?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  jobProfile?: Prisma.JobProfileUncheckedCreateNestedOneWithoutUserInput
+  participations?: Prisma.ParticipationUncheckedCreateNestedManyWithoutUserInput
+  events?: Prisma.EventUncheckedCreateNestedManyWithoutCreatedByUserInput
+  joinRequests?: Prisma.JoinRequestUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutNotificationsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
+}
+
+export type UserUpsertWithoutNotificationsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutNotificationsInput, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutNotificationsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutNotificationsInput, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
+}
+
+export type UserUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  jobProfile?: Prisma.JobProfileUpdateOneWithoutUserNestedInput
+  participations?: Prisma.ParticipationUpdateManyWithoutUserNestedInput
+  events?: Prisma.EventUpdateManyWithoutCreatedByUserNestedInput
+  joinRequests?: Prisma.JoinRequestUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  jobProfile?: Prisma.JobProfileUncheckedUpdateOneWithoutUserNestedInput
+  participations?: Prisma.ParticipationUncheckedUpdateManyWithoutUserNestedInput
+  events?: Prisma.EventUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  joinRequests?: Prisma.JoinRequestUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -975,6 +1241,8 @@ export type UserCountOutputType = {
   sessions: number
   participations: number
   events: number
+  notifications: number
+  joinRequests: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -982,6 +1250,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   sessions?: boolean | UserCountOutputTypeCountSessionsArgs
   participations?: boolean | UserCountOutputTypeCountParticipationsArgs
   events?: boolean | UserCountOutputTypeCountEventsArgs
+  notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
+  joinRequests?: boolean | UserCountOutputTypeCountJoinRequestsArgs
 }
 
 /**
@@ -1022,6 +1292,20 @@ export type UserCountOutputTypeCountEventsArgs<ExtArgs extends runtime.Types.Ext
   where?: Prisma.EventWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NotificationWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountJoinRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.JoinRequestWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1039,6 +1323,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   jobProfile?: boolean | Prisma.User$jobProfileArgs<ExtArgs>
   participations?: boolean | Prisma.User$participationsArgs<ExtArgs>
   events?: boolean | Prisma.User$eventsArgs<ExtArgs>
+  notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
+  joinRequests?: boolean | Prisma.User$joinRequestsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1088,6 +1374,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   jobProfile?: boolean | Prisma.User$jobProfileArgs<ExtArgs>
   participations?: boolean | Prisma.User$participationsArgs<ExtArgs>
   events?: boolean | Prisma.User$eventsArgs<ExtArgs>
+  notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
+  joinRequests?: boolean | Prisma.User$joinRequestsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1101,6 +1389,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     jobProfile: Prisma.$JobProfilePayload<ExtArgs> | null
     participations: Prisma.$ParticipationPayload<ExtArgs>[]
     events: Prisma.$EventPayload<ExtArgs>[]
+    notifications: Prisma.$NotificationPayload<ExtArgs>[]
+    joinRequests: Prisma.$JoinRequestPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1512,6 +1802,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   jobProfile<T extends Prisma.User$jobProfileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$jobProfileArgs<ExtArgs>>): Prisma.Prisma__JobProfileClient<runtime.Types.Result.GetResult<Prisma.$JobProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   participations<T extends Prisma.User$participationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$participationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ParticipationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   events<T extends Prisma.User$eventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$eventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  joinRequests<T extends Prisma.User$joinRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$joinRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JoinRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2056,6 +2348,54 @@ export type User$eventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   distinct?: Prisma.EventScalarFieldEnum | Prisma.EventScalarFieldEnum[]
+}
+
+/**
+ * User.notifications
+ */
+export type User$notificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Notification
+   */
+  select?: Prisma.NotificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Notification
+   */
+  omit?: Prisma.NotificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotificationInclude<ExtArgs> | null
+  where?: Prisma.NotificationWhereInput
+  orderBy?: Prisma.NotificationOrderByWithRelationInput | Prisma.NotificationOrderByWithRelationInput[]
+  cursor?: Prisma.NotificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
+}
+
+/**
+ * User.joinRequests
+ */
+export type User$joinRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the JoinRequest
+   */
+  select?: Prisma.JoinRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the JoinRequest
+   */
+  omit?: Prisma.JoinRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.JoinRequestInclude<ExtArgs> | null
+  where?: Prisma.JoinRequestWhereInput
+  orderBy?: Prisma.JoinRequestOrderByWithRelationInput | Prisma.JoinRequestOrderByWithRelationInput[]
+  cursor?: Prisma.JoinRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.JoinRequestScalarFieldEnum | Prisma.JoinRequestScalarFieldEnum[]
 }
 
 /**

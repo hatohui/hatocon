@@ -25,6 +25,8 @@ model User {
   jobProfile     JobProfile?
   participations Participation[]
   events         Event[]
+  notifications  Notification[]
+  joinRequests   JoinRequest[]
 }
 
 model Account {
@@ -110,9 +112,10 @@ model Event {
   isDeleted Boolean   @default(false)
   deletedAt DateTime?
 
-  participations Participation[]
-  invitees       EventInvitee[]
-  createdByUser  User            @relation(fields: [createdBy], references: [id])
+  participations     Participation[]
+  invitees           EventInvitee[]
+  createdByUser      User                @relation(fields: [createdBy], references: [id])
+  participationGroups ParticipationGroup[]
 
   @@index([title])
 }
@@ -121,6 +124,7 @@ model Participation {
   id        String    @id @default(uuid())
   userId    String
   eventId   String?
+  groupId   String?
   from      DateTime
   to        DateTime
   leaveType LeaveType
@@ -129,52 +133,50 @@ model Participation {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user       User                 @relation(fields: [userId], references: [id])
-  event      Event?               @relation(fields: [eventId], references: [id])
-  images     ParticipationImage[]
-  activities Activity[]
+  user  User                 @relation(fields: [userId], references: [id])
+  event Event?               @relation(fields: [eventId], references: [id])
+  group ParticipationGroup?  @relation(fields: [groupId], references: [id])
 
   @@index([userId, from, to])
-  @@unique([userId, eventId])
-  @@unique([userId, from, to])
   @@index([userId, eventId])
+  @@index([groupId])
 }
 
 model ParticipationImage {
-  id              String @id @default(uuid())
-  participationId String
-  url             String
-  caption         String?
+  id      String @id @default(uuid())
+  groupId String
+  url     String
+  caption String?
 
   createdAt DateTime @default(now())
 
-  participation Participation @relation(fields: [participationId], references: [id], onDelete: Cascade)
+  group ParticipationGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
-  @@index([participationId])
+  @@index([groupId])
 }
 
 model Activity {
-  id              String   @id @default(uuid())
-  participationId String
-  name            String
-  from            DateTime
-  to              DateTime
-  location        String?
-  locationUrl     String?
-  involvedPeople  String[] // array of user IDs
-  note            String?
-  imageUrl        String?
-  sortOrder       Int      @default(0)
+  id                   String   @id @default(uuid())
+  participationGroupId String
+  name                 String
+  from                 DateTime
+  to                   DateTime
+  location             String?
+  locationUrl          String?
+  involvedPeople       String[] // array of user IDs
+  note                 String?
+  imageUrl             String?
+  sortOrder            Int      @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   createdBy String
 
-  participation Participation   @relation(fields: [participationId], references: [id], onDelete: Cascade)
-  media         ActivityMedia[]
+  group ParticipationGroup @relation(fields: [participationGroupId], references: [id], onDelete: Cascade)
+  media ActivityMedia[]
 
-  @@index([participationId])
-  @@index([participationId, from])
+  @@index([participationGroupId])
+  @@index([participationGroupId, from])
 }
 
 model ActivityMedia {
@@ -223,4 +225,74 @@ enum LeaveType {
   ANNUAL
   SICK
   UNPAID
+}
+
+enum NotificationType {
+  JOIN_REQUEST
+  JOIN_REQUEST_APPROVED
+  JOIN_REQUEST_REJECTED
+  OWNERSHIP_TRANSFERRED
+  USER_KICKED
+  INVITED_TO_JOIN
+}
+
+enum JoinRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model ParticipationGroup {
+  id      String  @id @default(uuid())
+  eventId String?
+  ownerId String
+  name    String  @default("My Plan")
+
+  isMemberInviteAllowed     Boolean @default(true)
+  isPublic                  Boolean @default(false)
+  isActivityPublicVisible   Boolean @default(true)
+  isMemberListPublicVisible Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event          Event?               @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  joinRequests   JoinRequest[]
+  participations Participation[]
+  activities     Activity[]
+  images         ParticipationImage[]
+
+  @@index([eventId])
+  @@index([ownerId])
+}
+
+model JoinRequest {
+  id      String            @id @default(uuid())
+  groupId String
+  userId  String
+  status  JoinRequestStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  group ParticipationGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User               @relation(fields: [userId], references: [id])
+
+  @@unique([groupId, userId])
+  @@index([groupId, status])
+}
+
+model Notification {
+  id     String           @id @default(uuid())
+  userId String
+  type   NotificationType
+  data   Json
+  isRead Boolean          @default(false)
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
 }

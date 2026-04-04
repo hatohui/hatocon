@@ -26,7 +26,7 @@ export type AggregateParticipationImage = {
 
 export type ParticipationImageMinAggregateOutputType = {
   id: string | null
-  participationId: string | null
+  groupId: string | null
   url: string | null
   caption: string | null
   createdAt: Date | null
@@ -34,7 +34,7 @@ export type ParticipationImageMinAggregateOutputType = {
 
 export type ParticipationImageMaxAggregateOutputType = {
   id: string | null
-  participationId: string | null
+  groupId: string | null
   url: string | null
   caption: string | null
   createdAt: Date | null
@@ -42,7 +42,7 @@ export type ParticipationImageMaxAggregateOutputType = {
 
 export type ParticipationImageCountAggregateOutputType = {
   id: number
-  participationId: number
+  groupId: number
   url: number
   caption: number
   createdAt: number
@@ -52,7 +52,7 @@ export type ParticipationImageCountAggregateOutputType = {
 
 export type ParticipationImageMinAggregateInputType = {
   id?: true
-  participationId?: true
+  groupId?: true
   url?: true
   caption?: true
   createdAt?: true
@@ -60,7 +60,7 @@ export type ParticipationImageMinAggregateInputType = {
 
 export type ParticipationImageMaxAggregateInputType = {
   id?: true
-  participationId?: true
+  groupId?: true
   url?: true
   caption?: true
   createdAt?: true
@@ -68,7 +68,7 @@ export type ParticipationImageMaxAggregateInputType = {
 
 export type ParticipationImageCountAggregateInputType = {
   id?: true
-  participationId?: true
+  groupId?: true
   url?: true
   caption?: true
   createdAt?: true
@@ -149,7 +149,7 @@ export type ParticipationImageGroupByArgs<ExtArgs extends runtime.Types.Extensio
 
 export type ParticipationImageGroupByOutputType = {
   id: string
-  participationId: string
+  groupId: string
   url: string
   caption: string | null
   createdAt: Date
@@ -178,20 +178,20 @@ export type ParticipationImageWhereInput = {
   OR?: Prisma.ParticipationImageWhereInput[]
   NOT?: Prisma.ParticipationImageWhereInput | Prisma.ParticipationImageWhereInput[]
   id?: Prisma.StringFilter<"ParticipationImage"> | string
-  participationId?: Prisma.StringFilter<"ParticipationImage"> | string
+  groupId?: Prisma.StringFilter<"ParticipationImage"> | string
   url?: Prisma.StringFilter<"ParticipationImage"> | string
   caption?: Prisma.StringNullableFilter<"ParticipationImage"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ParticipationImage"> | Date | string
-  participation?: Prisma.XOR<Prisma.ParticipationScalarRelationFilter, Prisma.ParticipationWhereInput>
+  group?: Prisma.XOR<Prisma.ParticipationGroupScalarRelationFilter, Prisma.ParticipationGroupWhereInput>
 }
 
 export type ParticipationImageOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  participationId?: Prisma.SortOrder
+  groupId?: Prisma.SortOrder
   url?: Prisma.SortOrder
   caption?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  participation?: Prisma.ParticipationOrderByWithRelationInput
+  group?: Prisma.ParticipationGroupOrderByWithRelationInput
 }
 
 export type ParticipationImageWhereUniqueInput = Prisma.AtLeast<{
@@ -199,16 +199,16 @@ export type ParticipationImageWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.ParticipationImageWhereInput | Prisma.ParticipationImageWhereInput[]
   OR?: Prisma.ParticipationImageWhereInput[]
   NOT?: Prisma.ParticipationImageWhereInput | Prisma.ParticipationImageWhereInput[]
-  participationId?: Prisma.StringFilter<"ParticipationImage"> | string
+  groupId?: Prisma.StringFilter<"ParticipationImage"> | string
   url?: Prisma.StringFilter<"ParticipationImage"> | string
   caption?: Prisma.StringNullableFilter<"ParticipationImage"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ParticipationImage"> | Date | string
-  participation?: Prisma.XOR<Prisma.ParticipationScalarRelationFilter, Prisma.ParticipationWhereInput>
+  group?: Prisma.XOR<Prisma.ParticipationGroupScalarRelationFilter, Prisma.ParticipationGroupWhereInput>
 }, "id">
 
 export type ParticipationImageOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  participationId?: Prisma.SortOrder
+  groupId?: Prisma.SortOrder
   url?: Prisma.SortOrder
   caption?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -222,7 +222,7 @@ export type ParticipationImageScalarWhereWithAggregatesInput = {
   OR?: Prisma.ParticipationImageScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ParticipationImageScalarWhereWithAggregatesInput | Prisma.ParticipationImageScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"ParticipationImage"> | string
-  participationId?: Prisma.StringWithAggregatesFilter<"ParticipationImage"> | string
+  groupId?: Prisma.StringWithAggregatesFilter<"ParticipationImage"> | string
   url?: Prisma.StringWithAggregatesFilter<"ParticipationImage"> | string
   caption?: Prisma.StringNullableWithAggregatesFilter<"ParticipationImage"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ParticipationImage"> | Date | string
@@ -233,12 +233,12 @@ export type ParticipationImageCreateInput = {
   url: string
   caption?: string | null
   createdAt?: Date | string
-  participation: Prisma.ParticipationCreateNestedOneWithoutImagesInput
+  group: Prisma.ParticipationGroupCreateNestedOneWithoutImagesInput
 }
 
 export type ParticipationImageUncheckedCreateInput = {
   id?: string
-  participationId: string
+  groupId: string
   url: string
   caption?: string | null
   createdAt?: Date | string
@@ -249,12 +249,12 @@ export type ParticipationImageUpdateInput = {
   url?: Prisma.StringFieldUpdateOperationsInput | string
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  participation?: Prisma.ParticipationUpdateOneRequiredWithoutImagesNestedInput
+  group?: Prisma.ParticipationGroupUpdateOneRequiredWithoutImagesNestedInput
 }
 
 export type ParticipationImageUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  participationId?: Prisma.StringFieldUpdateOperationsInput | string
+  groupId?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -262,7 +262,7 @@ export type ParticipationImageUncheckedUpdateInput = {
 
 export type ParticipationImageCreateManyInput = {
   id?: string
-  participationId: string
+  groupId: string
   url: string
   caption?: string | null
   createdAt?: Date | string
@@ -277,10 +277,34 @@ export type ParticipationImageUpdateManyMutationInput = {
 
 export type ParticipationImageUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  participationId?: Prisma.StringFieldUpdateOperationsInput | string
+  groupId?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ParticipationImageCountOrderByAggregateInput = {
+  id?: Prisma.SortOrder
+  groupId?: Prisma.SortOrder
+  url?: Prisma.SortOrder
+  caption?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+}
+
+export type ParticipationImageMaxOrderByAggregateInput = {
+  id?: Prisma.SortOrder
+  groupId?: Prisma.SortOrder
+  url?: Prisma.SortOrder
+  caption?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+}
+
+export type ParticipationImageMinOrderByAggregateInput = {
+  id?: Prisma.SortOrder
+  groupId?: Prisma.SortOrder
+  url?: Prisma.SortOrder
+  caption?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
 }
 
 export type ParticipationImageListRelationFilter = {
@@ -293,110 +317,86 @@ export type ParticipationImageOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type ParticipationImageCountOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  participationId?: Prisma.SortOrder
-  url?: Prisma.SortOrder
-  caption?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-}
-
-export type ParticipationImageMaxOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  participationId?: Prisma.SortOrder
-  url?: Prisma.SortOrder
-  caption?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-}
-
-export type ParticipationImageMinOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  participationId?: Prisma.SortOrder
-  url?: Prisma.SortOrder
-  caption?: Prisma.SortOrder
-  createdAt?: Prisma.SortOrder
-}
-
-export type ParticipationImageCreateNestedManyWithoutParticipationInput = {
-  create?: Prisma.XOR<Prisma.ParticipationImageCreateWithoutParticipationInput, Prisma.ParticipationImageUncheckedCreateWithoutParticipationInput> | Prisma.ParticipationImageCreateWithoutParticipationInput[] | Prisma.ParticipationImageUncheckedCreateWithoutParticipationInput[]
-  connectOrCreate?: Prisma.ParticipationImageCreateOrConnectWithoutParticipationInput | Prisma.ParticipationImageCreateOrConnectWithoutParticipationInput[]
-  createMany?: Prisma.ParticipationImageCreateManyParticipationInputEnvelope
+export type ParticipationImageCreateNestedManyWithoutGroupInput = {
+  create?: Prisma.XOR<Prisma.ParticipationImageCreateWithoutGroupInput, Prisma.ParticipationImageUncheckedCreateWithoutGroupInput> | Prisma.ParticipationImageCreateWithoutGroupInput[] | Prisma.ParticipationImageUncheckedCreateWithoutGroupInput[]
+  connectOrCreate?: Prisma.ParticipationImageCreateOrConnectWithoutGroupInput | Prisma.ParticipationImageCreateOrConnectWithoutGroupInput[]
+  createMany?: Prisma.ParticipationImageCreateManyGroupInputEnvelope
   connect?: Prisma.ParticipationImageWhereUniqueInput | Prisma.ParticipationImageWhereUniqueInput[]
 }
 
-export type ParticipationImageUncheckedCreateNestedManyWithoutParticipationInput = {
-  create?: Prisma.XOR<Prisma.ParticipationImageCreateWithoutParticipationInput, Prisma.ParticipationImageUncheckedCreateWithoutParticipationInput> | Prisma.ParticipationImageCreateWithoutParticipationInput[] | Prisma.ParticipationImageUncheckedCreateWithoutParticipationInput[]
-  connectOrCreate?: Prisma.ParticipationImageCreateOrConnectWithoutParticipationInput | Prisma.ParticipationImageCreateOrConnectWithoutParticipationInput[]
-  createMany?: Prisma.ParticipationImageCreateManyParticipationInputEnvelope
+export type ParticipationImageUncheckedCreateNestedManyWithoutGroupInput = {
+  create?: Prisma.XOR<Prisma.ParticipationImageCreateWithoutGroupInput, Prisma.ParticipationImageUncheckedCreateWithoutGroupInput> | Prisma.ParticipationImageCreateWithoutGroupInput[] | Prisma.ParticipationImageUncheckedCreateWithoutGroupInput[]
+  connectOrCreate?: Prisma.ParticipationImageCreateOrConnectWithoutGroupInput | Prisma.ParticipationImageCreateOrConnectWithoutGroupInput[]
+  createMany?: Prisma.ParticipationImageCreateManyGroupInputEnvelope
   connect?: Prisma.ParticipationImageWhereUniqueInput | Prisma.ParticipationImageWhereUniqueInput[]
 }
 
-export type ParticipationImageUpdateManyWithoutParticipationNestedInput = {
-  create?: Prisma.XOR<Prisma.ParticipationImageCreateWithoutParticipationInput, Prisma.ParticipationImageUncheckedCreateWithoutParticipationInput> | Prisma.ParticipationImageCreateWithoutParticipationInput[] | Prisma.ParticipationImageUncheckedCreateWithoutParticipationInput[]
-  connectOrCreate?: Prisma.ParticipationImageCreateOrConnectWithoutParticipationInput | Prisma.ParticipationImageCreateOrConnectWithoutParticipationInput[]
-  upsert?: Prisma.ParticipationImageUpsertWithWhereUniqueWithoutParticipationInput | Prisma.ParticipationImageUpsertWithWhereUniqueWithoutParticipationInput[]
-  createMany?: Prisma.ParticipationImageCreateManyParticipationInputEnvelope
+export type ParticipationImageUpdateManyWithoutGroupNestedInput = {
+  create?: Prisma.XOR<Prisma.ParticipationImageCreateWithoutGroupInput, Prisma.ParticipationImageUncheckedCreateWithoutGroupInput> | Prisma.ParticipationImageCreateWithoutGroupInput[] | Prisma.ParticipationImageUncheckedCreateWithoutGroupInput[]
+  connectOrCreate?: Prisma.ParticipationImageCreateOrConnectWithoutGroupInput | Prisma.ParticipationImageCreateOrConnectWithoutGroupInput[]
+  upsert?: Prisma.ParticipationImageUpsertWithWhereUniqueWithoutGroupInput | Prisma.ParticipationImageUpsertWithWhereUniqueWithoutGroupInput[]
+  createMany?: Prisma.ParticipationImageCreateManyGroupInputEnvelope
   set?: Prisma.ParticipationImageWhereUniqueInput | Prisma.ParticipationImageWhereUniqueInput[]
   disconnect?: Prisma.ParticipationImageWhereUniqueInput | Prisma.ParticipationImageWhereUniqueInput[]
   delete?: Prisma.ParticipationImageWhereUniqueInput | Prisma.ParticipationImageWhereUniqueInput[]
   connect?: Prisma.ParticipationImageWhereUniqueInput | Prisma.ParticipationImageWhereUniqueInput[]
-  update?: Prisma.ParticipationImageUpdateWithWhereUniqueWithoutParticipationInput | Prisma.ParticipationImageUpdateWithWhereUniqueWithoutParticipationInput[]
-  updateMany?: Prisma.ParticipationImageUpdateManyWithWhereWithoutParticipationInput | Prisma.ParticipationImageUpdateManyWithWhereWithoutParticipationInput[]
+  update?: Prisma.ParticipationImageUpdateWithWhereUniqueWithoutGroupInput | Prisma.ParticipationImageUpdateWithWhereUniqueWithoutGroupInput[]
+  updateMany?: Prisma.ParticipationImageUpdateManyWithWhereWithoutGroupInput | Prisma.ParticipationImageUpdateManyWithWhereWithoutGroupInput[]
   deleteMany?: Prisma.ParticipationImageScalarWhereInput | Prisma.ParticipationImageScalarWhereInput[]
 }
 
-export type ParticipationImageUncheckedUpdateManyWithoutParticipationNestedInput = {
-  create?: Prisma.XOR<Prisma.ParticipationImageCreateWithoutParticipationInput, Prisma.ParticipationImageUncheckedCreateWithoutParticipationInput> | Prisma.ParticipationImageCreateWithoutParticipationInput[] | Prisma.ParticipationImageUncheckedCreateWithoutParticipationInput[]
-  connectOrCreate?: Prisma.ParticipationImageCreateOrConnectWithoutParticipationInput | Prisma.ParticipationImageCreateOrConnectWithoutParticipationInput[]
-  upsert?: Prisma.ParticipationImageUpsertWithWhereUniqueWithoutParticipationInput | Prisma.ParticipationImageUpsertWithWhereUniqueWithoutParticipationInput[]
-  createMany?: Prisma.ParticipationImageCreateManyParticipationInputEnvelope
+export type ParticipationImageUncheckedUpdateManyWithoutGroupNestedInput = {
+  create?: Prisma.XOR<Prisma.ParticipationImageCreateWithoutGroupInput, Prisma.ParticipationImageUncheckedCreateWithoutGroupInput> | Prisma.ParticipationImageCreateWithoutGroupInput[] | Prisma.ParticipationImageUncheckedCreateWithoutGroupInput[]
+  connectOrCreate?: Prisma.ParticipationImageCreateOrConnectWithoutGroupInput | Prisma.ParticipationImageCreateOrConnectWithoutGroupInput[]
+  upsert?: Prisma.ParticipationImageUpsertWithWhereUniqueWithoutGroupInput | Prisma.ParticipationImageUpsertWithWhereUniqueWithoutGroupInput[]
+  createMany?: Prisma.ParticipationImageCreateManyGroupInputEnvelope
   set?: Prisma.ParticipationImageWhereUniqueInput | Prisma.ParticipationImageWhereUniqueInput[]
   disconnect?: Prisma.ParticipationImageWhereUniqueInput | Prisma.ParticipationImageWhereUniqueInput[]
   delete?: Prisma.ParticipationImageWhereUniqueInput | Prisma.ParticipationImageWhereUniqueInput[]
   connect?: Prisma.ParticipationImageWhereUniqueInput | Prisma.ParticipationImageWhereUniqueInput[]
-  update?: Prisma.ParticipationImageUpdateWithWhereUniqueWithoutParticipationInput | Prisma.ParticipationImageUpdateWithWhereUniqueWithoutParticipationInput[]
-  updateMany?: Prisma.ParticipationImageUpdateManyWithWhereWithoutParticipationInput | Prisma.ParticipationImageUpdateManyWithWhereWithoutParticipationInput[]
+  update?: Prisma.ParticipationImageUpdateWithWhereUniqueWithoutGroupInput | Prisma.ParticipationImageUpdateWithWhereUniqueWithoutGroupInput[]
+  updateMany?: Prisma.ParticipationImageUpdateManyWithWhereWithoutGroupInput | Prisma.ParticipationImageUpdateManyWithWhereWithoutGroupInput[]
   deleteMany?: Prisma.ParticipationImageScalarWhereInput | Prisma.ParticipationImageScalarWhereInput[]
 }
 
-export type ParticipationImageCreateWithoutParticipationInput = {
+export type ParticipationImageCreateWithoutGroupInput = {
   id?: string
   url: string
   caption?: string | null
   createdAt?: Date | string
 }
 
-export type ParticipationImageUncheckedCreateWithoutParticipationInput = {
+export type ParticipationImageUncheckedCreateWithoutGroupInput = {
   id?: string
   url: string
   caption?: string | null
   createdAt?: Date | string
 }
 
-export type ParticipationImageCreateOrConnectWithoutParticipationInput = {
+export type ParticipationImageCreateOrConnectWithoutGroupInput = {
   where: Prisma.ParticipationImageWhereUniqueInput
-  create: Prisma.XOR<Prisma.ParticipationImageCreateWithoutParticipationInput, Prisma.ParticipationImageUncheckedCreateWithoutParticipationInput>
+  create: Prisma.XOR<Prisma.ParticipationImageCreateWithoutGroupInput, Prisma.ParticipationImageUncheckedCreateWithoutGroupInput>
 }
 
-export type ParticipationImageCreateManyParticipationInputEnvelope = {
-  data: Prisma.ParticipationImageCreateManyParticipationInput | Prisma.ParticipationImageCreateManyParticipationInput[]
+export type ParticipationImageCreateManyGroupInputEnvelope = {
+  data: Prisma.ParticipationImageCreateManyGroupInput | Prisma.ParticipationImageCreateManyGroupInput[]
   skipDuplicates?: boolean
 }
 
-export type ParticipationImageUpsertWithWhereUniqueWithoutParticipationInput = {
+export type ParticipationImageUpsertWithWhereUniqueWithoutGroupInput = {
   where: Prisma.ParticipationImageWhereUniqueInput
-  update: Prisma.XOR<Prisma.ParticipationImageUpdateWithoutParticipationInput, Prisma.ParticipationImageUncheckedUpdateWithoutParticipationInput>
-  create: Prisma.XOR<Prisma.ParticipationImageCreateWithoutParticipationInput, Prisma.ParticipationImageUncheckedCreateWithoutParticipationInput>
+  update: Prisma.XOR<Prisma.ParticipationImageUpdateWithoutGroupInput, Prisma.ParticipationImageUncheckedUpdateWithoutGroupInput>
+  create: Prisma.XOR<Prisma.ParticipationImageCreateWithoutGroupInput, Prisma.ParticipationImageUncheckedCreateWithoutGroupInput>
 }
 
-export type ParticipationImageUpdateWithWhereUniqueWithoutParticipationInput = {
+export type ParticipationImageUpdateWithWhereUniqueWithoutGroupInput = {
   where: Prisma.ParticipationImageWhereUniqueInput
-  data: Prisma.XOR<Prisma.ParticipationImageUpdateWithoutParticipationInput, Prisma.ParticipationImageUncheckedUpdateWithoutParticipationInput>
+  data: Prisma.XOR<Prisma.ParticipationImageUpdateWithoutGroupInput, Prisma.ParticipationImageUncheckedUpdateWithoutGroupInput>
 }
 
-export type ParticipationImageUpdateManyWithWhereWithoutParticipationInput = {
+export type ParticipationImageUpdateManyWithWhereWithoutGroupInput = {
   where: Prisma.ParticipationImageScalarWhereInput
-  data: Prisma.XOR<Prisma.ParticipationImageUpdateManyMutationInput, Prisma.ParticipationImageUncheckedUpdateManyWithoutParticipationInput>
+  data: Prisma.XOR<Prisma.ParticipationImageUpdateManyMutationInput, Prisma.ParticipationImageUncheckedUpdateManyWithoutGroupInput>
 }
 
 export type ParticipationImageScalarWhereInput = {
@@ -404,34 +404,34 @@ export type ParticipationImageScalarWhereInput = {
   OR?: Prisma.ParticipationImageScalarWhereInput[]
   NOT?: Prisma.ParticipationImageScalarWhereInput | Prisma.ParticipationImageScalarWhereInput[]
   id?: Prisma.StringFilter<"ParticipationImage"> | string
-  participationId?: Prisma.StringFilter<"ParticipationImage"> | string
+  groupId?: Prisma.StringFilter<"ParticipationImage"> | string
   url?: Prisma.StringFilter<"ParticipationImage"> | string
   caption?: Prisma.StringNullableFilter<"ParticipationImage"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ParticipationImage"> | Date | string
 }
 
-export type ParticipationImageCreateManyParticipationInput = {
+export type ParticipationImageCreateManyGroupInput = {
   id?: string
   url: string
   caption?: string | null
   createdAt?: Date | string
 }
 
-export type ParticipationImageUpdateWithoutParticipationInput = {
+export type ParticipationImageUpdateWithoutGroupInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type ParticipationImageUncheckedUpdateWithoutParticipationInput = {
+export type ParticipationImageUncheckedUpdateWithoutGroupInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type ParticipationImageUncheckedUpdateManyWithoutParticipationInput = {
+export type ParticipationImageUncheckedUpdateManyWithoutGroupInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -442,58 +442,58 @@ export type ParticipationImageUncheckedUpdateManyWithoutParticipationInput = {
 
 export type ParticipationImageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  participationId?: boolean
+  groupId?: boolean
   url?: boolean
   caption?: boolean
   createdAt?: boolean
-  participation?: boolean | Prisma.ParticipationDefaultArgs<ExtArgs>
+  group?: boolean | Prisma.ParticipationGroupDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["participationImage"]>
 
 export type ParticipationImageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  participationId?: boolean
+  groupId?: boolean
   url?: boolean
   caption?: boolean
   createdAt?: boolean
-  participation?: boolean | Prisma.ParticipationDefaultArgs<ExtArgs>
+  group?: boolean | Prisma.ParticipationGroupDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["participationImage"]>
 
 export type ParticipationImageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  participationId?: boolean
+  groupId?: boolean
   url?: boolean
   caption?: boolean
   createdAt?: boolean
-  participation?: boolean | Prisma.ParticipationDefaultArgs<ExtArgs>
+  group?: boolean | Prisma.ParticipationGroupDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["participationImage"]>
 
 export type ParticipationImageSelectScalar = {
   id?: boolean
-  participationId?: boolean
+  groupId?: boolean
   url?: boolean
   caption?: boolean
   createdAt?: boolean
 }
 
-export type ParticipationImageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "participationId" | "url" | "caption" | "createdAt", ExtArgs["result"]["participationImage"]>
+export type ParticipationImageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "groupId" | "url" | "caption" | "createdAt", ExtArgs["result"]["participationImage"]>
 export type ParticipationImageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  participation?: boolean | Prisma.ParticipationDefaultArgs<ExtArgs>
+  group?: boolean | Prisma.ParticipationGroupDefaultArgs<ExtArgs>
 }
 export type ParticipationImageIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  participation?: boolean | Prisma.ParticipationDefaultArgs<ExtArgs>
+  group?: boolean | Prisma.ParticipationGroupDefaultArgs<ExtArgs>
 }
 export type ParticipationImageIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  participation?: boolean | Prisma.ParticipationDefaultArgs<ExtArgs>
+  group?: boolean | Prisma.ParticipationGroupDefaultArgs<ExtArgs>
 }
 
 export type $ParticipationImagePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ParticipationImage"
   objects: {
-    participation: Prisma.$ParticipationPayload<ExtArgs>
+    group: Prisma.$ParticipationGroupPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    participationId: string
+    groupId: string
     url: string
     caption: string | null
     createdAt: Date
@@ -891,7 +891,7 @@ readonly fields: ParticipationImageFieldRefs;
  */
 export interface Prisma__ParticipationImageClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  participation<T extends Prisma.ParticipationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ParticipationDefaultArgs<ExtArgs>>): Prisma.Prisma__ParticipationClient<runtime.Types.Result.GetResult<Prisma.$ParticipationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  group<T extends Prisma.ParticipationGroupDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ParticipationGroupDefaultArgs<ExtArgs>>): Prisma.Prisma__ParticipationGroupClient<runtime.Types.Result.GetResult<Prisma.$ParticipationGroupPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -922,7 +922,7 @@ export interface Prisma__ParticipationImageClient<T, Null = never, ExtArgs exten
  */
 export interface ParticipationImageFieldRefs {
   readonly id: Prisma.FieldRef<"ParticipationImage", 'String'>
-  readonly participationId: Prisma.FieldRef<"ParticipationImage", 'String'>
+  readonly groupId: Prisma.FieldRef<"ParticipationImage", 'String'>
   readonly url: Prisma.FieldRef<"ParticipationImage", 'String'>
   readonly caption: Prisma.FieldRef<"ParticipationImage", 'String'>
   readonly createdAt: Prisma.FieldRef<"ParticipationImage", 'DateTime'>

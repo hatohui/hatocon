@@ -1,10 +1,10 @@
 import { db } from "@/config/prisma";
 import { ParticipationCreateDTO } from "@/types/participation.d";
-import { LeaveType } from "@prisma/client";
+import { JoinRequestStatus, LeaveType } from "@prisma/client";
+import type { ParticipationGroupSettingsUpdate } from "@/types/notification.d";
 
 /**
  * Counts weekdays (Mon–Fri) between two dates inclusive of both endpoints.
- * `from` and `to` are treated as midnight boundaries (date-only semantics).
  */
 function countWeekdays(from: Date, to: Date): number {
   let count = 0;
@@ -14,7 +14,7 @@ function countWeekdays(from: Date, to: Date): number {
   end.setHours(0, 0, 0, 0);
   while (cursor <= end) {
     const day = cursor.getDay();
-    if (day !== 0 && day !== 6) count++; // exclude Sunday (0) and Saturday (6)
+    if (day !== 0 && day !== 6) count++;
     cursor.setDate(cursor.getDate() + 1);
   }
   return count;
@@ -43,8 +43,22 @@ const participationRepository = {
             visibility: true,
           },
         },
-        images: { orderBy: { createdAt: "desc" } },
+        group: {
+          include: {
+            images: { orderBy: { createdAt: "desc" } },
+          },
+        },
       },
+    });
+  },
+
+  getParticipantsByGroup: async (groupId: string) => {
+    return db.participation.findMany({
+      where: { groupId },
+      include: {
+        user: { select: { id: true, name: true, image: true, email: true } },
+      },
+      orderBy: { createdAt: "asc" },
     });
   },
 
@@ -64,6 +78,12 @@ const participationRepository = {
     });
   },
 
+  getByUserAndGroup: async (userId: string, groupId: string) => {
+    return db.participation.findFirst({
+      where: { userId, groupId },
+    });
+  },
+
   getByUserId: async (userId: string, from: Date, to: Date) => {
     return db.participation.findMany({
       where: {
@@ -75,6 +95,7 @@ const participationRepository = {
         event: {
           select: { id: true, title: true, startAt: true, endAt: true },
         },
+        group: { select: { id: true, name: true } },
       },
       orderBy: { from: "asc" },
     });
@@ -90,6 +111,25 @@ const participationRepository = {
       where: {
         userId,
         id: excludeId ? { not: excludeId } : undefined,
+        from: { lt: to },
+        to: { gt: from },
+      },
+    });
+  },
+
+  /** Check if user already has a participation in a group for the same event with overlapping dates */
+  getOverlappingInEvent: async (
+    userId: string,
+    eventId: string,
+    from: Date,
+    to: Date,
+    excludeGroupId?: string,
+  ) => {
+    return db.participation.findFirst({
+      where: {
+        userId,
+        eventId,
+        groupId: excludeGroupId ? { not: excludeGroupId } : undefined,
         from: { lt: to },
         to: { gt: from },
       },
@@ -127,6 +167,7 @@ const participationRepository = {
       data: {
         userId,
         eventId: data.eventId ?? null,
+        groupId: data.groupId ?? null,
         from: new Date(data.from),
         to: new Date(data.to),
         leaveType: data.leaveType,
@@ -135,7 +176,6 @@ const participationRepository = {
     });
   },
 
-  // Bulk create for co-travelers
   createMany: async (
     userIds: string[],
     data: Omit<ParticipationCreateDTO, "coTravelerIds">,
@@ -155,6 +195,7 @@ const participationRepository = {
           data: {
             userId: uid,
             eventId: data.eventId ?? null,
+            groupId: data.groupId ?? null,
             from: new Date(data.from),
             to: new Date(data.to),
             leaveType: data.leaveType,
@@ -167,7 +208,6 @@ const participationRepository = {
     return results;
   },
 
-  // Admin: get all participations
   getAllAdmin: async (opts: { userId?: string; eventId?: string } = {}) => {
     return db.participation.findMany({
       where: {
@@ -188,17 +228,18 @@ const participationRepository = {
     return db.participation.delete({ where: { id } });
   },
 
-  // ─── Participation Images ──────────────────────────────────────────
-  getImages: async (participationId: string) => {
+  // ─── Group Images ──────────────────────────────────────────────────
+
+  getImages: async (groupId: string) => {
     return db.participationImage.findMany({
-      where: { participationId },
+      where: { groupId },
       orderBy: { createdAt: "desc" },
     });
   },
 
-  addImage: async (participationId: string, url: string, caption?: string) => {
+  addImage: async (groupId: string, url: string, caption?: string) => {
     return db.participationImage.create({
-      data: { participationId, url, caption },
+      data: { groupId, url, caption },
     });
   },
 
@@ -209,40 +250,43 @@ const participationRepository = {
   getImageById: async (imageId: string) => {
     return db.participationImage.findUnique({
       where: { id: imageId },
-      include: { participation: { select: { userId: true } } },
+      include: { group: { select: { ownerId: true } } },
     });
   },
 
-  /** Returns true if userId is the owner or a co-participant of the participation */
+  /** Returns true if userId is a member of the participation's group */
   isMember: async (participationId: string, userId: string) => {
-    const participation = await db.participation.findFirst({
-      where: {
-        id: participationId,
-        OR: [
-          { userId },
-          {
-            eventId: { not: null },
-            event: {
-              participations: { some: { userId } },
-            },
-          },
-        ],
-      },
+    const participation = await db.participation.findUnique({
+      where: { id: participationId },
+      select: { userId: true, groupId: true },
+    });
+    if (!participation) return false;
+    if (participation.userId === userId) return true;
+    if (!participation.groupId) return false;
+    const groupMember = await db.participation.findFirst({
+      where: { groupId: participation.groupId, userId },
       select: { id: true },
     });
-    return participation !== null;
+    return groupMember !== null;
   },
 
-  /** Returns members of the same event participation, optionally filtered by name/email */
+  isGroupMember: async (groupId: string, userId: string) => {
+    const member = await db.participation.findFirst({
+      where: { groupId, userId },
+      select: { id: true },
+    });
+    return member !== null;
+  },
+
+  /** Returns members of the same group, optionally filtered by name/email */
   searchMembers: async (participationId: string, search: string) => {
     const participation = await db.participation.findUnique({
       where: { id: participationId },
-      select: { userId: true, eventId: true },
+      select: { userId: true, groupId: true },
     });
     if (!participation) return [];
 
-    if (!participation.eventId) {
-      // Stand-alone participation — only the owner
+    if (!participation.groupId) {
       const user = await db.user.findUnique({
         where: { id: participation.userId },
         select: { id: true, name: true, image: true, email: true },
@@ -258,9 +302,8 @@ const participationRepository = {
       return [user];
     }
 
-    // Event-linked — return all co-participants
     const participations = await db.participation.findMany({
-      where: { eventId: participation.eventId },
+      where: { groupId: participation.groupId },
       select: {
         user: { select: { id: true, name: true, image: true, email: true } },
       },
@@ -273,6 +316,131 @@ const participationRepository = {
       (u) =>
         u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q),
     );
+  },
+
+  // ─── Participation Group ────────────────────────────────────────────
+
+  getGroupById: async (id: string) => {
+    return db.participationGroup.findUnique({ where: { id } });
+  },
+
+  getGroupsByEventId: async (eventId: string) => {
+    return db.participationGroup.findMany({
+      where: { eventId },
+      include: {
+        participations: {
+          include: {
+            user: {
+              select: { id: true, name: true, image: true, email: true },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: "asc" },
+    });
+  },
+
+  createGroup: async (data: {
+    eventId?: string;
+    ownerId: string;
+    name?: string;
+  }) => {
+    return db.participationGroup.create({
+      data: {
+        eventId: data.eventId ?? null,
+        ownerId: data.ownerId,
+        name: data.name ?? "My Plan",
+      },
+    });
+  },
+
+  /** Get or create a group for a participation */
+  getOrCreateGroupForParticipation: async (
+    participationId: string,
+    ownerId: string,
+  ) => {
+    const participation = await db.participation.findUnique({
+      where: { id: participationId },
+      select: { groupId: true, eventId: true },
+    });
+    if (!participation) return null;
+
+    if (participation.groupId) {
+      return db.participationGroup.findUnique({
+        where: { id: participation.groupId },
+      });
+    }
+
+    const group = await db.participationGroup.create({
+      data: {
+        eventId: participation.eventId,
+        ownerId,
+      },
+    });
+
+    await db.participation.update({
+      where: { id: participationId },
+      data: { groupId: group.id },
+    });
+
+    return group;
+  },
+
+  updateGroupSettings: async (
+    groupId: string,
+    data: ParticipationGroupSettingsUpdate,
+  ) => {
+    return db.participationGroup.update({
+      where: { id: groupId },
+      data,
+    });
+  },
+
+  transferOwnership: async (groupId: string, newOwnerId: string) => {
+    return db.participationGroup.update({
+      where: { id: groupId },
+      data: { ownerId: newOwnerId },
+    });
+  },
+
+  // ─── Join Requests ─────────────────────────────────────────────────
+
+  createJoinRequest: async (groupId: string, userId: string) => {
+    return db.joinRequest.create({
+      data: { groupId, userId },
+    });
+  },
+
+  getJoinRequest: async (id: string) => {
+    return db.joinRequest.findUnique({
+      where: { id },
+      include: {
+        user: { select: { id: true, name: true, image: true, email: true } },
+      },
+    });
+  },
+
+  getJoinRequestByGroupAndUser: async (groupId: string, userId: string) => {
+    return db.joinRequest.findUnique({
+      where: { groupId_userId: { groupId, userId } },
+    });
+  },
+
+  getPendingJoinRequests: async (groupId: string) => {
+    return db.joinRequest.findMany({
+      where: { groupId, status: JoinRequestStatus.PENDING },
+      include: {
+        user: { select: { id: true, name: true, image: true, email: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+  },
+
+  updateJoinRequestStatus: async (id: string, status: JoinRequestStatus) => {
+    return db.joinRequest.update({
+      where: { id },
+      data: { status },
+    });
   },
 };
 

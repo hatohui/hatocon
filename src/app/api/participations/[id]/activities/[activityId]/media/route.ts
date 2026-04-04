@@ -46,7 +46,7 @@ const POST = async (req: NextRequest, ctx: RouteContext) => {
   if (!participation) return NotFound(messages.participation.notFound);
 
   const activity = await activityRepository.getById(activityId);
-  if (!activity || activity.participationId !== id) {
+  if (!activity || activity.participationGroupId !== participation.groupId) {
     return NotFound(messages.activity.notFound);
   }
 

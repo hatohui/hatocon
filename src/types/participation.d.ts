@@ -1,8 +1,10 @@
 import type { Participation } from "@prisma/client";
 import { LeaveType } from "@/types/leave-type";
+import type { ParticipationGroupDTO } from "@/types/notification.d";
 
 export type ParticipationCreateDTO = {
   eventId?: string;
+  groupId?: string;
   from: Date | string;
   to: Date | string;
   leaveType: LeaveType;
@@ -11,7 +13,7 @@ export type ParticipationCreateDTO = {
 
 export type ParticipationImageDTO = {
   id: string;
-  participationId: string;
+  groupId: string;
   url: string;
   caption?: string | null;
   createdAt: Date;
@@ -29,6 +31,7 @@ export type LeaveBalance = {
 
 export type ParticipationWithEvent = Participation & {
   event: { id: string; title: string; startAt: Date; endAt: Date } | null;
+  group: { id: string; name: string } | null;
 };
 
 export type ParticipationParticipant = {
@@ -50,6 +53,10 @@ export type ParticipationDetail = Participation & {
     locationUrl: string | null;
     visibility: string;
   } | null;
-  images: ParticipationImageDTO[];
   participants: ParticipationParticipant[];
+  group:
+    | (ParticipationGroupDTO & {
+        images: ParticipationImageDTO[];
+      })
+    | null;
 };

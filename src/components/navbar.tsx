@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import AppIcon from "./common/AppIcon";
+import NotificationBell from "./notification-bell";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -187,6 +188,7 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-2">
+          <NotificationBell />
           {/* Avatar dropdown (all screen sizes) */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

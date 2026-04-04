@@ -6,6 +6,8 @@ import { Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,7 +22,9 @@ import {
 import { Separator } from "@/components/ui/separator";
 
 import { useDeleteParticipation } from "@/hooks/participations/useParticipations";
+import { useUpdateGroupSettings } from "@/hooks/participations/useParticipationGroup";
 import type { ParticipationDetail } from "@/types/participation.d";
+import TransferOwnershipDialog from "./transfer-ownership-dialog";
 
 export default function ParticipationSettings({
   participation,
@@ -31,6 +35,10 @@ export default function ParticipationSettings({
 }) {
   const router = useRouter();
   const deleteMutation = useDeleteParticipation();
+  const updateSettings = useUpdateGroupSettings();
+
+  const group = participation.group;
+  const isGroupOwner = group?.ownerId === participation.userId && isOwner;
 
   const handleDelete = () => {
     deleteMutation.mutate(participation.id, {
@@ -40,6 +48,13 @@ export default function ParticipationSettings({
       },
       onError: () => toast.error("Failed to delete plan"),
     });
+  };
+
+  const handleToggle = (key: string, value: boolean) => {
+    updateSettings.mutate(
+      { participationId: participation.id, data: { [key]: value } },
+      { onError: () => toast.error("Failed to update setting") },
+    );
   };
 
   return (
@@ -73,6 +88,77 @@ export default function ParticipationSettings({
           )}
         </CardContent>
       </Card>
+
+      {/* Group Settings (owner only, event-linked only) */}
+      {isGroupOwner && group && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Group Settings</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <SettingToggle
+              id="isMemberInviteAllowed"
+              label="Allow member invites"
+              description="When enabled, any member can invite others to join"
+              checked={group.isMemberInviteAllowed}
+              onToggle={(v) => handleToggle("isMemberInviteAllowed", v)}
+              disabled={updateSettings.isPending}
+            />
+            <Separator />
+            <SettingToggle
+              id="isPublic"
+              label="Public participation"
+              description="Anyone with the link can view this participation"
+              checked={group.isPublic}
+              onToggle={(v) => handleToggle("isPublic", v)}
+              disabled={updateSettings.isPending}
+            />
+            <Separator />
+            <SettingToggle
+              id="isActivityPublicVisible"
+              label="Public activity visibility"
+              description="Non-members can see activities. If disabled, returns 404"
+              checked={group.isActivityPublicVisible}
+              onToggle={(v) => handleToggle("isActivityPublicVisible", v)}
+              disabled={updateSettings.isPending}
+            />
+            <Separator />
+            <SettingToggle
+              id="isMemberListPublicVisible"
+              label="Public member list"
+              description="Non-members can see the member list"
+              checked={group.isMemberListPublicVisible}
+              onToggle={(v) => handleToggle("isMemberListPublicVisible", v)}
+              disabled={updateSettings.isPending}
+            />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Transfer Ownership (owner only, event-linked only) */}
+      {isGroupOwner && group && participation.participants.length > 1 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Ownership</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-medium">Transfer ownership</p>
+                <p className="text-xs text-muted-foreground">
+                  Transfer ownership to another member. You will become a
+                  regular member.
+                </p>
+              </div>
+              <TransferOwnershipDialog
+                participationId={participation.id}
+                participants={participation.participants}
+                currentOwnerId={group.ownerId}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Danger zone */}
       {isOwner && (
@@ -124,6 +210,39 @@ export default function ParticipationSettings({
           </CardContent>
         </Card>
       )}
+    </div>
+  );
+}
+
+function SettingToggle({
+  id,
+  label,
+  description,
+  checked,
+  onToggle,
+  disabled,
+}: {
+  id: string;
+  label: string;
+  description: string;
+  checked: boolean;
+  onToggle: (value: boolean) => void;
+  disabled: boolean;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <div className="space-y-0.5">
+        <Label htmlFor={id} className="text-sm font-medium">
+          {label}
+        </Label>
+        <p className="text-xs text-muted-foreground">{description}</p>
+      </div>
+      <Switch
+        id={id}
+        checked={checked}
+        onCheckedChange={onToggle}
+        disabled={disabled}
+      />
     </div>
   );
 }

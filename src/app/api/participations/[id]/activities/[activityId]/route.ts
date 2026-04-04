@@ -36,12 +36,13 @@ const PATCH = async (req: NextRequest, ctx: RouteContext) => {
   const participation = await participationRepository.getById(id);
   if (!participation) return NotFound(messages.participation.notFound);
 
-  if (participation.userId !== session.user.id && !session.user.isAdmin) {
-    return Forbidden("You can only edit activities in your own participations");
+  const isMember = await participationRepository.isMember(id, session.user.id);
+  if (!isMember && !session.user.isAdmin) {
+    return Forbidden("You can only edit activities in your own group");
   }
 
   const activity = await activityRepository.getById(activityId);
-  if (!activity || activity.participationId !== id) {
+  if (!activity || activity.participationGroupId !== participation.groupId) {
     return NotFound(messages.activity.notFound);
   }
 
@@ -64,14 +65,13 @@ const DELETE = async (_req: NextRequest, ctx: RouteContext) => {
   const participation = await participationRepository.getById(id);
   if (!participation) return NotFound(messages.participation.notFound);
 
-  if (participation.userId !== session.user.id && !session.user.isAdmin) {
-    return Forbidden(
-      "You can only delete activities in your own participations",
-    );
+  const isMember = await participationRepository.isMember(id, session.user.id);
+  if (!isMember && !session.user.isAdmin) {
+    return Forbidden("You can only delete activities in your own group");
   }
 
   const activity = await activityRepository.getById(activityId);
-  if (!activity || activity.participationId !== id) {
+  if (!activity || activity.participationGroupId !== participation.groupId) {
     return NotFound(messages.activity.notFound);
   }
 

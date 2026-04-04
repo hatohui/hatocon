@@ -24,3 +24,24 @@ export const LeaveType = {
 } as const
 
 export type LeaveType = (typeof LeaveType)[keyof typeof LeaveType]
+
+
+export const NotificationType = {
+  JOIN_REQUEST: 'JOIN_REQUEST',
+  JOIN_REQUEST_APPROVED: 'JOIN_REQUEST_APPROVED',
+  JOIN_REQUEST_REJECTED: 'JOIN_REQUEST_REJECTED',
+  OWNERSHIP_TRANSFERRED: 'OWNERSHIP_TRANSFERRED',
+  USER_KICKED: 'USER_KICKED',
+  INVITED_TO_JOIN: 'INVITED_TO_JOIN'
+} as const
+
+export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
+
+
+export const JoinRequestStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type JoinRequestStatus = (typeof JoinRequestStatus)[keyof typeof JoinRequestStatus]

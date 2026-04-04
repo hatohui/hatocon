@@ -23,9 +23,7 @@ import {
   ImageIcon,
   MapPin,
   Plane,
-  Plus,
   Trash2,
-  UserPlus,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -41,19 +39,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import {
-  Command,
-  CommandEmpty,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -80,16 +66,16 @@ import {
   useDeleteParticipation,
   useUploadParticipationImage,
   useDeleteParticipationImage,
-  useAddParticipationMember,
 } from "@/hooks/participations/useParticipations";
 import { useActivities } from "@/hooks/activities/useActivities";
-import { useSearchUsers } from "@/hooks/users/useUsers";
 import { cn } from "@/lib/utils";
 import ActivityTimeline, {
   ActivityOverviewSection,
 } from "@/components/pages/participation/activity-timeline";
 import MediaGallery from "@/components/pages/participation/media-gallery";
 import ParticipationSettings from "@/components/pages/participation/participation-settings";
+import MembersList from "@/components/pages/participation/members-list";
+import JoinRequestsPanel from "@/components/pages/participation/join-requests-panel";
 
 const LEAVE_COLOURS: Record<string, string> = {
   ANNUAL: "bg-blue-100 text-blue-800",
@@ -272,129 +258,6 @@ function PhotoGallery({
         </DialogContent>
       </Dialog>
     </>
-  );
-}
-
-// ─── Add Member Popover ──────────────────────────────────────────────────────
-
-function AddMemberPopover({
-  participationId,
-  existingUserIds,
-}: {
-  participationId: string;
-  existingUserIds: string[];
-}) {
-  const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState("");
-  const { data: users } = useSearchUsers(search);
-  const addMember = useAddParticipationMember();
-
-  const filteredUsers = users?.filter((u) => !existingUserIds.includes(u.id));
-
-  const handleSelect = async (userId: string) => {
-    try {
-      await addMember.mutateAsync({ participationId, userId });
-      toast.success("Member added!");
-      setOpen(false);
-      setSearch("");
-    } catch {
-      toast.error("Failed to add member");
-    }
-  };
-
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button size="sm" variant="outline" className="gap-1.5">
-          <UserPlus className="h-4 w-4" />
-          Add Member
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="p-0 w-64" align="end">
-        <Command shouldFilter={false}>
-          <CommandInput
-            placeholder="Search users..."
-            value={search}
-            onValueChange={setSearch}
-          />
-          <CommandList>
-            <CommandEmpty>
-              {search.length < 1 ? "Type to search..." : "No users found"}
-            </CommandEmpty>
-            {filteredUsers?.map((user) => (
-              <CommandItem
-                key={user.id}
-                onSelect={() => handleSelect(user.id)}
-                disabled={addMember.isPending}
-              >
-                <Avatar className="h-6 w-6 mr-2">
-                  <AvatarImage src={user.image ?? undefined} />
-                  <AvatarFallback className="text-[10px]">
-                    {initials(user.name)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm truncate">{user.name}</p>
-                  <p className="text-xs text-muted-foreground truncate">
-                    {user.email}
-                  </p>
-                </div>
-              </CommandItem>
-            ))}
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
-  );
-}
-
-// ─── Members List ────────────────────────────────────────────────────────────
-
-function MembersList({
-  participants,
-  participationId,
-}: {
-  participants: {
-    id: string;
-    userId: string;
-    user: { id: string; name: string; image: string | null; email: string };
-  }[];
-  participationId: string;
-}) {
-  const existingUserIds = participants.map((p) => p.userId);
-
-  return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-sm">
-            Members ({participants.length})
-          </CardTitle>
-          <AddMemberPopover
-            participationId={participationId}
-            existingUserIds={existingUserIds}
-          />
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        {participants.map((p) => (
-          <div key={p.id} className="flex items-center gap-3">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={p.user.image ?? undefined} />
-              <AvatarFallback className="text-xs">
-                {initials(p.user.name)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium truncate">{p.user.name}</p>
-              <p className="text-xs text-muted-foreground truncate">
-                {p.user.email}
-              </p>
-            </div>
-          </div>
-        ))}
-      </CardContent>
-    </Card>
   );
 }
 
@@ -830,7 +693,7 @@ export default function ParticipationDetailPage() {
           <div className="grid gap-6 md:grid-cols-3">
             <div className="md:col-span-2 space-y-6">
               <PhotoGallery
-                images={participation.images}
+                images={participation.group?.images ?? []}
                 participationId={participation.id}
               />
               <ScheduleTimeline
@@ -849,10 +712,16 @@ export default function ParticipationDetailPage() {
               />
               {participation.eventId &&
                 participation.participants.length > 0 && (
-                  <MembersList
-                    participants={participation.participants}
-                    participationId={participation.id}
-                  />
+                  <>
+                    <MembersList
+                      participants={participation.participants}
+                      participationId={participation.id}
+                      group={participation.group}
+                      currentUserId={currentUserId}
+                      isAdmin={session.data?.user?.isAdmin ?? false}
+                    />
+                    <JoinRequestsPanel participationId={participation.id} />
+                  </>
                 )}
             </div>
           </div>

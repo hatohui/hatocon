@@ -245,7 +245,7 @@ export default function ParticipationGalleryPage() {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [gridSize, setGridSize] = useState<GridSize>("md");
 
-  const images = participation?.images ?? [];
+  const images = participation?.group?.images ?? [];
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

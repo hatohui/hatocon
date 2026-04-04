@@ -52,13 +52,8 @@ export default function ActivityInlineForm({
   onDone,
 }: {
   participationId: string;
-  activity?: ActivityWithMedia | null;
-  allUsers?: {
-    id: string;
-    name: string;
-    image: string | null;
-    email: string;
-  }[];
+  activity?: ActivityWithMedia;
+  allUsers?: UserLike[];
   onDone: () => void;
 }) {
   const isEditing = !!activity;
@@ -154,84 +149,109 @@ export default function ActivityInlineForm({
   const isPending = createMutation.isPending || updateMutation.isPending;
 
   return (
-    <Card className="border-2 border-primary/40 shadow-sm">
+    <Card className="border-2 border-primary/50 shadow-md bg-muted/30">
       <CardContent className="p-4">
-        <div className="flex gap-3">
-          {/* Content — matches ActivityCard layout */}
-          <div className="flex-1 min-w-0 space-y-2">
-            {/* Name row + compact save/cancel */}
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex-1 space-y-0.5">
-                <Input
-                  ref={nameRef}
-                  placeholder="Activity name *"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="h-7 p-0 font-semibold text-sm border-0 bg-transparent shadow-none focus-visible:ring-0 leading-tight"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleSave();
-                    if (e.key === "Escape") onDone();
-                  }}
-                />
-                {/* Dates — same style as ActivityCard time row */}
-                <div className="flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
-                  <Clock className="h-3 w-3 shrink-0" />
-                  <Input
-                    type="datetime-local"
-                    value={from}
-                    onChange={(e) => setFrom(e.target.value)}
-                    className="h-6 p-0 text-xs border-0 bg-transparent shadow-none focus-visible:ring-0 w-auto max-w-38"
-                  />
-                  <span className="text-muted-foreground/60">–</span>
-                  <Input
-                    type="datetime-local"
-                    value={to}
-                    onChange={(e) => setTo(e.target.value)}
-                    className="h-6 p-0 text-xs border-0 bg-transparent shadow-none focus-visible:ring-0 w-auto max-w-38"
-                  />
-                </div>
-              </div>
-              {/* Compact icon buttons */}
-              <div className="flex gap-0.5 shrink-0">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={onDone}
-                  disabled={isPending}
-                >
-                  <X className="h-3.5 w-3.5" />
-                </Button>
-                <Button
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={handleSave}
-                  disabled={isPending || !name.trim() || !from}
-                >
-                  {isPending ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    <Check className="h-3.5 w-3.5" />
-                  )}
-                </Button>
-              </div>
+        <div className="space-y-3">
+          {/* Header row: title + action buttons */}
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+              {isEditing ? "Edit Activity" : "New Activity"}
+            </p>
+            <div className="flex gap-1 shrink-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-xs"
+                onClick={onDone}
+                disabled={isPending}
+              >
+                <X className="h-3.5 w-3.5 mr-1" />
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                className="h-7 px-2 text-xs"
+                onClick={handleSave}
+                disabled={isPending || !name.trim() || !from}
+              >
+                {isPending ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
+                ) : (
+                  <Check className="h-3.5 w-3.5 mr-1" />
+                )}
+                {isEditing ? "Save" : "Add"}
+              </Button>
             </div>
+          </div>
 
-            {/* Location — matches ActivityCard location row */}
-            <div className="flex items-center gap-1.5 text-xs">
-              <MapPin className="h-3 w-3 text-muted-foreground shrink-0" />
+          {/* Activity name */}
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-muted-foreground">
+              Activity name <span className="text-destructive">*</span>
+            </label>
+            <Input
+              ref={nameRef}
+              placeholder="e.g. Morning hike"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="h-8 text-sm font-semibold"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSave();
+                if (e.key === "Escape") onDone();
+              }}
+            />
+          </div>
+
+          {/* Date/time row */}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1">
+              <label className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                <Clock className="h-3 w-3" />
+                Start <span className="text-destructive">*</span>
+              </label>
               <Input
-                placeholder="Location (optional)"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="h-6 p-0 text-xs border-0 bg-transparent shadow-none focus-visible:ring-0"
+                type="datetime-local"
+                value={from}
+                onChange={(e) => setFrom(e.target.value)}
+                className="h-8 text-xs"
               />
             </div>
+            <div className="space-y-1">
+              <label className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                <Clock className="h-3 w-3" />
+                End
+              </label>
+              <Input
+                type="datetime-local"
+                value={to}
+                onChange={(e) => setTo(e.target.value)}
+                className="h-8 text-xs"
+              />
+            </div>
+          </div>
 
-            {/* People — matches ActivityCard people row */}
-            {(allUsers ?? []).length > 0 && (
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <Users className="h-3 w-3 text-muted-foreground shrink-0" />
+          {/* Location */}
+          <div className="space-y-1">
+            <label className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+              <MapPin className="h-3 w-3" />
+              Location
+            </label>
+            <Input
+              placeholder="e.g. Base camp"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className="h-8 text-sm"
+            />
+          </div>
+
+          {/* People */}
+          {(allUsers ?? []).length > 0 && (
+            <div className="space-y-1">
+              <label className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                <Users className="h-3 w-3" />
+                Involved people
+              </label>
+              <div className="flex flex-wrap items-center gap-1.5 rounded-md border border-input bg-background px-2 py-1.5 min-h-8">
                 {selectedPeople.map((p) => (
                   <Badge
                     key={p.id}
@@ -258,7 +278,7 @@ export default function ActivityInlineForm({
                   <PopoverTrigger asChild>
                     <button
                       type="button"
-                      className="text-xs text-muted-foreground hover:text-foreground px-1"
+                      className="text-xs text-muted-foreground hover:text-foreground px-1 py-0.5 rounded hover:bg-muted"
                     >
                       + Add
                     </button>
@@ -297,14 +317,19 @@ export default function ActivityInlineForm({
                   </PopoverContent>
                 </Popover>
               </div>
-            )}
+            </div>
+          )}
 
-            {/* Note — matches ActivityCard note display */}
+          {/* Note */}
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-muted-foreground">
+              Note
+            </label>
             <Textarea
               placeholder="Add a note… (optional)"
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="text-xs min-h-0 h-14 resize-none"
+              className="text-sm min-h-0 h-16 resize-none"
             />
           </div>
         </div>

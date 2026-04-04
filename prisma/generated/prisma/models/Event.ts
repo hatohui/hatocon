@@ -281,6 +281,7 @@ export type EventWhereInput = {
   participations?: Prisma.ParticipationListRelationFilter
   invitees?: Prisma.EventInviteeListRelationFilter
   createdByUser?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  participationGroups?: Prisma.ParticipationGroupListRelationFilter
 }
 
 export type EventOrderByWithRelationInput = {
@@ -304,6 +305,7 @@ export type EventOrderByWithRelationInput = {
   participations?: Prisma.ParticipationOrderByRelationAggregateInput
   invitees?: Prisma.EventInviteeOrderByRelationAggregateInput
   createdByUser?: Prisma.UserOrderByWithRelationInput
+  participationGroups?: Prisma.ParticipationGroupOrderByRelationAggregateInput
 }
 
 export type EventWhereUniqueInput = Prisma.AtLeast<{
@@ -330,6 +332,7 @@ export type EventWhereUniqueInput = Prisma.AtLeast<{
   participations?: Prisma.ParticipationListRelationFilter
   invitees?: Prisma.EventInviteeListRelationFilter
   createdByUser?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  participationGroups?: Prisma.ParticipationGroupListRelationFilter
 }, "id">
 
 export type EventOrderByWithAggregationInput = {
@@ -398,6 +401,7 @@ export type EventCreateInput = {
   participations?: Prisma.ParticipationCreateNestedManyWithoutEventInput
   invitees?: Prisma.EventInviteeCreateNestedManyWithoutEventInput
   createdByUser: Prisma.UserCreateNestedOneWithoutEventsInput
+  participationGroups?: Prisma.ParticipationGroupCreateNestedManyWithoutEventInput
 }
 
 export type EventUncheckedCreateInput = {
@@ -420,6 +424,7 @@ export type EventUncheckedCreateInput = {
   deletedAt?: Date | string | null
   participations?: Prisma.ParticipationUncheckedCreateNestedManyWithoutEventInput
   invitees?: Prisma.EventInviteeUncheckedCreateNestedManyWithoutEventInput
+  participationGroups?: Prisma.ParticipationGroupUncheckedCreateNestedManyWithoutEventInput
 }
 
 export type EventUpdateInput = {
@@ -442,6 +447,7 @@ export type EventUpdateInput = {
   participations?: Prisma.ParticipationUpdateManyWithoutEventNestedInput
   invitees?: Prisma.EventInviteeUpdateManyWithoutEventNestedInput
   createdByUser?: Prisma.UserUpdateOneRequiredWithoutEventsNestedInput
+  participationGroups?: Prisma.ParticipationGroupUpdateManyWithoutEventNestedInput
 }
 
 export type EventUncheckedUpdateInput = {
@@ -464,6 +470,7 @@ export type EventUncheckedUpdateInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   participations?: Prisma.ParticipationUncheckedUpdateManyWithoutEventNestedInput
   invitees?: Prisma.EventInviteeUncheckedUpdateManyWithoutEventNestedInput
+  participationGroups?: Prisma.ParticipationGroupUncheckedUpdateManyWithoutEventNestedInput
 }
 
 export type EventCreateManyInput = {
@@ -681,6 +688,22 @@ export type EventUpdateOneRequiredWithoutInviteesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.EventUpdateToOneWithWhereWithoutInviteesInput, Prisma.EventUpdateWithoutInviteesInput>, Prisma.EventUncheckedUpdateWithoutInviteesInput>
 }
 
+export type EventCreateNestedOneWithoutParticipationGroupsInput = {
+  create?: Prisma.XOR<Prisma.EventCreateWithoutParticipationGroupsInput, Prisma.EventUncheckedCreateWithoutParticipationGroupsInput>
+  connectOrCreate?: Prisma.EventCreateOrConnectWithoutParticipationGroupsInput
+  connect?: Prisma.EventWhereUniqueInput
+}
+
+export type EventUpdateOneWithoutParticipationGroupsNestedInput = {
+  create?: Prisma.XOR<Prisma.EventCreateWithoutParticipationGroupsInput, Prisma.EventUncheckedCreateWithoutParticipationGroupsInput>
+  connectOrCreate?: Prisma.EventCreateOrConnectWithoutParticipationGroupsInput
+  upsert?: Prisma.EventUpsertWithoutParticipationGroupsInput
+  disconnect?: Prisma.EventWhereInput | boolean
+  delete?: Prisma.EventWhereInput | boolean
+  connect?: Prisma.EventWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.EventUpdateToOneWithWhereWithoutParticipationGroupsInput, Prisma.EventUpdateWithoutParticipationGroupsInput>, Prisma.EventUncheckedUpdateWithoutParticipationGroupsInput>
+}
+
 export type EventCreateWithoutCreatedByUserInput = {
   id?: string
   title: string
@@ -700,6 +723,7 @@ export type EventCreateWithoutCreatedByUserInput = {
   deletedAt?: Date | string | null
   participations?: Prisma.ParticipationCreateNestedManyWithoutEventInput
   invitees?: Prisma.EventInviteeCreateNestedManyWithoutEventInput
+  participationGroups?: Prisma.ParticipationGroupCreateNestedManyWithoutEventInput
 }
 
 export type EventUncheckedCreateWithoutCreatedByUserInput = {
@@ -721,6 +745,7 @@ export type EventUncheckedCreateWithoutCreatedByUserInput = {
   deletedAt?: Date | string | null
   participations?: Prisma.ParticipationUncheckedCreateNestedManyWithoutEventInput
   invitees?: Prisma.EventInviteeUncheckedCreateNestedManyWithoutEventInput
+  participationGroups?: Prisma.ParticipationGroupUncheckedCreateNestedManyWithoutEventInput
 }
 
 export type EventCreateOrConnectWithoutCreatedByUserInput = {
@@ -791,6 +816,7 @@ export type EventCreateWithoutParticipationsInput = {
   deletedAt?: Date | string | null
   invitees?: Prisma.EventInviteeCreateNestedManyWithoutEventInput
   createdByUser: Prisma.UserCreateNestedOneWithoutEventsInput
+  participationGroups?: Prisma.ParticipationGroupCreateNestedManyWithoutEventInput
 }
 
 export type EventUncheckedCreateWithoutParticipationsInput = {
@@ -812,6 +838,7 @@ export type EventUncheckedCreateWithoutParticipationsInput = {
   isDeleted?: boolean
   deletedAt?: Date | string | null
   invitees?: Prisma.EventInviteeUncheckedCreateNestedManyWithoutEventInput
+  participationGroups?: Prisma.ParticipationGroupUncheckedCreateNestedManyWithoutEventInput
 }
 
 export type EventCreateOrConnectWithoutParticipationsInput = {
@@ -849,6 +876,7 @@ export type EventUpdateWithoutParticipationsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   invitees?: Prisma.EventInviteeUpdateManyWithoutEventNestedInput
   createdByUser?: Prisma.UserUpdateOneRequiredWithoutEventsNestedInput
+  participationGroups?: Prisma.ParticipationGroupUpdateManyWithoutEventNestedInput
 }
 
 export type EventUncheckedUpdateWithoutParticipationsInput = {
@@ -870,6 +898,7 @@ export type EventUncheckedUpdateWithoutParticipationsInput = {
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   invitees?: Prisma.EventInviteeUncheckedUpdateManyWithoutEventNestedInput
+  participationGroups?: Prisma.ParticipationGroupUncheckedUpdateManyWithoutEventNestedInput
 }
 
 export type EventCreateWithoutInviteesInput = {
@@ -891,6 +920,7 @@ export type EventCreateWithoutInviteesInput = {
   deletedAt?: Date | string | null
   participations?: Prisma.ParticipationCreateNestedManyWithoutEventInput
   createdByUser: Prisma.UserCreateNestedOneWithoutEventsInput
+  participationGroups?: Prisma.ParticipationGroupCreateNestedManyWithoutEventInput
 }
 
 export type EventUncheckedCreateWithoutInviteesInput = {
@@ -912,6 +942,7 @@ export type EventUncheckedCreateWithoutInviteesInput = {
   isDeleted?: boolean
   deletedAt?: Date | string | null
   participations?: Prisma.ParticipationUncheckedCreateNestedManyWithoutEventInput
+  participationGroups?: Prisma.ParticipationGroupUncheckedCreateNestedManyWithoutEventInput
 }
 
 export type EventCreateOrConnectWithoutInviteesInput = {
@@ -949,6 +980,7 @@ export type EventUpdateWithoutInviteesInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   participations?: Prisma.ParticipationUpdateManyWithoutEventNestedInput
   createdByUser?: Prisma.UserUpdateOneRequiredWithoutEventsNestedInput
+  participationGroups?: Prisma.ParticipationGroupUpdateManyWithoutEventNestedInput
 }
 
 export type EventUncheckedUpdateWithoutInviteesInput = {
@@ -970,6 +1002,111 @@ export type EventUncheckedUpdateWithoutInviteesInput = {
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   participations?: Prisma.ParticipationUncheckedUpdateManyWithoutEventNestedInput
+  participationGroups?: Prisma.ParticipationGroupUncheckedUpdateManyWithoutEventNestedInput
+}
+
+export type EventCreateWithoutParticipationGroupsInput = {
+  id?: string
+  title: string
+  image?: string | null
+  description?: string | null
+  isApproved?: boolean
+  isYearly?: boolean
+  visibility?: $Enums.EventVisibility
+  startAt: Date | string
+  endAt: Date | string
+  location?: string | null
+  locationUrl?: string | null
+  reference?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDeleted?: boolean
+  deletedAt?: Date | string | null
+  participations?: Prisma.ParticipationCreateNestedManyWithoutEventInput
+  invitees?: Prisma.EventInviteeCreateNestedManyWithoutEventInput
+  createdByUser: Prisma.UserCreateNestedOneWithoutEventsInput
+}
+
+export type EventUncheckedCreateWithoutParticipationGroupsInput = {
+  id?: string
+  title: string
+  image?: string | null
+  description?: string | null
+  isApproved?: boolean
+  isYearly?: boolean
+  visibility?: $Enums.EventVisibility
+  startAt: Date | string
+  endAt: Date | string
+  location?: string | null
+  locationUrl?: string | null
+  reference?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  createdBy: string
+  isDeleted?: boolean
+  deletedAt?: Date | string | null
+  participations?: Prisma.ParticipationUncheckedCreateNestedManyWithoutEventInput
+  invitees?: Prisma.EventInviteeUncheckedCreateNestedManyWithoutEventInput
+}
+
+export type EventCreateOrConnectWithoutParticipationGroupsInput = {
+  where: Prisma.EventWhereUniqueInput
+  create: Prisma.XOR<Prisma.EventCreateWithoutParticipationGroupsInput, Prisma.EventUncheckedCreateWithoutParticipationGroupsInput>
+}
+
+export type EventUpsertWithoutParticipationGroupsInput = {
+  update: Prisma.XOR<Prisma.EventUpdateWithoutParticipationGroupsInput, Prisma.EventUncheckedUpdateWithoutParticipationGroupsInput>
+  create: Prisma.XOR<Prisma.EventCreateWithoutParticipationGroupsInput, Prisma.EventUncheckedCreateWithoutParticipationGroupsInput>
+  where?: Prisma.EventWhereInput
+}
+
+export type EventUpdateToOneWithWhereWithoutParticipationGroupsInput = {
+  where?: Prisma.EventWhereInput
+  data: Prisma.XOR<Prisma.EventUpdateWithoutParticipationGroupsInput, Prisma.EventUncheckedUpdateWithoutParticipationGroupsInput>
+}
+
+export type EventUpdateWithoutParticipationGroupsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isYearly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  visibility?: Prisma.EnumEventVisibilityFieldUpdateOperationsInput | $Enums.EventVisibility
+  startAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  participations?: Prisma.ParticipationUpdateManyWithoutEventNestedInput
+  invitees?: Prisma.EventInviteeUpdateManyWithoutEventNestedInput
+  createdByUser?: Prisma.UserUpdateOneRequiredWithoutEventsNestedInput
+}
+
+export type EventUncheckedUpdateWithoutParticipationGroupsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isYearly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  visibility?: Prisma.EnumEventVisibilityFieldUpdateOperationsInput | $Enums.EventVisibility
+  startAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdBy?: Prisma.StringFieldUpdateOperationsInput | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  participations?: Prisma.ParticipationUncheckedUpdateManyWithoutEventNestedInput
+  invitees?: Prisma.EventInviteeUncheckedUpdateManyWithoutEventNestedInput
 }
 
 export type EventCreateManyCreatedByUserInput = {
@@ -1010,6 +1147,7 @@ export type EventUpdateWithoutCreatedByUserInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   participations?: Prisma.ParticipationUpdateManyWithoutEventNestedInput
   invitees?: Prisma.EventInviteeUpdateManyWithoutEventNestedInput
+  participationGroups?: Prisma.ParticipationGroupUpdateManyWithoutEventNestedInput
 }
 
 export type EventUncheckedUpdateWithoutCreatedByUserInput = {
@@ -1031,6 +1169,7 @@ export type EventUncheckedUpdateWithoutCreatedByUserInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   participations?: Prisma.ParticipationUncheckedUpdateManyWithoutEventNestedInput
   invitees?: Prisma.EventInviteeUncheckedUpdateManyWithoutEventNestedInput
+  participationGroups?: Prisma.ParticipationGroupUncheckedUpdateManyWithoutEventNestedInput
 }
 
 export type EventUncheckedUpdateManyWithoutCreatedByUserInput = {
@@ -1060,11 +1199,13 @@ export type EventUncheckedUpdateManyWithoutCreatedByUserInput = {
 export type EventCountOutputType = {
   participations: number
   invitees: number
+  participationGroups: number
 }
 
 export type EventCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   participations?: boolean | EventCountOutputTypeCountParticipationsArgs
   invitees?: boolean | EventCountOutputTypeCountInviteesArgs
+  participationGroups?: boolean | EventCountOutputTypeCountParticipationGroupsArgs
 }
 
 /**
@@ -1091,6 +1232,13 @@ export type EventCountOutputTypeCountInviteesArgs<ExtArgs extends runtime.Types.
   where?: Prisma.EventInviteeWhereInput
 }
 
+/**
+ * EventCountOutputType without action
+ */
+export type EventCountOutputTypeCountParticipationGroupsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ParticipationGroupWhereInput
+}
+
 
 export type EventSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1113,6 +1261,7 @@ export type EventSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   participations?: boolean | Prisma.Event$participationsArgs<ExtArgs>
   invitees?: boolean | Prisma.Event$inviteesArgs<ExtArgs>
   createdByUser?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  participationGroups?: boolean | Prisma.Event$participationGroupsArgs<ExtArgs>
   _count?: boolean | Prisma.EventCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["event"]>
 
@@ -1183,6 +1332,7 @@ export type EventInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   participations?: boolean | Prisma.Event$participationsArgs<ExtArgs>
   invitees?: boolean | Prisma.Event$inviteesArgs<ExtArgs>
   createdByUser?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  participationGroups?: boolean | Prisma.Event$participationGroupsArgs<ExtArgs>
   _count?: boolean | Prisma.EventCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type EventIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1198,6 +1348,7 @@ export type $EventPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     participations: Prisma.$ParticipationPayload<ExtArgs>[]
     invitees: Prisma.$EventInviteePayload<ExtArgs>[]
     createdByUser: Prisma.$UserPayload<ExtArgs>
+    participationGroups: Prisma.$ParticipationGroupPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1614,6 +1765,7 @@ export interface Prisma__EventClient<T, Null = never, ExtArgs extends runtime.Ty
   participations<T extends Prisma.Event$participationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Event$participationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ParticipationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   invitees<T extends Prisma.Event$inviteesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Event$inviteesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EventInviteePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   createdByUser<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  participationGroups<T extends Prisma.Event$participationGroupsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Event$participationGroupsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ParticipationGroupPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2106,6 +2258,30 @@ export type Event$inviteesArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.EventInviteeScalarFieldEnum | Prisma.EventInviteeScalarFieldEnum[]
+}
+
+/**
+ * Event.participationGroups
+ */
+export type Event$participationGroupsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ParticipationGroup
+   */
+  select?: Prisma.ParticipationGroupSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ParticipationGroup
+   */
+  omit?: Prisma.ParticipationGroupOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ParticipationGroupInclude<ExtArgs> | null
+  where?: Prisma.ParticipationGroupWhereInput
+  orderBy?: Prisma.ParticipationGroupOrderByWithRelationInput | Prisma.ParticipationGroupOrderByWithRelationInput[]
+  cursor?: Prisma.ParticipationGroupWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ParticipationGroupScalarFieldEnum | Prisma.ParticipationGroupScalarFieldEnum[]
 }
 
 /**

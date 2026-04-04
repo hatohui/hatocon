@@ -62,18 +62,13 @@ const POST = async (req: NextRequest) => {
 
   const { from, to, eventId, leaveType, coTravelerIds } = result.data;
 
-  // If linked to an event, validate participation falls within event bounds
   if (eventId) {
     const event = await eventRepository.getById(eventId);
     if (!event) {
       return NotFound(messages.event.notFound);
     }
-    if (from < event.startAt || to > event.endAt) {
-      return BadRequest(messages.participation.outOfEventBounds);
-    }
   }
 
-  // Check for overlapping participations
   const overlap = await participationRepository.getOverlapping(
     session.user.id,
     from,
@@ -83,10 +78,19 @@ const POST = async (req: NextRequest) => {
     return Conflict(messages.participation.overlap);
   }
 
-  const participation = await participationRepository.create(
-    session.user.id,
-    { eventId, from, to, leaveType },
-  );
+  // Create a group for this participation
+  const group = await participationRepository.createGroup({
+    eventId: eventId ?? undefined,
+    ownerId: session.user.id,
+  });
+
+  const participation = await participationRepository.create(session.user.id, {
+    eventId,
+    groupId: group.id,
+    from,
+    to,
+    leaveType,
+  });
 
   // Create participations for co-travelers
   if (coTravelerIds && coTravelerIds.length > 0) {
@@ -94,7 +98,7 @@ const POST = async (req: NextRequest) => {
     if (validIds.length > 0) {
       await participationRepository.createMany(
         validIds,
-        { eventId, from, to, leaveType },
+        { eventId, groupId: group.id, from, to, leaveType },
         session.user.id,
       );
     }

@@ -2,11 +2,13 @@ import { auth } from "@/auth";
 import {
   BadRequest,
   Conflict,
+  Forbidden,
   NotFound,
   OK,
   Unauthorized,
 } from "@/common/response";
 import { messages } from "@/common/messages";
+import notificationRepository from "@/repositories/notification_repository";
 import participationRepository from "@/repositories/participation_repository";
 import eventRepository from "@/repositories/event_repository";
 import type { NextRequest } from "next/server";
@@ -49,6 +51,18 @@ const POST = async (req: NextRequest, ctx: RouteContext) => {
     return BadRequest("userId is required");
   }
 
+  // Check if invite is allowed (via group)
+  const group = await participationRepository.getOrCreateGroupForParticipation(
+    id,
+    participation.userId,
+  );
+  if (group && !group.isMemberInviteAllowed) {
+    // Only owner can add members when invite is disabled
+    if (group.ownerId !== session.user.id && !session.user.isAdmin) {
+      return Forbidden(messages.participationGroup.inviteNotAllowed);
+    }
+  }
+
   // Check the event exists
   const event = await eventRepository.getById(participation.eventId);
   if (!event) return NotFound(messages.event.notFound);
@@ -64,13 +78,23 @@ const POST = async (req: NextRequest, ctx: RouteContext) => {
   const newParticipation = await participationRepository.create(
     userId,
     {
-      eventId: participation.eventId,
+      eventId: participation.eventId ?? undefined,
+      groupId: participation.groupId ?? undefined,
       from: participation.from,
       to: participation.to,
       leaveType: participation.leaveType,
     },
     session.user.id,
   );
+
+  // Notify the invited user
+  await notificationRepository.create(userId, "INVITED_TO_JOIN", {
+    eventId: participation.eventId,
+    eventTitle: event.title,
+    participationId: id,
+    userId: session.user.id,
+    userName: session.user.name ?? "Someone",
+  });
 
   return OK(newParticipation);
 };

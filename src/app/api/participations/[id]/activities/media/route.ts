@@ -16,12 +16,18 @@ const GET = async (req: NextRequest, ctx: RouteContext) => {
   const participation = await participationRepository.getById(id);
   if (!participation) return NotFound(messages.participation.notFound);
 
+  // Resolve group to get media
+  const group = participation.groupId
+    ? await participationRepository.getGroupById(participation.groupId)
+    : null;
+  if (!group) return OK([]);
+
   const { searchParams } = req.nextUrl;
   const activityId = searchParams.get("activityId") || undefined;
   const uploadedBy = searchParams.get("uploadedBy") || undefined;
 
-  const media = await activityRepository.getAllMediaByParticipation(
-    id,
+  const media = await activityRepository.getAllMediaByGroup(
+    group.id,
     activityId,
     uploadedBy,
   );
