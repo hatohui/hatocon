@@ -1,13 +1,9 @@
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { durationLabel } from "@/lib/utils";
 import { Event } from "@prisma/client";
 import { format } from "date-fns";
-import { CalendarDays, MapPin } from "lucide-react";
-import Image from "next/image";
+import { CalendarDays } from "lucide-react";
 import React from "react";
+import TimelineEventCard from "./timeline-event-card";
 
 interface EventTimeLineProps {
   events: Event[] | undefined;
@@ -34,6 +30,7 @@ const EventTimeLine = ({
       </div>
     );
   }
+
   if (!events || events.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -48,7 +45,6 @@ const EventTimeLine = ({
     );
   }
 
-  // Group by "Month Year"
   const groups = new Map<string, Event[]>();
   events.forEach((e) => {
     const label = format(new Date(e.startAt), "MMMM yyyy");
@@ -58,11 +54,12 @@ const EventTimeLine = ({
   });
 
   return (
-    <div className="space-y-10">
+    <div className="relative grid grid-cols-[10px_1fr] items-start gap-x-4 gap-y-4">
+      <div className="absolute left-1 top-0 bottom-0 w-px bg-border" />
+
       {Array.from(groups.entries()).map(([month, monthEvents]) => (
-        <div key={month} className="relative">
-          {/* Month separator */}
-          <div className="flex items-center gap-3 mb-4">
+        <React.Fragment key={month}>
+          <div className="col-span-2 flex items-center gap-3">
             <div className="h-px flex-1 bg-border" />
             <span className="text-sm font-semibold text-muted-foreground px-2">
               {month}
@@ -70,84 +67,15 @@ const EventTimeLine = ({
             <div className="h-px flex-1 bg-border" />
           </div>
 
-          <div className="relative pl-6">
-            {/* Vertical line */}
-            <div className="absolute left-2 top-0 bottom-0 w-px bg-border" />
-
-            <div className="space-y-4">
-              {monthEvents.map((event) => {
-                const start = new Date(event.startAt);
-                const end = new Date(event.endAt);
-                return (
-                  <div key={event.id} className="relative">
-                    {/* Timeline dot */}
-                    <div className="absolute -left-4 top-4 h-3 w-3 rounded-full border-2 border-primary bg-background" />
-
-                    <Card
-                      className="hover:shadow-sm transition-shadow cursor-pointer"
-                      onClick={() => onSelect(event)}
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex items-start gap-3">
-                          {/* Date range column */}
-                          <div className="shrink-0 text-center w-14">
-                            <p className="text-xs font-medium tabular-nums">
-                              {format(start, "dd EEE")}
-                            </p>
-                            <p className="text-[10px] text-muted-foreground leading-none my-0.5">
-                              -&gt;
-                            </p>
-                            <p className="text-xs font-medium tabular-nums">
-                              {format(end, "dd EEE")}
-                            </p>
-                          </div>
-                          <Separator
-                            orientation="vertical"
-                            className="h-auto self-stretch"
-                          />
-                          {event.image && (
-                            <div className="relative h-14 w-20 rounded-md overflow-hidden shrink-0">
-                              <Image
-                                src={event.image}
-                                alt={event.title}
-                                fill
-                                className="object-cover"
-                              />
-                            </div>
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-2">
-                              <p className="font-semibold text-sm">
-                                {event.title}
-                              </p>
-                              <Badge
-                                variant="secondary"
-                                className="shrink-0 text-[10px]"
-                              >
-                                {durationLabel(start, end)}
-                              </Badge>
-                            </div>
-                            {event.description && (
-                              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
-                                {event.description}
-                              </p>
-                            )}
-                            {event.location && (
-                              <span className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-                                <MapPin className="h-3 w-3 shrink-0" />
-                                {event.location}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
+          {monthEvents.map((event) => (
+            <React.Fragment key={event.id}>
+              <div className="flex items-center justify-center self-stretch">
+                <div className="h-3 w-3 shrink-0 rounded-full border-2 border-primary bg-background z-10" />
+              </div>
+              <TimelineEventCard event={event} onSelect={onSelect} />
+            </React.Fragment>
+          ))}
+        </React.Fragment>
       ))}
     </div>
   );

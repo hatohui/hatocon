@@ -40,17 +40,20 @@ const EventCard = ({ event, onClick, isOwner }: EventCardProps) => {
             src={event.image}
             alt={event.title}
             fill
-            className="object-cover"
+            sizes="33vw"
+            className="object-cover rounded-xl p-2"
           />
         </div>
       )}
-      <CardContent className="p-4">
-        <p className="font-semibold text-sm leading-tight">{event.title}</p>
-        {event.description && (
-          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-            {event.description}
-          </p>
-        )}
+      <CardContent className="px-4 flex h-full flex-col justify-between">
+        <div>
+          <p className="font-semibold leading-tight">{event.title}</p>
+          {event.description && (
+            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+              {event.description}
+            </p>
+          )}
+        </div>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2">
           <span className="flex items-center gap-1 text-xs text-muted-foreground">
             <Clock className="h-3 w-3" />
