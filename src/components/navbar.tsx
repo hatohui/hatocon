@@ -22,7 +22,6 @@ import {
 import {
   CalendarDays,
   CalendarRange,
-  ClipboardList,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -32,7 +31,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import AppIcon from "./common/AppIcon";
 import NotificationBell from "./notification-bell";
 import { cn } from "@/lib/utils";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 const NAV_LINKS = [
@@ -44,6 +43,7 @@ export default function Navbar() {
   const { data: session, status } = useSession();
   const pathname = usePathname();
   const isAdmin = session?.user.isAdmin;
+  const navigate = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   if (status === "loading") {
@@ -224,7 +224,10 @@ export default function Navbar() {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="flex items-center gap-2 text-destructive focus:text-destructive"
-                onClick={() => signOut()}
+                onClick={() => {
+                  signOut();
+                  navigate.push("/login");
+                }}
               >
                 <LogOut className="h-4 w-4" />
                 Sign out

@@ -26,16 +26,21 @@ import {
   Plane,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useWorkSchedule, useHolidays } from "@/hooks/schedule/useSchedule";
 
-function countWeekdays(from: Date, to: Date): number {
+function countWorkingDays(
+  from: Date,
+  to: Date,
+  workDays?: boolean[],
+): number {
+  const wd = workDays ?? [false, true, true, true, true, true, false];
   let count = 0;
   const cur = new Date(from);
   cur.setHours(0, 0, 0, 0);
   const end = new Date(to);
   end.setHours(0, 0, 0, 0);
   while (cur <= end) {
-    const d = cur.getDay();
-    if (d !== 0 && d !== 6) count++;
+    if (wd[cur.getDay()]) count++;
     cur.setDate(cur.getDate() + 1);
   }
   return count;
@@ -78,6 +83,33 @@ function ScheduleCalendar({
   });
 
   const startDay = getDay(days[0]);
+
+  const { data: schedule } = useWorkSchedule();
+  const workDays = schedule
+    ? [schedule.sunday, schedule.monday, schedule.tuesday, schedule.wednesday, schedule.thursday, schedule.friday, schedule.saturday]
+    : [false, true, true, true, true, true, false];
+
+  const monthFrom = startOfMonth(currentMonth).toISOString();
+  const monthTo = endOfMonth(currentMonth).toISOString();
+  const { data: holidays } = useHolidays(monthFrom, monthTo);
+
+  // Build a set of holiday date strings for quick lookup
+  const holidayMap = useMemo(() => {
+    const map = new Map<string, string>();
+    if (!holidays) return map;
+    for (const h of holidays) {
+      const hDate = new Date(h.date);
+      if (h.isRecurring) {
+        // Match month/day in current displayed month's year
+        const d = new Date(currentMonth.getFullYear(), hDate.getMonth(), hDate.getDate());
+        map.set(d.toDateString(), h.description);
+      } else {
+        hDate.setHours(0, 0, 0, 0);
+        map.set(hDate.toDateString(), h.description);
+      }
+    }
+    return map;
+  }, [holidays, currentMonth]);
 
   const getLeaveForDay = (day: Date) =>
     participations.filter((p) =>
@@ -140,20 +172,32 @@ function ScheduleCalendar({
         {days.map((day) => {
           const leaves = getLeaveForDay(day);
           const isToday = isSameDay(day, today);
-          const isWeekend = getDay(day) === 0 || getDay(day) === 6;
+          const isOffDay = !workDays[getDay(day)];
+          const holidayName = holidayMap.get(day.toDateString());
+          const isHoliday = !!holidayName;
 
           return (
             <div
               key={day.toISOString()}
-              className={`h-16 border-t p-1 ${isWeekend ? "bg-muted/30" : ""}`}
+              className={`h-16 border-t p-1 ${isHoliday ? "bg-red-50 dark:bg-red-950/20" : isOffDay ? "bg-muted/30" : ""}`}
+              title={holidayName}
             >
               <span
                 className={`text-xs font-medium inline-flex items-center justify-center w-5 h-5 rounded-full ${
-                  isToday ? "bg-primary text-primary-foreground" : ""
+                  isToday
+                    ? "bg-primary text-primary-foreground"
+                    : isHoliday
+                      ? "text-red-600 dark:text-red-400"
+                      : ""
                 }`}
               >
                 {format(day, "d")}
               </span>
+              {isHoliday && (
+                <p className="text-[8px] leading-tight text-red-600 dark:text-red-400 truncate">
+                  {holidayName}
+                </p>
+              )}
               <div className="flex flex-wrap gap-0.5 mt-0.5">
                 {leaves.map((l) => (
                   <div
@@ -178,6 +222,11 @@ function UpcomingLeaveList({
 }: {
   participations: ParticipationWithEvent[];
 }) {
+  const { data: schedule } = useWorkSchedule();
+  const workDays = schedule
+    ? [schedule.sunday, schedule.monday, schedule.tuesday, schedule.wednesday, schedule.thursday, schedule.friday, schedule.saturday]
+    : undefined;
+
   const upcoming = participations
     .filter((p) => new Date(p.to) >= new Date())
     .sort((a, b) => new Date(a.from).getTime() - new Date(b.from).getTime());
@@ -196,7 +245,7 @@ function UpcomingLeaveList({
   return (
     <div className="space-y-3">
       {upcoming.map((p) => {
-        const days = countWeekdays(new Date(p.from), new Date(p.to));
+        const days = countWorkingDays(new Date(p.from), new Date(p.to), workDays);
         const daysUntil = differenceInCalendarDays(
           new Date(p.from),
           new Date(),
@@ -258,8 +307,12 @@ function LeaveStats({
   participations: ParticipationWithEvent[];
 }) {
   const { data: balance } = useLeaveBalance();
+  const { data: schedule } = useWorkSchedule();
+  const workDays = schedule
+    ? [schedule.sunday, schedule.monday, schedule.tuesday, schedule.wednesday, schedule.thursday, schedule.friday, schedule.saturday]
+    : undefined;
   const totalDays = participations.reduce(
-    (sum, p) => sum + countWeekdays(new Date(p.from), new Date(p.to)),
+    (sum, p) => sum + countWorkingDays(new Date(p.from), new Date(p.to), workDays),
     0,
   );
   const totalTrips = participations.filter((p) => p.event).length;

@@ -92,3 +92,18 @@ export type JoinRequest = Prisma.JoinRequestModel
  * 
  */
 export type Notification = Prisma.NotificationModel
+/**
+ * Model WorkSchedule
+ * 
+ */
+export type WorkSchedule = Prisma.WorkScheduleModel
+/**
+ * Model ScheduleException
+ * 
+ */
+export type ScheduleException = Prisma.ScheduleExceptionModel
+/**
+ * Model CustomHoliday
+ * 
+ */
+export type CustomHoliday = Prisma.CustomHolidayModel

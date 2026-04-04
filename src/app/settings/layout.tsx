@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { CalendarDays, User } from "lucide-react";
+import { CalendarDays, Clock, Star, User } from "lucide-react";
 
 const links = [
   { href: "/settings/profile", label: "Profile", icon: User },
   { href: "/settings/leave", label: "Leave", icon: CalendarDays },
+  { href: "/settings/schedule", label: "Schedule", icon: Clock },
+  { href: "/settings/holidays", label: "Holidays", icon: Star },
 ];
 
 export default function SettingsLayout({

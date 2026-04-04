@@ -15,6 +15,7 @@ export type NotificationDTO = {
   type: NotificationType;
   data: NotificationData;
   isRead: boolean;
+  createdBy: string | null;
   createdAt: Date;
 };
 
@@ -36,11 +37,14 @@ export type ParticipationGroupDTO = {
   isPublic: boolean;
   isActivityPublicVisible: boolean;
   isMemberListPublicVisible: boolean;
+  isMediaPublicVisible: boolean;
 };
 
 export type ParticipationGroupSettingsUpdate = {
+  name?: string;
   isMemberInviteAllowed?: boolean;
   isPublic?: boolean;
   isActivityPublicVisible?: boolean;
   isMemberListPublicVisible?: boolean;
+  isMediaPublicVisible?: boolean;
 };

@@ -398,7 +398,10 @@ export const ModelName = {
   EventInvitee: 'EventInvitee',
   ParticipationGroup: 'ParticipationGroup',
   JoinRequest: 'JoinRequest',
-  Notification: 'Notification'
+  Notification: 'Notification',
+  WorkSchedule: 'WorkSchedule',
+  ScheduleException: 'ScheduleException',
+  CustomHoliday: 'CustomHoliday'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -414,7 +417,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "account" | "session" | "verificationToken" | "jobProfile" | "event" | "participation" | "participationImage" | "activity" | "activityMedia" | "holiday" | "eventInvitee" | "participationGroup" | "joinRequest" | "notification"
+    modelProps: "user" | "account" | "session" | "verificationToken" | "jobProfile" | "event" | "participation" | "participationImage" | "activity" | "activityMedia" | "holiday" | "eventInvitee" | "participationGroup" | "joinRequest" | "notification" | "workSchedule" | "scheduleException" | "customHoliday"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1528,6 +1531,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    WorkSchedule: {
+      payload: Prisma.$WorkSchedulePayload<ExtArgs>
+      fields: Prisma.WorkScheduleFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.WorkScheduleFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkSchedulePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.WorkScheduleFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkSchedulePayload>
+        }
+        findFirst: {
+          args: Prisma.WorkScheduleFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkSchedulePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.WorkScheduleFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkSchedulePayload>
+        }
+        findMany: {
+          args: Prisma.WorkScheduleFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkSchedulePayload>[]
+        }
+        create: {
+          args: Prisma.WorkScheduleCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkSchedulePayload>
+        }
+        createMany: {
+          args: Prisma.WorkScheduleCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.WorkScheduleCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkSchedulePayload>[]
+        }
+        delete: {
+          args: Prisma.WorkScheduleDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkSchedulePayload>
+        }
+        update: {
+          args: Prisma.WorkScheduleUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkSchedulePayload>
+        }
+        deleteMany: {
+          args: Prisma.WorkScheduleDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.WorkScheduleUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.WorkScheduleUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkSchedulePayload>[]
+        }
+        upsert: {
+          args: Prisma.WorkScheduleUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkSchedulePayload>
+        }
+        aggregate: {
+          args: Prisma.WorkScheduleAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateWorkSchedule>
+        }
+        groupBy: {
+          args: Prisma.WorkScheduleGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WorkScheduleGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.WorkScheduleCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WorkScheduleCountAggregateOutputType> | number
+        }
+      }
+    }
+    ScheduleException: {
+      payload: Prisma.$ScheduleExceptionPayload<ExtArgs>
+      fields: Prisma.ScheduleExceptionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ScheduleExceptionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScheduleExceptionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ScheduleExceptionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScheduleExceptionPayload>
+        }
+        findFirst: {
+          args: Prisma.ScheduleExceptionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScheduleExceptionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ScheduleExceptionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScheduleExceptionPayload>
+        }
+        findMany: {
+          args: Prisma.ScheduleExceptionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScheduleExceptionPayload>[]
+        }
+        create: {
+          args: Prisma.ScheduleExceptionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScheduleExceptionPayload>
+        }
+        createMany: {
+          args: Prisma.ScheduleExceptionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ScheduleExceptionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScheduleExceptionPayload>[]
+        }
+        delete: {
+          args: Prisma.ScheduleExceptionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScheduleExceptionPayload>
+        }
+        update: {
+          args: Prisma.ScheduleExceptionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScheduleExceptionPayload>
+        }
+        deleteMany: {
+          args: Prisma.ScheduleExceptionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ScheduleExceptionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ScheduleExceptionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScheduleExceptionPayload>[]
+        }
+        upsert: {
+          args: Prisma.ScheduleExceptionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScheduleExceptionPayload>
+        }
+        aggregate: {
+          args: Prisma.ScheduleExceptionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateScheduleException>
+        }
+        groupBy: {
+          args: Prisma.ScheduleExceptionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ScheduleExceptionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ScheduleExceptionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ScheduleExceptionCountAggregateOutputType> | number
+        }
+      }
+    }
+    CustomHoliday: {
+      payload: Prisma.$CustomHolidayPayload<ExtArgs>
+      fields: Prisma.CustomHolidayFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CustomHolidayFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomHolidayPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CustomHolidayFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomHolidayPayload>
+        }
+        findFirst: {
+          args: Prisma.CustomHolidayFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomHolidayPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CustomHolidayFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomHolidayPayload>
+        }
+        findMany: {
+          args: Prisma.CustomHolidayFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomHolidayPayload>[]
+        }
+        create: {
+          args: Prisma.CustomHolidayCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomHolidayPayload>
+        }
+        createMany: {
+          args: Prisma.CustomHolidayCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CustomHolidayCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomHolidayPayload>[]
+        }
+        delete: {
+          args: Prisma.CustomHolidayDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomHolidayPayload>
+        }
+        update: {
+          args: Prisma.CustomHolidayUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomHolidayPayload>
+        }
+        deleteMany: {
+          args: Prisma.CustomHolidayDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CustomHolidayUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CustomHolidayUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomHolidayPayload>[]
+        }
+        upsert: {
+          args: Prisma.CustomHolidayUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomHolidayPayload>
+        }
+        aggregate: {
+          args: Prisma.CustomHolidayAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCustomHoliday>
+        }
+        groupBy: {
+          args: Prisma.CustomHolidayGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CustomHolidayGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CustomHolidayCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CustomHolidayCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1725,7 +1950,11 @@ export const HolidayScalarFieldEnum = {
   date: 'date',
   description: 'description',
   country: 'country',
-  isGlobal: 'isGlobal'
+  isGlobal: 'isGlobal',
+  isRecurring: 'isRecurring',
+  isLunar: 'isLunar',
+  lunarMonth: 'lunarMonth',
+  lunarDay: 'lunarDay'
 } as const
 
 export type HolidayScalarFieldEnum = (typeof HolidayScalarFieldEnum)[keyof typeof HolidayScalarFieldEnum]
@@ -1750,6 +1979,7 @@ export const ParticipationGroupScalarFieldEnum = {
   isPublic: 'isPublic',
   isActivityPublicVisible: 'isActivityPublicVisible',
   isMemberListPublicVisible: 'isMemberListPublicVisible',
+  isMediaPublicVisible: 'isMediaPublicVisible',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1775,10 +2005,51 @@ export const NotificationScalarFieldEnum = {
   type: 'type',
   data: 'data',
   isRead: 'isRead',
+  createdBy: 'createdBy',
   createdAt: 'createdAt'
 } as const
 
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
+export const WorkScheduleScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  sunday: 'sunday',
+  monday: 'monday',
+  tuesday: 'tuesday',
+  wednesday: 'wednesday',
+  thursday: 'thursday',
+  friday: 'friday',
+  saturday: 'saturday',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WorkScheduleScalarFieldEnum = (typeof WorkScheduleScalarFieldEnum)[keyof typeof WorkScheduleScalarFieldEnum]
+
+
+export const ScheduleExceptionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  date: 'date',
+  isWorkDay: 'isWorkDay',
+  reason: 'reason',
+  createdAt: 'createdAt'
+} as const
+
+export type ScheduleExceptionScalarFieldEnum = (typeof ScheduleExceptionScalarFieldEnum)[keyof typeof ScheduleExceptionScalarFieldEnum]
+
+
+export const CustomHolidayScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  date: 'date',
+  name: 'name',
+  createdAt: 'createdAt'
+} as const
+
+export type CustomHolidayScalarFieldEnum = (typeof CustomHolidayScalarFieldEnum)[keyof typeof CustomHolidayScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -2069,6 +2340,9 @@ export type GlobalOmitConfig = {
   participationGroup?: Prisma.ParticipationGroupOmit
   joinRequest?: Prisma.JoinRequestOmit
   notification?: Prisma.NotificationOmit
+  workSchedule?: Prisma.WorkScheduleOmit
+  scheduleException?: Prisma.ScheduleExceptionOmit
+  customHoliday?: Prisma.CustomHolidayOmit
 }
 
 /* Types for Logging */

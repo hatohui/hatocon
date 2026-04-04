@@ -205,24 +205,7 @@ function InviteePicker({
 }
 
 export default function EditEventPage() {
-  const router = useRouter();
   const params = useParams<{ id: string }>();
-  const updateEvent = useUpdateOwnEvent();
-  const deleteEvent = useDeleteOwnEvent();
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
-
-  const [uploading, setUploading] = React.useState(false);
-  const [selectedInvitees, setSelectedInvitees] = React.useState<
-    Omit<User, "password">[]
-  >([]);
-  const [pendingValues, setPendingValues] = React.useState<FormValues | null>(
-    null,
-  );
-  const [visibilityDecision, setVisibilityDecision] =
-    React.useState<VisibilityDecision | null>(null);
-  const [visibilityConfirmOpen, setVisibilityConfirmOpen] =
-    React.useState(false);
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = React.useState(false);
 
   const { data: event, isLoading } = useQuery({
     queryKey: ["events", params.id, "edit"],
@@ -232,26 +215,48 @@ export default function EditEventPage() {
         .then((r) => r.data.data),
   });
 
+  if (isLoading) {
+    return (
+      <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10 space-y-6">
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-96 rounded-xl" />
+      </main>
+    );
+  }
+
+  if (!event) {
+    return (
+      <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
+        <p className="text-muted-foreground">Event not found.</p>
+      </main>
+    );
+  }
+
+  return <EditEventForm event={event} />;
+}
+
+function EditEventForm({ event }: { event: EventEditResponse }) {
+  const router = useRouter();
+  const updateEvent = useUpdateOwnEvent();
+  const deleteEvent = useDeleteOwnEvent();
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const [uploading, setUploading] = React.useState(false);
+  const [selectedInvitees, setSelectedInvitees] = React.useState<
+    Omit<User, "password">[]
+  >(event.inviteeUsers ?? []);
+  const [pendingValues, setPendingValues] = React.useState<FormValues | null>(
+    null,
+  );
+  const [visibilityDecision, setVisibilityDecision] =
+    React.useState<VisibilityDecision | null>(null);
+  const [visibilityConfirmOpen, setVisibilityConfirmOpen] =
+    React.useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = React.useState(false);
+
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      title: "",
-      description: "",
-      image: "",
-      startAt: "",
-      endAt: "",
-      location: "",
-      locationUrl: "",
-      reference: "",
-      visibility: "PUBLIC",
-    },
-  });
-
-  const visibility = form.watch("visibility");
-
-  React.useEffect(() => {
-    if (!event) return;
-    form.reset({
       title: event.title,
       description: event.description ?? "",
       image: event.image ?? "",
@@ -261,9 +266,10 @@ export default function EditEventPage() {
       locationUrl: event.locationUrl ?? "",
       reference: event.reference ?? "",
       visibility: event.visibility,
-    });
-    setSelectedInvitees(event.inviteeUsers ?? []);
-  }, [event, form]);
+    },
+  });
+
+  const visibility = form.watch("visibility");
 
   const handleImageUpload = async (file: File) => {
     if (file.size > 5 * 1024 * 1024) {
@@ -295,11 +301,11 @@ export default function EditEventPage() {
 
   const runSubmit = (values: FormValues) => {
     const isPrivateToPublic =
-      event?.visibility === "PRIVATE" && values.visibility === "PUBLIC";
+      event.visibility === "PRIVATE" && values.visibility === "PUBLIC";
 
     updateEvent.mutate(
       {
-        id: params.id,
+        id: event.id,
         data: {
           title: values.title,
           description: values.description || undefined,
@@ -337,8 +343,6 @@ export default function EditEventPage() {
   };
 
   const onSubmit = (values: FormValues) => {
-    if (!event) return;
-
     if (event.visibility !== values.visibility) {
       setPendingValues(values);
       setVisibilityDecision(
@@ -376,23 +380,6 @@ export default function EditEventPage() {
       },
     });
   };
-
-  if (isLoading) {
-    return (
-      <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10 space-y-6">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-96 rounded-xl" />
-      </main>
-    );
-  }
-
-  if (!event) {
-    return (
-      <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
-        <p className="text-muted-foreground">Event not found.</p>
-      </main>
-    );
-  }
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10 space-y-6">

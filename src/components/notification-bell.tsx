@@ -30,7 +30,11 @@ export default function NotificationBell() {
           <span className="sr-only">Notifications</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="p-0" align="end" sideOffset={8}>
+      <PopoverContent
+        className="p-0 w-auto overflow-hidden"
+        align="end"
+        sideOffset={8}
+      >
         <NotificationList onClose={() => setOpen(false)} />
       </PopoverContent>
     </Popover>

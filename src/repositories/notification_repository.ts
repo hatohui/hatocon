@@ -20,9 +20,15 @@ const notificationRepository = {
     userId: string,
     type: NotificationType,
     data: Record<string, unknown>,
+    createdBy?: string,
   ) => {
     return db.notification.create({
-      data: { userId, type, data: data as Prisma.InputJsonValue },
+      data: {
+        userId,
+        type,
+        data: data as Prisma.InputJsonValue,
+        ...(createdBy ? { createdBy } : {}),
+      },
     });
   },
 
@@ -30,6 +36,7 @@ const notificationRepository = {
     userIds: string[],
     type: NotificationType,
     data: Record<string, unknown>,
+    createdBy?: string,
   ) => {
     if (userIds.length === 0) return;
     return db.notification.createMany({
@@ -37,6 +44,7 @@ const notificationRepository = {
         userId,
         type,
         data: data as Prisma.InputJsonValue,
+        ...(createdBy ? { createdBy } : {}),
       })),
     });
   },
@@ -57,6 +65,18 @@ const notificationRepository = {
 
   getById: async (id: string) => {
     return db.notification.findUnique({ where: { id } });
+  },
+
+  /** Update a specific INVITED_TO_JOIN notification to ACCEPTED or DECLINED by its own id */
+  respondToInvite: async (
+    notificationId: string,
+    userId: string,
+    type: "INVITE_ACCEPTED" | "INVITE_DECLINED",
+  ) => {
+    return db.notification.updateMany({
+      where: { id: notificationId, userId, type: "INVITED_TO_JOIN" },
+      data: { type, isRead: true },
+    });
   },
 };
 

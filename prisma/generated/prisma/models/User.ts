@@ -229,6 +229,9 @@ export type UserWhereInput = {
   events?: Prisma.EventListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
   joinRequests?: Prisma.JoinRequestListRelationFilter
+  workSchedule?: Prisma.XOR<Prisma.WorkScheduleNullableScalarRelationFilter, Prisma.WorkScheduleWhereInput> | null
+  scheduleExceptions?: Prisma.ScheduleExceptionListRelationFilter
+  customHolidays?: Prisma.CustomHolidayListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -249,6 +252,9 @@ export type UserOrderByWithRelationInput = {
   events?: Prisma.EventOrderByRelationAggregateInput
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
   joinRequests?: Prisma.JoinRequestOrderByRelationAggregateInput
+  workSchedule?: Prisma.WorkScheduleOrderByWithRelationInput
+  scheduleExceptions?: Prisma.ScheduleExceptionOrderByRelationAggregateInput
+  customHolidays?: Prisma.CustomHolidayOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -272,6 +278,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   events?: Prisma.EventListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
   joinRequests?: Prisma.JoinRequestListRelationFilter
+  workSchedule?: Prisma.XOR<Prisma.WorkScheduleNullableScalarRelationFilter, Prisma.WorkScheduleWhereInput> | null
+  scheduleExceptions?: Prisma.ScheduleExceptionListRelationFilter
+  customHolidays?: Prisma.CustomHolidayListRelationFilter
 }, "id" | "username" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -324,6 +333,9 @@ export type UserCreateInput = {
   events?: Prisma.EventCreateNestedManyWithoutCreatedByUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   joinRequests?: Prisma.JoinRequestCreateNestedManyWithoutUserInput
+  workSchedule?: Prisma.WorkScheduleCreateNestedOneWithoutUserInput
+  scheduleExceptions?: Prisma.ScheduleExceptionCreateNestedManyWithoutUserInput
+  customHolidays?: Prisma.CustomHolidayCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -344,6 +356,9 @@ export type UserUncheckedCreateInput = {
   events?: Prisma.EventUncheckedCreateNestedManyWithoutCreatedByUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   joinRequests?: Prisma.JoinRequestUncheckedCreateNestedManyWithoutUserInput
+  workSchedule?: Prisma.WorkScheduleUncheckedCreateNestedOneWithoutUserInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUncheckedCreateNestedManyWithoutUserInput
+  customHolidays?: Prisma.CustomHolidayUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -364,6 +379,9 @@ export type UserUpdateInput = {
   events?: Prisma.EventUpdateManyWithoutCreatedByUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   joinRequests?: Prisma.JoinRequestUpdateManyWithoutUserNestedInput
+  workSchedule?: Prisma.WorkScheduleUpdateOneWithoutUserNestedInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUpdateManyWithoutUserNestedInput
+  customHolidays?: Prisma.CustomHolidayUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -384,6 +402,9 @@ export type UserUncheckedUpdateInput = {
   events?: Prisma.EventUncheckedUpdateManyWithoutCreatedByUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   joinRequests?: Prisma.JoinRequestUncheckedUpdateManyWithoutUserNestedInput
+  workSchedule?: Prisma.WorkScheduleUncheckedUpdateOneWithoutUserNestedInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUncheckedUpdateManyWithoutUserNestedInput
+  customHolidays?: Prisma.CustomHolidayUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -587,6 +608,48 @@ export type UserUpdateOneRequiredWithoutNotificationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutNotificationsInput, Prisma.UserUpdateWithoutNotificationsInput>, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
 }
 
+export type UserCreateNestedOneWithoutWorkScheduleInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutWorkScheduleInput, Prisma.UserUncheckedCreateWithoutWorkScheduleInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutWorkScheduleInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutWorkScheduleNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutWorkScheduleInput, Prisma.UserUncheckedCreateWithoutWorkScheduleInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutWorkScheduleInput
+  upsert?: Prisma.UserUpsertWithoutWorkScheduleInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutWorkScheduleInput, Prisma.UserUpdateWithoutWorkScheduleInput>, Prisma.UserUncheckedUpdateWithoutWorkScheduleInput>
+}
+
+export type UserCreateNestedOneWithoutScheduleExceptionsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutScheduleExceptionsInput, Prisma.UserUncheckedCreateWithoutScheduleExceptionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutScheduleExceptionsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutScheduleExceptionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutScheduleExceptionsInput, Prisma.UserUncheckedCreateWithoutScheduleExceptionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutScheduleExceptionsInput
+  upsert?: Prisma.UserUpsertWithoutScheduleExceptionsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutScheduleExceptionsInput, Prisma.UserUpdateWithoutScheduleExceptionsInput>, Prisma.UserUncheckedUpdateWithoutScheduleExceptionsInput>
+}
+
+export type UserCreateNestedOneWithoutCustomHolidaysInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCustomHolidaysInput, Prisma.UserUncheckedCreateWithoutCustomHolidaysInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCustomHolidaysInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutCustomHolidaysNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCustomHolidaysInput, Prisma.UserUncheckedCreateWithoutCustomHolidaysInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCustomHolidaysInput
+  upsert?: Prisma.UserUpsertWithoutCustomHolidaysInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCustomHolidaysInput, Prisma.UserUpdateWithoutCustomHolidaysInput>, Prisma.UserUncheckedUpdateWithoutCustomHolidaysInput>
+}
+
 export type UserCreateWithoutAccountsInput = {
   id?: string
   name: string
@@ -604,6 +667,9 @@ export type UserCreateWithoutAccountsInput = {
   events?: Prisma.EventCreateNestedManyWithoutCreatedByUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   joinRequests?: Prisma.JoinRequestCreateNestedManyWithoutUserInput
+  workSchedule?: Prisma.WorkScheduleCreateNestedOneWithoutUserInput
+  scheduleExceptions?: Prisma.ScheduleExceptionCreateNestedManyWithoutUserInput
+  customHolidays?: Prisma.CustomHolidayCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAccountsInput = {
@@ -623,6 +689,9 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   events?: Prisma.EventUncheckedCreateNestedManyWithoutCreatedByUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   joinRequests?: Prisma.JoinRequestUncheckedCreateNestedManyWithoutUserInput
+  workSchedule?: Prisma.WorkScheduleUncheckedCreateNestedOneWithoutUserInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUncheckedCreateNestedManyWithoutUserInput
+  customHolidays?: Prisma.CustomHolidayUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAccountsInput = {
@@ -658,6 +727,9 @@ export type UserUpdateWithoutAccountsInput = {
   events?: Prisma.EventUpdateManyWithoutCreatedByUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   joinRequests?: Prisma.JoinRequestUpdateManyWithoutUserNestedInput
+  workSchedule?: Prisma.WorkScheduleUpdateOneWithoutUserNestedInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUpdateManyWithoutUserNestedInput
+  customHolidays?: Prisma.CustomHolidayUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -677,6 +749,9 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   events?: Prisma.EventUncheckedUpdateManyWithoutCreatedByUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   joinRequests?: Prisma.JoinRequestUncheckedUpdateManyWithoutUserNestedInput
+  workSchedule?: Prisma.WorkScheduleUncheckedUpdateOneWithoutUserNestedInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUncheckedUpdateManyWithoutUserNestedInput
+  customHolidays?: Prisma.CustomHolidayUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSessionsInput = {
@@ -696,6 +771,9 @@ export type UserCreateWithoutSessionsInput = {
   events?: Prisma.EventCreateNestedManyWithoutCreatedByUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   joinRequests?: Prisma.JoinRequestCreateNestedManyWithoutUserInput
+  workSchedule?: Prisma.WorkScheduleCreateNestedOneWithoutUserInput
+  scheduleExceptions?: Prisma.ScheduleExceptionCreateNestedManyWithoutUserInput
+  customHolidays?: Prisma.CustomHolidayCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -715,6 +793,9 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   events?: Prisma.EventUncheckedCreateNestedManyWithoutCreatedByUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   joinRequests?: Prisma.JoinRequestUncheckedCreateNestedManyWithoutUserInput
+  workSchedule?: Prisma.WorkScheduleUncheckedCreateNestedOneWithoutUserInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUncheckedCreateNestedManyWithoutUserInput
+  customHolidays?: Prisma.CustomHolidayUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -750,6 +831,9 @@ export type UserUpdateWithoutSessionsInput = {
   events?: Prisma.EventUpdateManyWithoutCreatedByUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   joinRequests?: Prisma.JoinRequestUpdateManyWithoutUserNestedInput
+  workSchedule?: Prisma.WorkScheduleUpdateOneWithoutUserNestedInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUpdateManyWithoutUserNestedInput
+  customHolidays?: Prisma.CustomHolidayUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -769,6 +853,9 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   events?: Prisma.EventUncheckedUpdateManyWithoutCreatedByUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   joinRequests?: Prisma.JoinRequestUncheckedUpdateManyWithoutUserNestedInput
+  workSchedule?: Prisma.WorkScheduleUncheckedUpdateOneWithoutUserNestedInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUncheckedUpdateManyWithoutUserNestedInput
+  customHolidays?: Prisma.CustomHolidayUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutJobProfileInput = {
@@ -788,6 +875,9 @@ export type UserCreateWithoutJobProfileInput = {
   events?: Prisma.EventCreateNestedManyWithoutCreatedByUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   joinRequests?: Prisma.JoinRequestCreateNestedManyWithoutUserInput
+  workSchedule?: Prisma.WorkScheduleCreateNestedOneWithoutUserInput
+  scheduleExceptions?: Prisma.ScheduleExceptionCreateNestedManyWithoutUserInput
+  customHolidays?: Prisma.CustomHolidayCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutJobProfileInput = {
@@ -807,6 +897,9 @@ export type UserUncheckedCreateWithoutJobProfileInput = {
   events?: Prisma.EventUncheckedCreateNestedManyWithoutCreatedByUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   joinRequests?: Prisma.JoinRequestUncheckedCreateNestedManyWithoutUserInput
+  workSchedule?: Prisma.WorkScheduleUncheckedCreateNestedOneWithoutUserInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUncheckedCreateNestedManyWithoutUserInput
+  customHolidays?: Prisma.CustomHolidayUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutJobProfileInput = {
@@ -842,6 +935,9 @@ export type UserUpdateWithoutJobProfileInput = {
   events?: Prisma.EventUpdateManyWithoutCreatedByUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   joinRequests?: Prisma.JoinRequestUpdateManyWithoutUserNestedInput
+  workSchedule?: Prisma.WorkScheduleUpdateOneWithoutUserNestedInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUpdateManyWithoutUserNestedInput
+  customHolidays?: Prisma.CustomHolidayUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutJobProfileInput = {
@@ -861,6 +957,9 @@ export type UserUncheckedUpdateWithoutJobProfileInput = {
   events?: Prisma.EventUncheckedUpdateManyWithoutCreatedByUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   joinRequests?: Prisma.JoinRequestUncheckedUpdateManyWithoutUserNestedInput
+  workSchedule?: Prisma.WorkScheduleUncheckedUpdateOneWithoutUserNestedInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUncheckedUpdateManyWithoutUserNestedInput
+  customHolidays?: Prisma.CustomHolidayUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutEventsInput = {
@@ -880,6 +979,9 @@ export type UserCreateWithoutEventsInput = {
   participations?: Prisma.ParticipationCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   joinRequests?: Prisma.JoinRequestCreateNestedManyWithoutUserInput
+  workSchedule?: Prisma.WorkScheduleCreateNestedOneWithoutUserInput
+  scheduleExceptions?: Prisma.ScheduleExceptionCreateNestedManyWithoutUserInput
+  customHolidays?: Prisma.CustomHolidayCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEventsInput = {
@@ -899,6 +1001,9 @@ export type UserUncheckedCreateWithoutEventsInput = {
   participations?: Prisma.ParticipationUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   joinRequests?: Prisma.JoinRequestUncheckedCreateNestedManyWithoutUserInput
+  workSchedule?: Prisma.WorkScheduleUncheckedCreateNestedOneWithoutUserInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUncheckedCreateNestedManyWithoutUserInput
+  customHolidays?: Prisma.CustomHolidayUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEventsInput = {
@@ -934,6 +1039,9 @@ export type UserUpdateWithoutEventsInput = {
   participations?: Prisma.ParticipationUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   joinRequests?: Prisma.JoinRequestUpdateManyWithoutUserNestedInput
+  workSchedule?: Prisma.WorkScheduleUpdateOneWithoutUserNestedInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUpdateManyWithoutUserNestedInput
+  customHolidays?: Prisma.CustomHolidayUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEventsInput = {
@@ -953,6 +1061,9 @@ export type UserUncheckedUpdateWithoutEventsInput = {
   participations?: Prisma.ParticipationUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   joinRequests?: Prisma.JoinRequestUncheckedUpdateManyWithoutUserNestedInput
+  workSchedule?: Prisma.WorkScheduleUncheckedUpdateOneWithoutUserNestedInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUncheckedUpdateManyWithoutUserNestedInput
+  customHolidays?: Prisma.CustomHolidayUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutParticipationsInput = {
@@ -972,6 +1083,9 @@ export type UserCreateWithoutParticipationsInput = {
   events?: Prisma.EventCreateNestedManyWithoutCreatedByUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   joinRequests?: Prisma.JoinRequestCreateNestedManyWithoutUserInput
+  workSchedule?: Prisma.WorkScheduleCreateNestedOneWithoutUserInput
+  scheduleExceptions?: Prisma.ScheduleExceptionCreateNestedManyWithoutUserInput
+  customHolidays?: Prisma.CustomHolidayCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutParticipationsInput = {
@@ -991,6 +1105,9 @@ export type UserUncheckedCreateWithoutParticipationsInput = {
   events?: Prisma.EventUncheckedCreateNestedManyWithoutCreatedByUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   joinRequests?: Prisma.JoinRequestUncheckedCreateNestedManyWithoutUserInput
+  workSchedule?: Prisma.WorkScheduleUncheckedCreateNestedOneWithoutUserInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUncheckedCreateNestedManyWithoutUserInput
+  customHolidays?: Prisma.CustomHolidayUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutParticipationsInput = {
@@ -1026,6 +1143,9 @@ export type UserUpdateWithoutParticipationsInput = {
   events?: Prisma.EventUpdateManyWithoutCreatedByUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   joinRequests?: Prisma.JoinRequestUpdateManyWithoutUserNestedInput
+  workSchedule?: Prisma.WorkScheduleUpdateOneWithoutUserNestedInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUpdateManyWithoutUserNestedInput
+  customHolidays?: Prisma.CustomHolidayUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutParticipationsInput = {
@@ -1045,6 +1165,9 @@ export type UserUncheckedUpdateWithoutParticipationsInput = {
   events?: Prisma.EventUncheckedUpdateManyWithoutCreatedByUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   joinRequests?: Prisma.JoinRequestUncheckedUpdateManyWithoutUserNestedInput
+  workSchedule?: Prisma.WorkScheduleUncheckedUpdateOneWithoutUserNestedInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUncheckedUpdateManyWithoutUserNestedInput
+  customHolidays?: Prisma.CustomHolidayUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutJoinRequestsInput = {
@@ -1064,6 +1187,9 @@ export type UserCreateWithoutJoinRequestsInput = {
   participations?: Prisma.ParticipationCreateNestedManyWithoutUserInput
   events?: Prisma.EventCreateNestedManyWithoutCreatedByUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  workSchedule?: Prisma.WorkScheduleCreateNestedOneWithoutUserInput
+  scheduleExceptions?: Prisma.ScheduleExceptionCreateNestedManyWithoutUserInput
+  customHolidays?: Prisma.CustomHolidayCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutJoinRequestsInput = {
@@ -1083,6 +1209,9 @@ export type UserUncheckedCreateWithoutJoinRequestsInput = {
   participations?: Prisma.ParticipationUncheckedCreateNestedManyWithoutUserInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutCreatedByUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  workSchedule?: Prisma.WorkScheduleUncheckedCreateNestedOneWithoutUserInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUncheckedCreateNestedManyWithoutUserInput
+  customHolidays?: Prisma.CustomHolidayUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutJoinRequestsInput = {
@@ -1118,6 +1247,9 @@ export type UserUpdateWithoutJoinRequestsInput = {
   participations?: Prisma.ParticipationUpdateManyWithoutUserNestedInput
   events?: Prisma.EventUpdateManyWithoutCreatedByUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  workSchedule?: Prisma.WorkScheduleUpdateOneWithoutUserNestedInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUpdateManyWithoutUserNestedInput
+  customHolidays?: Prisma.CustomHolidayUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutJoinRequestsInput = {
@@ -1137,6 +1269,9 @@ export type UserUncheckedUpdateWithoutJoinRequestsInput = {
   participations?: Prisma.ParticipationUncheckedUpdateManyWithoutUserNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutCreatedByUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  workSchedule?: Prisma.WorkScheduleUncheckedUpdateOneWithoutUserNestedInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUncheckedUpdateManyWithoutUserNestedInput
+  customHolidays?: Prisma.CustomHolidayUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutNotificationsInput = {
@@ -1156,6 +1291,9 @@ export type UserCreateWithoutNotificationsInput = {
   participations?: Prisma.ParticipationCreateNestedManyWithoutUserInput
   events?: Prisma.EventCreateNestedManyWithoutCreatedByUserInput
   joinRequests?: Prisma.JoinRequestCreateNestedManyWithoutUserInput
+  workSchedule?: Prisma.WorkScheduleCreateNestedOneWithoutUserInput
+  scheduleExceptions?: Prisma.ScheduleExceptionCreateNestedManyWithoutUserInput
+  customHolidays?: Prisma.CustomHolidayCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -1175,6 +1313,9 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   participations?: Prisma.ParticipationUncheckedCreateNestedManyWithoutUserInput
   events?: Prisma.EventUncheckedCreateNestedManyWithoutCreatedByUserInput
   joinRequests?: Prisma.JoinRequestUncheckedCreateNestedManyWithoutUserInput
+  workSchedule?: Prisma.WorkScheduleUncheckedCreateNestedOneWithoutUserInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUncheckedCreateNestedManyWithoutUserInput
+  customHolidays?: Prisma.CustomHolidayUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -1210,6 +1351,9 @@ export type UserUpdateWithoutNotificationsInput = {
   participations?: Prisma.ParticipationUpdateManyWithoutUserNestedInput
   events?: Prisma.EventUpdateManyWithoutCreatedByUserNestedInput
   joinRequests?: Prisma.JoinRequestUpdateManyWithoutUserNestedInput
+  workSchedule?: Prisma.WorkScheduleUpdateOneWithoutUserNestedInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUpdateManyWithoutUserNestedInput
+  customHolidays?: Prisma.CustomHolidayUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -1229,6 +1373,321 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   participations?: Prisma.ParticipationUncheckedUpdateManyWithoutUserNestedInput
   events?: Prisma.EventUncheckedUpdateManyWithoutCreatedByUserNestedInput
   joinRequests?: Prisma.JoinRequestUncheckedUpdateManyWithoutUserNestedInput
+  workSchedule?: Prisma.WorkScheduleUncheckedUpdateOneWithoutUserNestedInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUncheckedUpdateManyWithoutUserNestedInput
+  customHolidays?: Prisma.CustomHolidayUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutWorkScheduleInput = {
+  id?: string
+  name: string
+  username: string
+  password?: string | null
+  email: string
+  emailVerified?: Date | string | null
+  image?: string | null
+  isAdmin?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  jobProfile?: Prisma.JobProfileCreateNestedOneWithoutUserInput
+  participations?: Prisma.ParticipationCreateNestedManyWithoutUserInput
+  events?: Prisma.EventCreateNestedManyWithoutCreatedByUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  joinRequests?: Prisma.JoinRequestCreateNestedManyWithoutUserInput
+  scheduleExceptions?: Prisma.ScheduleExceptionCreateNestedManyWithoutUserInput
+  customHolidays?: Prisma.CustomHolidayCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutWorkScheduleInput = {
+  id?: string
+  name: string
+  username: string
+  password?: string | null
+  email: string
+  emailVerified?: Date | string | null
+  image?: string | null
+  isAdmin?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  jobProfile?: Prisma.JobProfileUncheckedCreateNestedOneWithoutUserInput
+  participations?: Prisma.ParticipationUncheckedCreateNestedManyWithoutUserInput
+  events?: Prisma.EventUncheckedCreateNestedManyWithoutCreatedByUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  joinRequests?: Prisma.JoinRequestUncheckedCreateNestedManyWithoutUserInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUncheckedCreateNestedManyWithoutUserInput
+  customHolidays?: Prisma.CustomHolidayUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutWorkScheduleInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutWorkScheduleInput, Prisma.UserUncheckedCreateWithoutWorkScheduleInput>
+}
+
+export type UserUpsertWithoutWorkScheduleInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutWorkScheduleInput, Prisma.UserUncheckedUpdateWithoutWorkScheduleInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutWorkScheduleInput, Prisma.UserUncheckedCreateWithoutWorkScheduleInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutWorkScheduleInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutWorkScheduleInput, Prisma.UserUncheckedUpdateWithoutWorkScheduleInput>
+}
+
+export type UserUpdateWithoutWorkScheduleInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  jobProfile?: Prisma.JobProfileUpdateOneWithoutUserNestedInput
+  participations?: Prisma.ParticipationUpdateManyWithoutUserNestedInput
+  events?: Prisma.EventUpdateManyWithoutCreatedByUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  joinRequests?: Prisma.JoinRequestUpdateManyWithoutUserNestedInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUpdateManyWithoutUserNestedInput
+  customHolidays?: Prisma.CustomHolidayUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutWorkScheduleInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  jobProfile?: Prisma.JobProfileUncheckedUpdateOneWithoutUserNestedInput
+  participations?: Prisma.ParticipationUncheckedUpdateManyWithoutUserNestedInput
+  events?: Prisma.EventUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  joinRequests?: Prisma.JoinRequestUncheckedUpdateManyWithoutUserNestedInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUncheckedUpdateManyWithoutUserNestedInput
+  customHolidays?: Prisma.CustomHolidayUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutScheduleExceptionsInput = {
+  id?: string
+  name: string
+  username: string
+  password?: string | null
+  email: string
+  emailVerified?: Date | string | null
+  image?: string | null
+  isAdmin?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  jobProfile?: Prisma.JobProfileCreateNestedOneWithoutUserInput
+  participations?: Prisma.ParticipationCreateNestedManyWithoutUserInput
+  events?: Prisma.EventCreateNestedManyWithoutCreatedByUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  joinRequests?: Prisma.JoinRequestCreateNestedManyWithoutUserInput
+  workSchedule?: Prisma.WorkScheduleCreateNestedOneWithoutUserInput
+  customHolidays?: Prisma.CustomHolidayCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutScheduleExceptionsInput = {
+  id?: string
+  name: string
+  username: string
+  password?: string | null
+  email: string
+  emailVerified?: Date | string | null
+  image?: string | null
+  isAdmin?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  jobProfile?: Prisma.JobProfileUncheckedCreateNestedOneWithoutUserInput
+  participations?: Prisma.ParticipationUncheckedCreateNestedManyWithoutUserInput
+  events?: Prisma.EventUncheckedCreateNestedManyWithoutCreatedByUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  joinRequests?: Prisma.JoinRequestUncheckedCreateNestedManyWithoutUserInput
+  workSchedule?: Prisma.WorkScheduleUncheckedCreateNestedOneWithoutUserInput
+  customHolidays?: Prisma.CustomHolidayUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutScheduleExceptionsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutScheduleExceptionsInput, Prisma.UserUncheckedCreateWithoutScheduleExceptionsInput>
+}
+
+export type UserUpsertWithoutScheduleExceptionsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutScheduleExceptionsInput, Prisma.UserUncheckedUpdateWithoutScheduleExceptionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutScheduleExceptionsInput, Prisma.UserUncheckedCreateWithoutScheduleExceptionsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutScheduleExceptionsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutScheduleExceptionsInput, Prisma.UserUncheckedUpdateWithoutScheduleExceptionsInput>
+}
+
+export type UserUpdateWithoutScheduleExceptionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  jobProfile?: Prisma.JobProfileUpdateOneWithoutUserNestedInput
+  participations?: Prisma.ParticipationUpdateManyWithoutUserNestedInput
+  events?: Prisma.EventUpdateManyWithoutCreatedByUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  joinRequests?: Prisma.JoinRequestUpdateManyWithoutUserNestedInput
+  workSchedule?: Prisma.WorkScheduleUpdateOneWithoutUserNestedInput
+  customHolidays?: Prisma.CustomHolidayUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutScheduleExceptionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  jobProfile?: Prisma.JobProfileUncheckedUpdateOneWithoutUserNestedInput
+  participations?: Prisma.ParticipationUncheckedUpdateManyWithoutUserNestedInput
+  events?: Prisma.EventUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  joinRequests?: Prisma.JoinRequestUncheckedUpdateManyWithoutUserNestedInput
+  workSchedule?: Prisma.WorkScheduleUncheckedUpdateOneWithoutUserNestedInput
+  customHolidays?: Prisma.CustomHolidayUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutCustomHolidaysInput = {
+  id?: string
+  name: string
+  username: string
+  password?: string | null
+  email: string
+  emailVerified?: Date | string | null
+  image?: string | null
+  isAdmin?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  jobProfile?: Prisma.JobProfileCreateNestedOneWithoutUserInput
+  participations?: Prisma.ParticipationCreateNestedManyWithoutUserInput
+  events?: Prisma.EventCreateNestedManyWithoutCreatedByUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  joinRequests?: Prisma.JoinRequestCreateNestedManyWithoutUserInput
+  workSchedule?: Prisma.WorkScheduleCreateNestedOneWithoutUserInput
+  scheduleExceptions?: Prisma.ScheduleExceptionCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutCustomHolidaysInput = {
+  id?: string
+  name: string
+  username: string
+  password?: string | null
+  email: string
+  emailVerified?: Date | string | null
+  image?: string | null
+  isAdmin?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  jobProfile?: Prisma.JobProfileUncheckedCreateNestedOneWithoutUserInput
+  participations?: Prisma.ParticipationUncheckedCreateNestedManyWithoutUserInput
+  events?: Prisma.EventUncheckedCreateNestedManyWithoutCreatedByUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  joinRequests?: Prisma.JoinRequestUncheckedCreateNestedManyWithoutUserInput
+  workSchedule?: Prisma.WorkScheduleUncheckedCreateNestedOneWithoutUserInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutCustomHolidaysInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCustomHolidaysInput, Prisma.UserUncheckedCreateWithoutCustomHolidaysInput>
+}
+
+export type UserUpsertWithoutCustomHolidaysInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCustomHolidaysInput, Prisma.UserUncheckedUpdateWithoutCustomHolidaysInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCustomHolidaysInput, Prisma.UserUncheckedCreateWithoutCustomHolidaysInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCustomHolidaysInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCustomHolidaysInput, Prisma.UserUncheckedUpdateWithoutCustomHolidaysInput>
+}
+
+export type UserUpdateWithoutCustomHolidaysInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  jobProfile?: Prisma.JobProfileUpdateOneWithoutUserNestedInput
+  participations?: Prisma.ParticipationUpdateManyWithoutUserNestedInput
+  events?: Prisma.EventUpdateManyWithoutCreatedByUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  joinRequests?: Prisma.JoinRequestUpdateManyWithoutUserNestedInput
+  workSchedule?: Prisma.WorkScheduleUpdateOneWithoutUserNestedInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCustomHolidaysInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  jobProfile?: Prisma.JobProfileUncheckedUpdateOneWithoutUserNestedInput
+  participations?: Prisma.ParticipationUncheckedUpdateManyWithoutUserNestedInput
+  events?: Prisma.EventUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  joinRequests?: Prisma.JoinRequestUncheckedUpdateManyWithoutUserNestedInput
+  workSchedule?: Prisma.WorkScheduleUncheckedUpdateOneWithoutUserNestedInput
+  scheduleExceptions?: Prisma.ScheduleExceptionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -1243,6 +1702,8 @@ export type UserCountOutputType = {
   events: number
   notifications: number
   joinRequests: number
+  scheduleExceptions: number
+  customHolidays: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1252,6 +1713,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   events?: boolean | UserCountOutputTypeCountEventsArgs
   notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
   joinRequests?: boolean | UserCountOutputTypeCountJoinRequestsArgs
+  scheduleExceptions?: boolean | UserCountOutputTypeCountScheduleExceptionsArgs
+  customHolidays?: boolean | UserCountOutputTypeCountCustomHolidaysArgs
 }
 
 /**
@@ -1306,6 +1769,20 @@ export type UserCountOutputTypeCountJoinRequestsArgs<ExtArgs extends runtime.Typ
   where?: Prisma.JoinRequestWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountScheduleExceptionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ScheduleExceptionWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCustomHolidaysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CustomHolidayWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1325,6 +1802,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   events?: boolean | Prisma.User$eventsArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   joinRequests?: boolean | Prisma.User$joinRequestsArgs<ExtArgs>
+  workSchedule?: boolean | Prisma.User$workScheduleArgs<ExtArgs>
+  scheduleExceptions?: boolean | Prisma.User$scheduleExceptionsArgs<ExtArgs>
+  customHolidays?: boolean | Prisma.User$customHolidaysArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1376,6 +1856,9 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   events?: boolean | Prisma.User$eventsArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   joinRequests?: boolean | Prisma.User$joinRequestsArgs<ExtArgs>
+  workSchedule?: boolean | Prisma.User$workScheduleArgs<ExtArgs>
+  scheduleExceptions?: boolean | Prisma.User$scheduleExceptionsArgs<ExtArgs>
+  customHolidays?: boolean | Prisma.User$customHolidaysArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1391,6 +1874,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     events: Prisma.$EventPayload<ExtArgs>[]
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
     joinRequests: Prisma.$JoinRequestPayload<ExtArgs>[]
+    workSchedule: Prisma.$WorkSchedulePayload<ExtArgs> | null
+    scheduleExceptions: Prisma.$ScheduleExceptionPayload<ExtArgs>[]
+    customHolidays: Prisma.$CustomHolidayPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1804,6 +2290,9 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   events<T extends Prisma.User$eventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$eventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   joinRequests<T extends Prisma.User$joinRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$joinRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JoinRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  workSchedule<T extends Prisma.User$workScheduleArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$workScheduleArgs<ExtArgs>>): Prisma.Prisma__WorkScheduleClient<runtime.Types.Result.GetResult<Prisma.$WorkSchedulePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  scheduleExceptions<T extends Prisma.User$scheduleExceptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$scheduleExceptionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ScheduleExceptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  customHolidays<T extends Prisma.User$customHolidaysArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$customHolidaysArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CustomHolidayPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2396,6 +2885,73 @@ export type User$joinRequestsArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.JoinRequestScalarFieldEnum | Prisma.JoinRequestScalarFieldEnum[]
+}
+
+/**
+ * User.workSchedule
+ */
+export type User$workScheduleArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WorkSchedule
+   */
+  select?: Prisma.WorkScheduleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the WorkSchedule
+   */
+  omit?: Prisma.WorkScheduleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WorkScheduleInclude<ExtArgs> | null
+  where?: Prisma.WorkScheduleWhereInput
+}
+
+/**
+ * User.scheduleExceptions
+ */
+export type User$scheduleExceptionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ScheduleException
+   */
+  select?: Prisma.ScheduleExceptionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ScheduleException
+   */
+  omit?: Prisma.ScheduleExceptionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ScheduleExceptionInclude<ExtArgs> | null
+  where?: Prisma.ScheduleExceptionWhereInput
+  orderBy?: Prisma.ScheduleExceptionOrderByWithRelationInput | Prisma.ScheduleExceptionOrderByWithRelationInput[]
+  cursor?: Prisma.ScheduleExceptionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ScheduleExceptionScalarFieldEnum | Prisma.ScheduleExceptionScalarFieldEnum[]
+}
+
+/**
+ * User.customHolidays
+ */
+export type User$customHolidaysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CustomHoliday
+   */
+  select?: Prisma.CustomHolidaySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CustomHoliday
+   */
+  omit?: Prisma.CustomHolidayOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CustomHolidayInclude<ExtArgs> | null
+  where?: Prisma.CustomHolidayWhereInput
+  orderBy?: Prisma.CustomHolidayOrderByWithRelationInput | Prisma.CustomHolidayOrderByWithRelationInput[]
+  cursor?: Prisma.CustomHolidayWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CustomHolidayScalarFieldEnum | Prisma.CustomHolidayScalarFieldEnum[]
 }
 
 /**

@@ -48,9 +48,16 @@ export default function MembersList({
   const kickMember = useKickMember();
   const existingUserIds = participants.map((p) => p.userId);
   const isOwner = group?.ownerId === currentUserId;
+  const isMemberOfGroup =
+    isOwner || participants.some((p) => p.userId === currentUserId);
   const canKick = isOwner || isAdmin;
+  // Non-members cannot invite at all; members need isMemberInviteAllowed
   const canInvite =
-    isOwner || isAdmin || (group?.isMemberInviteAllowed ?? true);
+    isAdmin ||
+    isOwner ||
+    (isMemberOfGroup && (group?.isMemberInviteAllowed ?? false));
+  // Only the owner or admin may directly add (bypass invite flow)
+  const canDirectAdd = isOwner || isAdmin;
 
   const handleKick = (userId: string, name: string) => {
     kickMember.mutate(
@@ -73,6 +80,7 @@ export default function MembersList({
             <AddMemberPopover
               participationId={participationId}
               existingUserIds={existingUserIds}
+              canDirectAdd={canDirectAdd}
             />
           )}
         </div>

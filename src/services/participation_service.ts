@@ -35,6 +35,9 @@ const participationService = {
 
   delete: (id: string) => axios.delete(`/api/participations/${id}`),
 
+  update: (id: string, data: { from?: Date | string; to?: Date | string }) =>
+    axios.patch(`/api/participations/${id}`, data),
+
   getImages: (participationId: string) =>
     axios.get<ApiOk<ParticipationImageDTO[]>>(
       `/api/participations/${participationId}/images`,
@@ -71,6 +74,22 @@ const participationService = {
       { userId },
     ),
 
+  inviteMember: (participationId: string, userId: string) =>
+    axios.post<ApiOk<{ message: string }>>(
+      `/api/participations/${participationId}/invite`,
+      { userId },
+    ),
+
+  acceptInvite: (participationId: string, notificationId?: string) =>
+    axios.post<ApiOk<Participation>>(
+      `/api/participations/${participationId}/invite/accept`,
+      { notificationId },
+    ),
+  declineInvite: (participationId: string, notificationId?: string) =>
+    axios.post<ApiOk<{ message: string }>>(
+      `/api/participations/${participationId}/invite/decline`,
+      { notificationId },
+    ),
   // ─── Group Settings ──────────────────────────────────────────────
 
   getSettings: (participationId: string) =>

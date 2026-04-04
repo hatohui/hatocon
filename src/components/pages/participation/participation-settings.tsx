@@ -131,6 +131,15 @@ export default function ParticipationSettings({
               onToggle={(v) => handleToggle("isMemberListPublicVisible", v)}
               disabled={updateSettings.isPending}
             />
+            <Separator />
+            <SettingToggle
+              id="isMediaPublicVisible"
+              label="Public media visibility"
+              description="Non-members can view the photos and media gallery"
+              checked={group.isMediaPublicVisible}
+              onToggle={(v) => handleToggle("isMediaPublicVisible", v)}
+              disabled={updateSettings.isPending}
+            />
           </CardContent>
         </Card>
       )}

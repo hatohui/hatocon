@@ -20,8 +20,20 @@ export type HolidayModel = runtime.Types.Result.DefaultSelection<Prisma.$Holiday
 
 export type AggregateHoliday = {
   _count: HolidayCountAggregateOutputType | null
+  _avg: HolidayAvgAggregateOutputType | null
+  _sum: HolidaySumAggregateOutputType | null
   _min: HolidayMinAggregateOutputType | null
   _max: HolidayMaxAggregateOutputType | null
+}
+
+export type HolidayAvgAggregateOutputType = {
+  lunarMonth: number | null
+  lunarDay: number | null
+}
+
+export type HolidaySumAggregateOutputType = {
+  lunarMonth: number | null
+  lunarDay: number | null
 }
 
 export type HolidayMinAggregateOutputType = {
@@ -30,6 +42,10 @@ export type HolidayMinAggregateOutputType = {
   description: string | null
   country: string | null
   isGlobal: boolean | null
+  isRecurring: boolean | null
+  isLunar: boolean | null
+  lunarMonth: number | null
+  lunarDay: number | null
 }
 
 export type HolidayMaxAggregateOutputType = {
@@ -38,6 +54,10 @@ export type HolidayMaxAggregateOutputType = {
   description: string | null
   country: string | null
   isGlobal: boolean | null
+  isRecurring: boolean | null
+  isLunar: boolean | null
+  lunarMonth: number | null
+  lunarDay: number | null
 }
 
 export type HolidayCountAggregateOutputType = {
@@ -46,9 +66,23 @@ export type HolidayCountAggregateOutputType = {
   description: number
   country: number
   isGlobal: number
+  isRecurring: number
+  isLunar: number
+  lunarMonth: number
+  lunarDay: number
   _all: number
 }
 
+
+export type HolidayAvgAggregateInputType = {
+  lunarMonth?: true
+  lunarDay?: true
+}
+
+export type HolidaySumAggregateInputType = {
+  lunarMonth?: true
+  lunarDay?: true
+}
 
 export type HolidayMinAggregateInputType = {
   id?: true
@@ -56,6 +90,10 @@ export type HolidayMinAggregateInputType = {
   description?: true
   country?: true
   isGlobal?: true
+  isRecurring?: true
+  isLunar?: true
+  lunarMonth?: true
+  lunarDay?: true
 }
 
 export type HolidayMaxAggregateInputType = {
@@ -64,6 +102,10 @@ export type HolidayMaxAggregateInputType = {
   description?: true
   country?: true
   isGlobal?: true
+  isRecurring?: true
+  isLunar?: true
+  lunarMonth?: true
+  lunarDay?: true
 }
 
 export type HolidayCountAggregateInputType = {
@@ -72,6 +114,10 @@ export type HolidayCountAggregateInputType = {
   description?: true
   country?: true
   isGlobal?: true
+  isRecurring?: true
+  isLunar?: true
+  lunarMonth?: true
+  lunarDay?: true
   _all?: true
 }
 
@@ -113,6 +159,18 @@ export type HolidayAggregateArgs<ExtArgs extends runtime.Types.Extensions.Intern
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: HolidayAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: HolidaySumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: HolidayMinAggregateInputType
@@ -143,6 +201,8 @@ export type HolidayGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   _count?: HolidayCountAggregateInputType | true
+  _avg?: HolidayAvgAggregateInputType
+  _sum?: HolidaySumAggregateInputType
   _min?: HolidayMinAggregateInputType
   _max?: HolidayMaxAggregateInputType
 }
@@ -153,7 +213,13 @@ export type HolidayGroupByOutputType = {
   description: string | null
   country: string | null
   isGlobal: boolean
+  isRecurring: boolean
+  isLunar: boolean
+  lunarMonth: number | null
+  lunarDay: number | null
   _count: HolidayCountAggregateOutputType | null
+  _avg: HolidayAvgAggregateOutputType | null
+  _sum: HolidaySumAggregateOutputType | null
   _min: HolidayMinAggregateOutputType | null
   _max: HolidayMaxAggregateOutputType | null
 }
@@ -182,6 +248,10 @@ export type HolidayWhereInput = {
   description?: Prisma.StringNullableFilter<"Holiday"> | string | null
   country?: Prisma.StringNullableFilter<"Holiday"> | string | null
   isGlobal?: Prisma.BoolFilter<"Holiday"> | boolean
+  isRecurring?: Prisma.BoolFilter<"Holiday"> | boolean
+  isLunar?: Prisma.BoolFilter<"Holiday"> | boolean
+  lunarMonth?: Prisma.IntNullableFilter<"Holiday"> | number | null
+  lunarDay?: Prisma.IntNullableFilter<"Holiday"> | number | null
 }
 
 export type HolidayOrderByWithRelationInput = {
@@ -190,6 +260,10 @@ export type HolidayOrderByWithRelationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   country?: Prisma.SortOrderInput | Prisma.SortOrder
   isGlobal?: Prisma.SortOrder
+  isRecurring?: Prisma.SortOrder
+  isLunar?: Prisma.SortOrder
+  lunarMonth?: Prisma.SortOrderInput | Prisma.SortOrder
+  lunarDay?: Prisma.SortOrderInput | Prisma.SortOrder
 }
 
 export type HolidayWhereUniqueInput = Prisma.AtLeast<{
@@ -201,6 +275,10 @@ export type HolidayWhereUniqueInput = Prisma.AtLeast<{
   description?: Prisma.StringNullableFilter<"Holiday"> | string | null
   country?: Prisma.StringNullableFilter<"Holiday"> | string | null
   isGlobal?: Prisma.BoolFilter<"Holiday"> | boolean
+  isRecurring?: Prisma.BoolFilter<"Holiday"> | boolean
+  isLunar?: Prisma.BoolFilter<"Holiday"> | boolean
+  lunarMonth?: Prisma.IntNullableFilter<"Holiday"> | number | null
+  lunarDay?: Prisma.IntNullableFilter<"Holiday"> | number | null
 }, "id">
 
 export type HolidayOrderByWithAggregationInput = {
@@ -209,9 +287,15 @@ export type HolidayOrderByWithAggregationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   country?: Prisma.SortOrderInput | Prisma.SortOrder
   isGlobal?: Prisma.SortOrder
+  isRecurring?: Prisma.SortOrder
+  isLunar?: Prisma.SortOrder
+  lunarMonth?: Prisma.SortOrderInput | Prisma.SortOrder
+  lunarDay?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.HolidayCountOrderByAggregateInput
+  _avg?: Prisma.HolidayAvgOrderByAggregateInput
   _max?: Prisma.HolidayMaxOrderByAggregateInput
   _min?: Prisma.HolidayMinOrderByAggregateInput
+  _sum?: Prisma.HolidaySumOrderByAggregateInput
 }
 
 export type HolidayScalarWhereWithAggregatesInput = {
@@ -223,6 +307,10 @@ export type HolidayScalarWhereWithAggregatesInput = {
   description?: Prisma.StringNullableWithAggregatesFilter<"Holiday"> | string | null
   country?: Prisma.StringNullableWithAggregatesFilter<"Holiday"> | string | null
   isGlobal?: Prisma.BoolWithAggregatesFilter<"Holiday"> | boolean
+  isRecurring?: Prisma.BoolWithAggregatesFilter<"Holiday"> | boolean
+  isLunar?: Prisma.BoolWithAggregatesFilter<"Holiday"> | boolean
+  lunarMonth?: Prisma.IntNullableWithAggregatesFilter<"Holiday"> | number | null
+  lunarDay?: Prisma.IntNullableWithAggregatesFilter<"Holiday"> | number | null
 }
 
 export type HolidayCreateInput = {
@@ -231,6 +319,10 @@ export type HolidayCreateInput = {
   description?: string | null
   country?: string | null
   isGlobal?: boolean
+  isRecurring?: boolean
+  isLunar?: boolean
+  lunarMonth?: number | null
+  lunarDay?: number | null
 }
 
 export type HolidayUncheckedCreateInput = {
@@ -239,6 +331,10 @@ export type HolidayUncheckedCreateInput = {
   description?: string | null
   country?: string | null
   isGlobal?: boolean
+  isRecurring?: boolean
+  isLunar?: boolean
+  lunarMonth?: number | null
+  lunarDay?: number | null
 }
 
 export type HolidayUpdateInput = {
@@ -247,6 +343,10 @@ export type HolidayUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isGlobal?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLunar?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lunarMonth?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lunarDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type HolidayUncheckedUpdateInput = {
@@ -255,6 +355,10 @@ export type HolidayUncheckedUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isGlobal?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLunar?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lunarMonth?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lunarDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type HolidayCreateManyInput = {
@@ -263,6 +367,10 @@ export type HolidayCreateManyInput = {
   description?: string | null
   country?: string | null
   isGlobal?: boolean
+  isRecurring?: boolean
+  isLunar?: boolean
+  lunarMonth?: number | null
+  lunarDay?: number | null
 }
 
 export type HolidayUpdateManyMutationInput = {
@@ -271,6 +379,10 @@ export type HolidayUpdateManyMutationInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isGlobal?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLunar?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lunarMonth?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lunarDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type HolidayUncheckedUpdateManyInput = {
@@ -279,6 +391,10 @@ export type HolidayUncheckedUpdateManyInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isGlobal?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLunar?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lunarMonth?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lunarDay?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type HolidayCountOrderByAggregateInput = {
@@ -287,6 +403,15 @@ export type HolidayCountOrderByAggregateInput = {
   description?: Prisma.SortOrder
   country?: Prisma.SortOrder
   isGlobal?: Prisma.SortOrder
+  isRecurring?: Prisma.SortOrder
+  isLunar?: Prisma.SortOrder
+  lunarMonth?: Prisma.SortOrder
+  lunarDay?: Prisma.SortOrder
+}
+
+export type HolidayAvgOrderByAggregateInput = {
+  lunarMonth?: Prisma.SortOrder
+  lunarDay?: Prisma.SortOrder
 }
 
 export type HolidayMaxOrderByAggregateInput = {
@@ -295,6 +420,10 @@ export type HolidayMaxOrderByAggregateInput = {
   description?: Prisma.SortOrder
   country?: Prisma.SortOrder
   isGlobal?: Prisma.SortOrder
+  isRecurring?: Prisma.SortOrder
+  isLunar?: Prisma.SortOrder
+  lunarMonth?: Prisma.SortOrder
+  lunarDay?: Prisma.SortOrder
 }
 
 export type HolidayMinOrderByAggregateInput = {
@@ -303,6 +432,15 @@ export type HolidayMinOrderByAggregateInput = {
   description?: Prisma.SortOrder
   country?: Prisma.SortOrder
   isGlobal?: Prisma.SortOrder
+  isRecurring?: Prisma.SortOrder
+  isLunar?: Prisma.SortOrder
+  lunarMonth?: Prisma.SortOrder
+  lunarDay?: Prisma.SortOrder
+}
+
+export type HolidaySumOrderByAggregateInput = {
+  lunarMonth?: Prisma.SortOrder
+  lunarDay?: Prisma.SortOrder
 }
 
 
@@ -313,6 +451,10 @@ export type HolidaySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   description?: boolean
   country?: boolean
   isGlobal?: boolean
+  isRecurring?: boolean
+  isLunar?: boolean
+  lunarMonth?: boolean
+  lunarDay?: boolean
 }, ExtArgs["result"]["holiday"]>
 
 export type HolidaySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -321,6 +463,10 @@ export type HolidaySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   description?: boolean
   country?: boolean
   isGlobal?: boolean
+  isRecurring?: boolean
+  isLunar?: boolean
+  lunarMonth?: boolean
+  lunarDay?: boolean
 }, ExtArgs["result"]["holiday"]>
 
 export type HolidaySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -329,6 +475,10 @@ export type HolidaySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   description?: boolean
   country?: boolean
   isGlobal?: boolean
+  isRecurring?: boolean
+  isLunar?: boolean
+  lunarMonth?: boolean
+  lunarDay?: boolean
 }, ExtArgs["result"]["holiday"]>
 
 export type HolidaySelectScalar = {
@@ -337,9 +487,13 @@ export type HolidaySelectScalar = {
   description?: boolean
   country?: boolean
   isGlobal?: boolean
+  isRecurring?: boolean
+  isLunar?: boolean
+  lunarMonth?: boolean
+  lunarDay?: boolean
 }
 
-export type HolidayOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "date" | "description" | "country" | "isGlobal", ExtArgs["result"]["holiday"]>
+export type HolidayOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "date" | "description" | "country" | "isGlobal" | "isRecurring" | "isLunar" | "lunarMonth" | "lunarDay", ExtArgs["result"]["holiday"]>
 
 export type $HolidayPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Holiday"
@@ -350,6 +504,10 @@ export type $HolidayPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     description: string | null
     country: string | null
     isGlobal: boolean
+    isRecurring: boolean
+    isLunar: boolean
+    lunarMonth: number | null
+    lunarDay: number | null
   }, ExtArgs["result"]["holiday"]>
   composites: {}
 }
@@ -778,6 +936,10 @@ export interface HolidayFieldRefs {
   readonly description: Prisma.FieldRef<"Holiday", 'String'>
   readonly country: Prisma.FieldRef<"Holiday", 'String'>
   readonly isGlobal: Prisma.FieldRef<"Holiday", 'Boolean'>
+  readonly isRecurring: Prisma.FieldRef<"Holiday", 'Boolean'>
+  readonly isLunar: Prisma.FieldRef<"Holiday", 'Boolean'>
+  readonly lunarMonth: Prisma.FieldRef<"Holiday", 'Int'>
+  readonly lunarDay: Prisma.FieldRef<"Holiday", 'Int'>
 }
     
 

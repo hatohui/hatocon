@@ -10,6 +10,7 @@ import {
   eachDayOfInterval,
   format,
   isSameDay,
+  isAfter,
   startOfMonth,
   endOfMonth,
   addMonths,
@@ -18,17 +19,22 @@ import {
   ArrowLeft,
   Calendar,
   Camera,
+  ChevronRight,
   Clock,
   ExternalLink,
   ImageIcon,
+  Link2,
+  Mail,
   MapPin,
+  Pencil,
   Plane,
   Trash2,
+  UserCheck,
+  UserX,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,7 +45,13 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -49,29 +61,20 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 
 import {
   useParticipationById,
-  useDeleteParticipation,
   useUploadParticipationImage,
   useDeleteParticipationImage,
+  useUpdateParticipationDates,
+  useAcceptInvite,
+  useDeclineInvite,
 } from "@/hooks/participations/useParticipations";
+import { useNotifications } from "@/hooks/notifications/useNotifications";
 import { useActivities } from "@/hooks/activities/useActivities";
+import { useUpdateGroupSettings } from "@/hooks/participations/useParticipationGroup";
 import { cn } from "@/lib/utils";
-import ActivityTimeline, {
-  ActivityOverviewSection,
-} from "@/components/pages/participation/activity-timeline";
+import ActivityTimeline from "@/components/pages/participation/activity-timeline";
 import MediaGallery from "@/components/pages/participation/media-gallery";
 import ParticipationSettings from "@/components/pages/participation/participation-settings";
 import MembersList from "@/components/pages/participation/members-list";
@@ -89,12 +92,72 @@ const LEAVE_DOT_COLOURS: Record<string, string> = {
   UNPAID: "bg-gray-500",
 };
 
-function initials(name: string) {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase();
+// ─── Edit Group Name Dialog ──────────────────────────────────────────────────
+
+function EditGroupNameDialog({
+  participationId,
+  currentName,
+  open,
+  onOpenChange,
+}: {
+  participationId: string;
+  currentName: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const [name, setName] = useState(currentName);
+  const updateSettings = useUpdateGroupSettings();
+
+  const handleSave = () => {
+    if (!name.trim()) return;
+    updateSettings.mutate(
+      { participationId, data: { name: name.trim() } },
+      {
+        onSuccess: () => {
+          toast.success("Name updated");
+          onOpenChange(false);
+        },
+        onError: () => toast.error("Failed to update name"),
+      },
+    );
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Rename plan</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 pt-2">
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Plan name"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSave();
+            }}
+            autoFocus
+          />
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onOpenChange(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleSave}
+              disabled={!name.trim() || updateSettings.isPending}
+            >
+              Save
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 // ─── Photo Gallery ───────────────────────────────────────────────────────────
@@ -102,9 +165,11 @@ function initials(name: string) {
 function PhotoGallery({
   images,
   participationId,
+  onViewAll,
 }: {
   images: { id: string; url: string; caption?: string | null }[];
   participationId: string;
+  onViewAll: () => void;
 }) {
   const [lightbox, setLightbox] = useState<string | null>(null);
   const uploadMutation = useUploadParticipationImage();
@@ -146,10 +211,8 @@ function PhotoGallery({
                 />
               </label>
             </Button>
-            <Button size="sm" variant="ghost" asChild>
-              <Link href={`/participations/${participationId}/gallery`}>
-                Open Gallery
-              </Link>
+            <Button size="sm" variant="ghost" onClick={onViewAll}>
+              Open Gallery
             </Button>
           </div>
         </CardContent>
@@ -163,12 +226,13 @@ function PhotoGallery({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <h3 className="text-sm font-semibold">Photos ({images.length})</h3>
-            <Link
-              href={`/participations/${participationId}/gallery`}
+            <button
+              type="button"
+              onClick={onViewAll}
               className="text-xs text-primary hover:underline"
             >
               View all →
-            </Link>
+            </button>
           </div>
           <Button size="sm" variant="outline" asChild>
             <label className="cursor-pointer">
@@ -184,56 +248,58 @@ function PhotoGallery({
             </label>
           </Button>
         </div>
-        <Carousel className="w-full" opts={{ align: "start", loop: false }}>
-          <CarouselContent className="-ml-2">
-            {images.map((img) => (
-              <CarouselItem
-                key={img.id}
-                className="pl-2 basis-1/2 sm:basis-1/3 md:basis-1/4"
-              >
-                <div className="group relative">
-                  <button
-                    type="button"
-                    className="w-full"
-                    onClick={() => setLightbox(img.url)}
-                  >
-                    <Image
-                      src={img.url}
-                      alt={img.caption || "Trip photo"}
-                      width={300}
-                      height={300}
-                      className="aspect-square rounded-lg object-cover"
-                    />
-                  </button>
-                  <Button
-                    size="icon"
-                    variant="destructive"
-                    className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={() =>
-                      deleteMutation.mutate({
-                        participationId,
-                        imageId: img.id,
-                      })
-                    }
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
-                  {img.caption && (
-                    <p className="text-xs text-muted-foreground mt-1 truncate">
-                      {img.caption}
-                    </p>
-                  )}
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          {images.length > 3 && (
-            <>
-              <CarouselPrevious />
-              <CarouselNext />
-            </>
-          )}
-        </Carousel>
+        <div className="relative px-8">
+          <Carousel className="w-full" opts={{ align: "start", loop: false }}>
+            <CarouselContent className="-ml-2">
+              {images.map((img) => (
+                <CarouselItem
+                  key={img.id}
+                  className="pl-2 basis-1/2 sm:basis-1/3 md:basis-1/4"
+                >
+                  <div className="group relative">
+                    <button
+                      type="button"
+                      className="w-full"
+                      onClick={() => setLightbox(img.url)}
+                    >
+                      <Image
+                        src={img.url}
+                        alt={img.caption || "Trip photo"}
+                        width={300}
+                        height={300}
+                        className="aspect-square rounded-lg object-cover"
+                      />
+                    </button>
+                    <Button
+                      size="icon"
+                      variant="destructive"
+                      className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() =>
+                        deleteMutation.mutate({
+                          participationId,
+                          imageId: img.id,
+                        })
+                      }
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                    {img.caption && (
+                      <p className="text-xs text-muted-foreground mt-1 truncate">
+                        {img.caption}
+                      </p>
+                    )}
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            {images.length > 3 && (
+              <>
+                <CarouselPrevious />
+                <CarouselNext />
+              </>
+            )}
+          </Carousel>
+        </div>
       </div>
 
       {/* Lightbox */}
@@ -347,9 +413,6 @@ function ParticipationCalendar({
                     <div
                       className={cn(
                         "h-8 flex items-center justify-center text-xs relative",
-                        isLeave && LEAVE_DOT_COLOURS[leaveType]
-                          ? `${LEAVE_DOT_COLOURS[leaveType].replace("bg-", "bg-")}/15`
-                          : "",
                         isLeave && "font-semibold",
                         isStart && "rounded-l-md",
                         isEnd && "rounded-r-md",
@@ -393,145 +456,252 @@ function ParticipationCalendar({
   );
 }
 
-// ─── Schedule Timeline View ──────────────────────────────────────────────────
+// ─── Upcoming Activities ─────────────────────────────────────────────────────
 
-function ScheduleTimeline({
+type UpcomingEntry = {
+  id: string;
+  name: string;
+  from: Date | string;
+  location?: string | null;
+  /** "__arriving" | "__departing" | "__event_start" | "__event_end" | falsy */
+  syntheticKind: string | false;
+};
+
+function UpcomingActivities({
   participationId,
-  from,
-  to,
-  leaveType,
+  participationFrom,
+  participationTo,
+  participantUser,
+  currentUserId,
+  isOwner,
   event,
+  onViewAll,
 }: {
   participationId: string;
-  from: Date;
-  to: Date;
-  leaveType: string;
-  event: {
+  participationFrom: Date | string;
+  participationTo: Date | string;
+  participantUser?: { id: string; name: string };
+  currentUserId?: string;
+  isOwner: boolean;
+  event?: {
     title: string;
     startAt: Date | string;
     endAt: Date | string;
-    location?: string | null;
+    location: string | null;
   } | null;
+  onViewAll: () => void;
 }) {
-  const start = new Date(from);
-  const end = new Date(to);
-  const totalDays = differenceInCalendarDays(end, start) + 1;
-  const { data: activities } = useActivities(participationId);
+  const { data: activities, isLoading } = useActivities(participationId);
+  const updateDates = useUpdateParticipationDates();
+  // which date field is being edited: "from" (arrival) | "to" (departure) | null
+  const [editingField, setEditingField] = useState<"from" | "to" | null>(null);
+  const [editValue, setEditValue] = useState("");
+  const now = new Date();
 
-  type LogItem = {
-    id: string;
-    from: Date;
-    name: string;
-    isSynthetic?: boolean;
+  const isOwnParticipation =
+    !participantUser || participantUser.id === currentUserId;
+  const arrivalName = isOwnParticipation
+    ? "You arrive"
+    : `${participantUser!.name} arrives`;
+  const departureName = isOwnParticipation
+    ? "You depart"
+    : `${participantUser!.name} departs`;
+
+  const openEdit = (field: "from" | "to") => {
+    const current = field === "from" ? participationFrom : participationTo;
+    setEditValue(format(new Date(current), "yyyy-MM-dd'T'HH:mm"));
+    setEditingField(field);
   };
 
-  const items: LogItem[] = [
+  const handleSave = () => {
+    if (!editingField || !editValue) return;
+    const newDate = new Date(editValue).toISOString();
+    updateDates.mutate(
+      {
+        id: participationId,
+        data: { [editingField]: newDate },
+      },
+      {
+        onSuccess: () => {
+          toast.success(
+            editingField === "from"
+              ? "Arrival time updated"
+              : "Departure time updated",
+          );
+          setEditingField(null);
+        },
+        onError: () => toast.error("Failed to update"),
+      },
+    );
+  };
+
+  const syntheticEntries: UpcomingEntry[] = [
+    {
+      id: "__arriving",
+      name: arrivalName,
+      from: participationFrom,
+      syntheticKind: "__arriving",
+    },
+    {
+      id: "__departing",
+      name: departureName,
+      from: participationTo,
+      syntheticKind: "__departing",
+    },
     ...(event
       ? [
           {
-            id: "event-start",
-            from: new Date(event.startAt),
-            name: `${event.title} – Starts`,
-            isSynthetic: true,
+            id: "__event_start",
+            name: `${event.title} starts`,
+            from: event.startAt,
+            location: event.location,
+            syntheticKind: "__event_start",
           },
           {
-            id: "event-end",
-            from: new Date(event.endAt),
-            name: `${event.title} – Ends`,
-            isSynthetic: true,
+            id: "__event_end",
+            name: `${event.title} ends`,
+            from: event.endAt,
+            location: event.location,
+            syntheticKind: "__event_end",
           },
         ]
       : []),
-    ...(activities ?? []).map((a) => ({
-      id: a.id,
-      from: new Date(a.from),
-      name: a.name,
-    })),
-  ].sort((a, b) => a.from.getTime() - b.from.getTime());
+  ];
+
+  const activityEntries: UpcomingEntry[] = (activities ?? []).map((a) => ({
+    id: a.id,
+    name: a.name,
+    from: a.from,
+    location: a.location,
+    syntheticKind: false,
+  }));
+
+  const upcoming = [...syntheticEntries, ...activityEntries]
+    .filter((a) => isAfter(new Date(a.from), now))
+    .sort((a, b) => new Date(a.from).getTime() - new Date(b.from).getTime())
+    .slice(0, 5);
+
+  const isEditable = (kind: string | false) =>
+    isOwner && (kind === "__arriving" || kind === "__departing");
 
   return (
-    <Card>
-      <CardContent className="p-4 space-y-4">
-        {/* Progress bar */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>{format(start, "MMM d, yyyy")}</span>
-            <span>
-              {totalDays} {totalDays === 1 ? "day" : "days"}
-            </span>
-            <span>{format(end, "MMM d, yyyy")}</span>
+    <>
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm">Upcoming Activities</CardTitle>
+            <button
+              type="button"
+              onClick={onViewAll}
+              className="text-xs text-primary hover:underline flex items-center gap-0.5"
+            >
+              View all
+              <ChevronRight className="h-3 w-3" />
+            </button>
           </div>
-          <div className="h-2 rounded-full bg-muted overflow-hidden">
-            {(() => {
-              const now = new Date();
-              if (now < start) return <div className="h-full w-0" />;
-              if (now > end)
-                return (
-                  <div className="h-full w-full rounded-full bg-primary" />
-                );
-              const elapsed = differenceInCalendarDays(now, start) + 1;
-              const pct = Math.min(100, (elapsed / totalDays) * 100);
-              return (
-                <div
-                  className="h-full rounded-full bg-primary transition-all"
-                  style={{ width: `${pct}%` }}
-                />
-              );
-            })()}
-          </div>
-        </div>
-
-        <Separator />
-
-        {/* Activity log */}
-        {items.length === 0 ? (
-          <p className="text-xs text-muted-foreground text-center py-2">
-            No activities yet
-          </p>
-        ) : (
-          <div className="space-y-0 max-h-64 overflow-y-auto">
-            {items.map((item) => {
-              const isPast = item.from < new Date();
-              return (
-                <div
-                  key={item.id}
-                  className={cn(
-                    "flex items-center gap-3 px-2 py-1.5 rounded-md text-xs",
-                    isPast && !item.isSynthetic && "text-muted-foreground",
-                    item.isSynthetic && "text-muted-foreground",
-                  )}
-                >
-                  <span className="shrink-0 w-18 tabular-nums font-mono">
-                    {format(item.from, "MMM d")}
-                  </span>
-                  <span className="shrink-0 w-10 tabular-nums text-muted-foreground">
-                    {format(item.from, "HH:mm")}
-                  </span>
-                  {item.isSynthetic ? (
-                    <Plane className="h-2.5 w-2.5 shrink-0 text-muted-foreground" />
-                  ) : (
-                    <div
-                      className={cn(
-                        "h-1.5 w-1.5 rounded-full shrink-0",
-                        LEAVE_DOT_COLOURS[leaveType] ?? "bg-gray-400",
-                      )}
-                    />
-                  )}
-                  <span
-                    className={cn(
-                      "flex-1 truncate",
-                      !item.isSynthetic && "font-medium",
-                    )}
-                  >
-                    {item.name}
-                  </span>
+        </CardHeader>
+        <CardContent className="pt-0 space-y-1">
+          {isLoading && (
+            <div className="space-y-2 py-1">
+              {[1, 2].map((i) => (
+                <Skeleton key={i} className="h-10 rounded-lg" />
+              ))}
+            </div>
+          )}
+          {!isLoading && upcoming.length === 0 && (
+            <p className="text-xs text-muted-foreground text-center py-4">
+              No upcoming activities
+            </p>
+          )}
+          {!isLoading &&
+            upcoming.map((a) => (
+              <div
+                key={a.id}
+                className="group flex items-center gap-3 px-2 py-2 rounded-md hover:bg-muted/50 text-xs"
+              >
+                <div className="shrink-0 text-center w-14">
+                  <p className="font-mono tabular-nums text-muted-foreground">
+                    {format(new Date(a.from), "MMM d")}
+                  </p>
+                  <p className="font-mono tabular-nums text-muted-foreground/70">
+                    {format(new Date(a.from), "HH:mm")}
+                  </p>
                 </div>
-              );
-            })}
+                <div className="h-8 w-px bg-border shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium truncate">{a.name}</p>
+                  {a.location && (
+                    <p className="text-muted-foreground truncate flex items-center gap-1">
+                      <MapPin className="h-2.5 w-2.5 shrink-0" />
+                      {a.location}
+                    </p>
+                  )}
+                </div>
+                {a.syntheticKind && !isEditable(a.syntheticKind) && (
+                  <Badge
+                    variant="secondary"
+                    className="shrink-0 text-[10px] px-1.5 py-0 h-4 font-normal"
+                  >
+                    milestone
+                  </Badge>
+                )}
+                {isEditable(a.syntheticKind) && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="shrink-0 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground"
+                    onClick={() =>
+                      openEdit(a.syntheticKind === "__arriving" ? "from" : "to")
+                    }
+                  >
+                    <Pencil className="h-3 w-3" />
+                  </Button>
+                )}
+              </div>
+            ))}
+        </CardContent>
+      </Card>
+
+      {/* Edit arrival / departure dialog */}
+      <Dialog
+        open={editingField !== null}
+        onOpenChange={(open) => !open && setEditingField(null)}
+      >
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>
+              {editingField === "from"
+                ? "Edit arrival time"
+                : "Edit departure time"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <Input
+              type="datetime-local"
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              autoFocus
+            />
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setEditingField(null)}
+              >
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleSave}
+                disabled={!editValue || updateDates.isPending}
+              >
+                Save
+              </Button>
+            </div>
           </div>
-        )}
-      </CardContent>
-    </Card>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
@@ -542,6 +712,13 @@ export default function ParticipationDetailPage() {
   const router = useRouter();
   const session = useSession();
   const { data: participation, isLoading } = useParticipationById(params.id);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [editNameOpen, setEditNameOpen] = useState(false);
+
+  // All hooks must be declared before any early returns (rules of hooks)
+  const { data: notifications } = useNotifications();
+  const acceptInvite = useAcceptInvite();
+  const declineInvite = useDeclineInvite();
 
   if (isLoading) {
     return (
@@ -579,9 +756,120 @@ export default function ParticipationDetailPage() {
   const isOwner = session.data?.user?.id === participation.userId;
   const currentUserId = session.data?.user?.id ?? "";
   const members = participation.participants.map((p) => p.user);
+  const groupName = participation.group?.name ?? "My Plan";
+  const isGroupPublic = participation.group?.isPublic ?? false;
+  const isMediaVisible = participation.group?.isMediaPublicVisible ?? true;
+  const isActivityVisible =
+    participation.group?.isActivityPublicVisible ?? true;
+  const isMemberListVisible =
+    participation.group?.isMemberListPublicVisible ?? true;
+  const isAdmin = session.data?.user?.isAdmin ?? false;
+
+  const handleShare = () => {
+    const url = `${window.location.origin}/share/p/${params.id}`;
+    navigator.clipboard.writeText(url);
+    toast.success("Share link copied to clipboard!");
+  };
+
+  // Banner shows only for pending invites (not yet accepted/declined)
+  const pendingInviteNotification = notifications?.find(
+    (n) =>
+      n.type === "INVITED_TO_JOIN" &&
+      (n.data as { participationId?: string }).participationId === params.id,
+  );
+  // Only show the banner if the current user is NOT already a member
+  const isMemberOfGroup = participation.participants.some(
+    (p) => p.userId === currentUserId,
+  );
+  const showInviteBanner =
+    !!pendingInviteNotification && !isMemberOfGroup && !!currentUserId;
+
+  const handleBannerAccept = () => {
+    acceptInvite.mutate(
+      {
+        participationId: params.id,
+        notificationId: pendingInviteNotification?.id,
+      },
+      {
+        onSuccess: () => {
+          toast.success("Welcome! You've joined the plan.");
+        },
+        onError: (err: unknown) => {
+          const msg = (err as { response?: { data?: { message?: string } } })
+            ?.response?.data?.message;
+          if (msg === "ALREADY_MEMBER") {
+            toast.info("You are already a member");
+          } else {
+            toast.error("Failed to accept invitation");
+          }
+        },
+      },
+    );
+  };
+
+  const handleBannerDecline = () => {
+    declineInvite.mutate(
+      {
+        participationId: params.id,
+        notificationId: pendingInviteNotification?.id,
+      },
+      {
+        onSuccess: () => toast("Invitation declined"),
+        onError: () => toast.error("Failed to decline invitation"),
+      },
+    );
+  };
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-8 space-y-6">
+      {/* Invite banner — shown when the current user has a pending invitation */}
+      {showInviteBanner && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <Mail className="h-4 w-4 text-primary shrink-0" />
+            <div className="min-w-0">
+              <p className="text-sm font-medium leading-snug">
+                You&apos;ve been invited to join this plan
+              </p>
+              {(pendingInviteNotification?.data as { userName?: string })
+                ?.userName && (
+                <p className="text-xs text-muted-foreground">
+                  Invited by{" "}
+                  <strong>
+                    {
+                      (pendingInviteNotification?.data as { userName?: string })
+                        .userName
+                    }
+                  </strong>
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="flex gap-2 shrink-0">
+            <Button
+              size="sm"
+              variant="default"
+              className="h-7 gap-1.5 text-xs"
+              onClick={handleBannerAccept}
+              disabled={acceptInvite.isPending || declineInvite.isPending}
+            >
+              <UserCheck className="h-3.5 w-3.5" />
+              Accept
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 gap-1.5 text-xs"
+              onClick={handleBannerDecline}
+              disabled={acceptInvite.isPending || declineInvite.isPending}
+            >
+              <UserX className="h-3.5 w-3.5" />
+              Decline
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="space-y-3">
         <Button
@@ -596,9 +884,19 @@ export default function ParticipationDetailPage() {
 
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
-            <h1 className="text-2xl font-bold tracking-tight">
-              {participation.event?.title ?? "Stand-alone Leave"}
-            </h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-bold tracking-tight">{groupName}</h1>
+              {isOwner && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                  onClick={() => setEditNameOpen(true)}
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </Button>
+              )}
+            </div>
             <div className="flex flex-wrap items-center gap-2">
               <Badge
                 variant="secondary"
@@ -617,8 +915,28 @@ export default function ParticipationDetailPage() {
               </span>
             </div>
           </div>
+          {isGroupPublic && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="shrink-0 gap-1.5"
+              onClick={handleShare}
+            >
+              <Link2 className="h-4 w-4" />
+              Share
+            </Button>
+          )}
         </div>
       </div>
+
+      {isOwner && (
+        <EditGroupNameDialog
+          participationId={participation.id}
+          currentName={groupName}
+          open={editNameOpen}
+          onOpenChange={setEditNameOpen}
+        />
+      )}
 
       {/* Event info banner */}
       {participation.event && (
@@ -680,28 +998,44 @@ export default function ParticipationDetailPage() {
       )}
 
       {/* Tabs */}
-      <Tabs defaultValue="overview" className="space-y-6">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-6"
+      >
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="timeline">Timeline</TabsTrigger>
-          <TabsTrigger value="media">Media</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+          {(isMemberOfGroup || isAdmin || isActivityVisible) && (
+            <TabsTrigger value="timeline">Timeline</TabsTrigger>
+          )}
+          {(isMemberOfGroup || isMediaVisible) && (
+            <TabsTrigger value="media">Media</TabsTrigger>
+          )}
+          {isMemberOfGroup && (
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+          )}
         </TabsList>
 
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-6">
           <div className="grid gap-6 md:grid-cols-3">
             <div className="md:col-span-2 space-y-6">
-              <PhotoGallery
-                images={participation.group?.images ?? []}
+              {(isMemberOfGroup || isMediaVisible) && (
+                <PhotoGallery
+                  images={participation.group?.images ?? []}
+                  participationId={participation.id}
+                  onViewAll={() => setActiveTab("media")}
+                />
+              )}
+              <UpcomingActivities
                 participationId={participation.id}
-              />
-              <ScheduleTimeline
-                participationId={participation.id}
-                from={new Date(participation.from)}
-                to={new Date(participation.to)}
-                leaveType={participation.leaveType}
+                participationFrom={participation.from}
+                participationTo={participation.to}
+                participantUser={participation.user}
+                currentUserId={currentUserId}
+                isOwner={isOwner}
                 event={participation.event}
+                onViewAll={() => setActiveTab("timeline")}
               />
             </div>
             <div className="space-y-6">
@@ -711,14 +1045,15 @@ export default function ParticipationDetailPage() {
                 leaveType={participation.leaveType}
               />
               {participation.eventId &&
-                participation.participants.length > 0 && (
+                participation.participants.length > 0 &&
+                (isMemberOfGroup || isAdmin || isMemberListVisible) && (
                   <>
                     <MembersList
                       participants={participation.participants}
                       participationId={participation.id}
                       group={participation.group}
                       currentUserId={currentUserId}
-                      isAdmin={session.data?.user?.isAdmin ?? false}
+                      isAdmin={isAdmin}
                     />
                     <JoinRequestsPanel participationId={participation.id} />
                   </>
@@ -726,14 +1061,22 @@ export default function ParticipationDetailPage() {
             </div>
           </div>
         </TabsContent>
-        <TabsContent value="timeline">
-          <ActivityTimeline
-            participationId={participation.id}
-            isOwner={isOwner}
-            members={members}
-            event={participation.event}
-          />
-        </TabsContent>
+
+        {/* Timeline Tab */}
+        {(isMemberOfGroup || isAdmin || isActivityVisible) && (
+          <TabsContent value="timeline">
+            <ActivityTimeline
+              participationId={participation.id}
+              isOwner={isOwner}
+              participationFrom={participation.from}
+              participationTo={participation.to}
+              participantUser={participation.user}
+              currentUserId={currentUserId}
+              members={members}
+              event={participation.event}
+            />
+          </TabsContent>
+        )}
 
         {/* Media Tab */}
         <TabsContent value="media">

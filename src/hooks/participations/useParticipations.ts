@@ -139,6 +139,72 @@ const useAddParticipationMember = () => {
   });
 };
 
+const useInviteMember = () =>
+  useMutation({
+    mutationFn: ({
+      participationId,
+      userId,
+    }: {
+      participationId: string;
+      userId: string;
+    }) => participationService.inviteMember(participationId, userId),
+  });
+
+const useAcceptInvite = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      participationId,
+      notificationId,
+    }: {
+      participationId: string;
+      notificationId?: string;
+    }) => participationService.acceptInvite(participationId, notificationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["participations"] });
+      queryClient.invalidateQueries({ queryKey: ["heatmap"] });
+      queryClient.invalidateQueries({ queryKey: ["leave-balance"] });
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
+};
+
+const useDeclineInvite = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      participationId,
+      notificationId,
+    }: {
+      participationId: string;
+      notificationId?: string;
+    }) => participationService.declineInvite(participationId, notificationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
+};
+
+const useUpdateParticipationDates = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: { from?: string; to?: string };
+    }) => participationService.update(id, data),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["participation", variables.id],
+      });
+      queryClient.invalidateQueries({ queryKey: ["participations"] });
+      queryClient.invalidateQueries({ queryKey: ["heatmap"] });
+    },
+  });
+};
+
 export {
   useParticipationById,
   useHeatmap,
@@ -150,4 +216,8 @@ export {
   useDeleteParticipationImage,
   useUploadParticipationImage,
   useAddParticipationMember,
+  useInviteMember,
+  useAcceptInvite,
+  useDeclineInvite,
+  useUpdateParticipationDates,
 };

@@ -33,6 +33,7 @@ export type ParticipationGroupMinAggregateOutputType = {
   isPublic: boolean | null
   isActivityPublicVisible: boolean | null
   isMemberListPublicVisible: boolean | null
+  isMediaPublicVisible: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -46,6 +47,7 @@ export type ParticipationGroupMaxAggregateOutputType = {
   isPublic: boolean | null
   isActivityPublicVisible: boolean | null
   isMemberListPublicVisible: boolean | null
+  isMediaPublicVisible: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -59,6 +61,7 @@ export type ParticipationGroupCountAggregateOutputType = {
   isPublic: number
   isActivityPublicVisible: number
   isMemberListPublicVisible: number
+  isMediaPublicVisible: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -74,6 +77,7 @@ export type ParticipationGroupMinAggregateInputType = {
   isPublic?: true
   isActivityPublicVisible?: true
   isMemberListPublicVisible?: true
+  isMediaPublicVisible?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -87,6 +91,7 @@ export type ParticipationGroupMaxAggregateInputType = {
   isPublic?: true
   isActivityPublicVisible?: true
   isMemberListPublicVisible?: true
+  isMediaPublicVisible?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -100,6 +105,7 @@ export type ParticipationGroupCountAggregateInputType = {
   isPublic?: true
   isActivityPublicVisible?: true
   isMemberListPublicVisible?: true
+  isMediaPublicVisible?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -186,6 +192,7 @@ export type ParticipationGroupGroupByOutputType = {
   isPublic: boolean
   isActivityPublicVisible: boolean
   isMemberListPublicVisible: boolean
+  isMediaPublicVisible: boolean
   createdAt: Date
   updatedAt: Date
   _count: ParticipationGroupCountAggregateOutputType | null
@@ -220,6 +227,7 @@ export type ParticipationGroupWhereInput = {
   isPublic?: Prisma.BoolFilter<"ParticipationGroup"> | boolean
   isActivityPublicVisible?: Prisma.BoolFilter<"ParticipationGroup"> | boolean
   isMemberListPublicVisible?: Prisma.BoolFilter<"ParticipationGroup"> | boolean
+  isMediaPublicVisible?: Prisma.BoolFilter<"ParticipationGroup"> | boolean
   createdAt?: Prisma.DateTimeFilter<"ParticipationGroup"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ParticipationGroup"> | Date | string
   event?: Prisma.XOR<Prisma.EventNullableScalarRelationFilter, Prisma.EventWhereInput> | null
@@ -238,6 +246,7 @@ export type ParticipationGroupOrderByWithRelationInput = {
   isPublic?: Prisma.SortOrder
   isActivityPublicVisible?: Prisma.SortOrder
   isMemberListPublicVisible?: Prisma.SortOrder
+  isMediaPublicVisible?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   event?: Prisma.EventOrderByWithRelationInput
@@ -259,6 +268,7 @@ export type ParticipationGroupWhereUniqueInput = Prisma.AtLeast<{
   isPublic?: Prisma.BoolFilter<"ParticipationGroup"> | boolean
   isActivityPublicVisible?: Prisma.BoolFilter<"ParticipationGroup"> | boolean
   isMemberListPublicVisible?: Prisma.BoolFilter<"ParticipationGroup"> | boolean
+  isMediaPublicVisible?: Prisma.BoolFilter<"ParticipationGroup"> | boolean
   createdAt?: Prisma.DateTimeFilter<"ParticipationGroup"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ParticipationGroup"> | Date | string
   event?: Prisma.XOR<Prisma.EventNullableScalarRelationFilter, Prisma.EventWhereInput> | null
@@ -277,6 +287,7 @@ export type ParticipationGroupOrderByWithAggregationInput = {
   isPublic?: Prisma.SortOrder
   isActivityPublicVisible?: Prisma.SortOrder
   isMemberListPublicVisible?: Prisma.SortOrder
+  isMediaPublicVisible?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ParticipationGroupCountOrderByAggregateInput
@@ -296,6 +307,7 @@ export type ParticipationGroupScalarWhereWithAggregatesInput = {
   isPublic?: Prisma.BoolWithAggregatesFilter<"ParticipationGroup"> | boolean
   isActivityPublicVisible?: Prisma.BoolWithAggregatesFilter<"ParticipationGroup"> | boolean
   isMemberListPublicVisible?: Prisma.BoolWithAggregatesFilter<"ParticipationGroup"> | boolean
+  isMediaPublicVisible?: Prisma.BoolWithAggregatesFilter<"ParticipationGroup"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ParticipationGroup"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ParticipationGroup"> | Date | string
 }
@@ -308,6 +320,7 @@ export type ParticipationGroupCreateInput = {
   isPublic?: boolean
   isActivityPublicVisible?: boolean
   isMemberListPublicVisible?: boolean
+  isMediaPublicVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   event?: Prisma.EventCreateNestedOneWithoutParticipationGroupsInput
@@ -326,6 +339,7 @@ export type ParticipationGroupUncheckedCreateInput = {
   isPublic?: boolean
   isActivityPublicVisible?: boolean
   isMemberListPublicVisible?: boolean
+  isMediaPublicVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   joinRequests?: Prisma.JoinRequestUncheckedCreateNestedManyWithoutGroupInput
@@ -342,6 +356,7 @@ export type ParticipationGroupUpdateInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActivityPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isMemberListPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMediaPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   event?: Prisma.EventUpdateOneWithoutParticipationGroupsNestedInput
@@ -360,6 +375,7 @@ export type ParticipationGroupUncheckedUpdateInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActivityPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isMemberListPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMediaPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   joinRequests?: Prisma.JoinRequestUncheckedUpdateManyWithoutGroupNestedInput
@@ -377,6 +393,7 @@ export type ParticipationGroupCreateManyInput = {
   isPublic?: boolean
   isActivityPublicVisible?: boolean
   isMemberListPublicVisible?: boolean
+  isMediaPublicVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -389,6 +406,7 @@ export type ParticipationGroupUpdateManyMutationInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActivityPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isMemberListPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMediaPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -402,6 +420,7 @@ export type ParticipationGroupUncheckedUpdateManyInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActivityPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isMemberListPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMediaPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -435,6 +454,7 @@ export type ParticipationGroupCountOrderByAggregateInput = {
   isPublic?: Prisma.SortOrder
   isActivityPublicVisible?: Prisma.SortOrder
   isMemberListPublicVisible?: Prisma.SortOrder
+  isMediaPublicVisible?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -448,6 +468,7 @@ export type ParticipationGroupMaxOrderByAggregateInput = {
   isPublic?: Prisma.SortOrder
   isActivityPublicVisible?: Prisma.SortOrder
   isMemberListPublicVisible?: Prisma.SortOrder
+  isMediaPublicVisible?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -461,6 +482,7 @@ export type ParticipationGroupMinOrderByAggregateInput = {
   isPublic?: Prisma.SortOrder
   isActivityPublicVisible?: Prisma.SortOrder
   isMemberListPublicVisible?: Prisma.SortOrder
+  isMediaPublicVisible?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -573,6 +595,7 @@ export type ParticipationGroupCreateWithoutEventInput = {
   isPublic?: boolean
   isActivityPublicVisible?: boolean
   isMemberListPublicVisible?: boolean
+  isMediaPublicVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   joinRequests?: Prisma.JoinRequestCreateNestedManyWithoutGroupInput
@@ -589,6 +612,7 @@ export type ParticipationGroupUncheckedCreateWithoutEventInput = {
   isPublic?: boolean
   isActivityPublicVisible?: boolean
   isMemberListPublicVisible?: boolean
+  isMediaPublicVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   joinRequests?: Prisma.JoinRequestUncheckedCreateNestedManyWithoutGroupInput
@@ -635,6 +659,7 @@ export type ParticipationGroupScalarWhereInput = {
   isPublic?: Prisma.BoolFilter<"ParticipationGroup"> | boolean
   isActivityPublicVisible?: Prisma.BoolFilter<"ParticipationGroup"> | boolean
   isMemberListPublicVisible?: Prisma.BoolFilter<"ParticipationGroup"> | boolean
+  isMediaPublicVisible?: Prisma.BoolFilter<"ParticipationGroup"> | boolean
   createdAt?: Prisma.DateTimeFilter<"ParticipationGroup"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ParticipationGroup"> | Date | string
 }
@@ -647,6 +672,7 @@ export type ParticipationGroupCreateWithoutParticipationsInput = {
   isPublic?: boolean
   isActivityPublicVisible?: boolean
   isMemberListPublicVisible?: boolean
+  isMediaPublicVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   event?: Prisma.EventCreateNestedOneWithoutParticipationGroupsInput
@@ -664,6 +690,7 @@ export type ParticipationGroupUncheckedCreateWithoutParticipationsInput = {
   isPublic?: boolean
   isActivityPublicVisible?: boolean
   isMemberListPublicVisible?: boolean
+  isMediaPublicVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   joinRequests?: Prisma.JoinRequestUncheckedCreateNestedManyWithoutGroupInput
@@ -695,6 +722,7 @@ export type ParticipationGroupUpdateWithoutParticipationsInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActivityPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isMemberListPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMediaPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   event?: Prisma.EventUpdateOneWithoutParticipationGroupsNestedInput
@@ -712,6 +740,7 @@ export type ParticipationGroupUncheckedUpdateWithoutParticipationsInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActivityPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isMemberListPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMediaPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   joinRequests?: Prisma.JoinRequestUncheckedUpdateManyWithoutGroupNestedInput
@@ -727,6 +756,7 @@ export type ParticipationGroupCreateWithoutImagesInput = {
   isPublic?: boolean
   isActivityPublicVisible?: boolean
   isMemberListPublicVisible?: boolean
+  isMediaPublicVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   event?: Prisma.EventCreateNestedOneWithoutParticipationGroupsInput
@@ -744,6 +774,7 @@ export type ParticipationGroupUncheckedCreateWithoutImagesInput = {
   isPublic?: boolean
   isActivityPublicVisible?: boolean
   isMemberListPublicVisible?: boolean
+  isMediaPublicVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   joinRequests?: Prisma.JoinRequestUncheckedCreateNestedManyWithoutGroupInput
@@ -775,6 +806,7 @@ export type ParticipationGroupUpdateWithoutImagesInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActivityPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isMemberListPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMediaPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   event?: Prisma.EventUpdateOneWithoutParticipationGroupsNestedInput
@@ -792,6 +824,7 @@ export type ParticipationGroupUncheckedUpdateWithoutImagesInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActivityPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isMemberListPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMediaPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   joinRequests?: Prisma.JoinRequestUncheckedUpdateManyWithoutGroupNestedInput
@@ -807,6 +840,7 @@ export type ParticipationGroupCreateWithoutActivitiesInput = {
   isPublic?: boolean
   isActivityPublicVisible?: boolean
   isMemberListPublicVisible?: boolean
+  isMediaPublicVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   event?: Prisma.EventCreateNestedOneWithoutParticipationGroupsInput
@@ -824,6 +858,7 @@ export type ParticipationGroupUncheckedCreateWithoutActivitiesInput = {
   isPublic?: boolean
   isActivityPublicVisible?: boolean
   isMemberListPublicVisible?: boolean
+  isMediaPublicVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   joinRequests?: Prisma.JoinRequestUncheckedCreateNestedManyWithoutGroupInput
@@ -855,6 +890,7 @@ export type ParticipationGroupUpdateWithoutActivitiesInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActivityPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isMemberListPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMediaPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   event?: Prisma.EventUpdateOneWithoutParticipationGroupsNestedInput
@@ -872,6 +908,7 @@ export type ParticipationGroupUncheckedUpdateWithoutActivitiesInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActivityPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isMemberListPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMediaPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   joinRequests?: Prisma.JoinRequestUncheckedUpdateManyWithoutGroupNestedInput
@@ -887,6 +924,7 @@ export type ParticipationGroupCreateWithoutJoinRequestsInput = {
   isPublic?: boolean
   isActivityPublicVisible?: boolean
   isMemberListPublicVisible?: boolean
+  isMediaPublicVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   event?: Prisma.EventCreateNestedOneWithoutParticipationGroupsInput
@@ -904,6 +942,7 @@ export type ParticipationGroupUncheckedCreateWithoutJoinRequestsInput = {
   isPublic?: boolean
   isActivityPublicVisible?: boolean
   isMemberListPublicVisible?: boolean
+  isMediaPublicVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   participations?: Prisma.ParticipationUncheckedCreateNestedManyWithoutGroupInput
@@ -935,6 +974,7 @@ export type ParticipationGroupUpdateWithoutJoinRequestsInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActivityPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isMemberListPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMediaPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   event?: Prisma.EventUpdateOneWithoutParticipationGroupsNestedInput
@@ -952,6 +992,7 @@ export type ParticipationGroupUncheckedUpdateWithoutJoinRequestsInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActivityPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isMemberListPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMediaPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   participations?: Prisma.ParticipationUncheckedUpdateManyWithoutGroupNestedInput
@@ -967,6 +1008,7 @@ export type ParticipationGroupCreateManyEventInput = {
   isPublic?: boolean
   isActivityPublicVisible?: boolean
   isMemberListPublicVisible?: boolean
+  isMediaPublicVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -979,6 +1021,7 @@ export type ParticipationGroupUpdateWithoutEventInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActivityPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isMemberListPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMediaPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   joinRequests?: Prisma.JoinRequestUpdateManyWithoutGroupNestedInput
@@ -995,6 +1038,7 @@ export type ParticipationGroupUncheckedUpdateWithoutEventInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActivityPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isMemberListPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMediaPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   joinRequests?: Prisma.JoinRequestUncheckedUpdateManyWithoutGroupNestedInput
@@ -1011,6 +1055,7 @@ export type ParticipationGroupUncheckedUpdateManyWithoutEventInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActivityPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isMemberListPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isMediaPublicVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1082,6 +1127,7 @@ export type ParticipationGroupSelect<ExtArgs extends runtime.Types.Extensions.In
   isPublic?: boolean
   isActivityPublicVisible?: boolean
   isMemberListPublicVisible?: boolean
+  isMediaPublicVisible?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   event?: boolean | Prisma.ParticipationGroup$eventArgs<ExtArgs>
@@ -1101,6 +1147,7 @@ export type ParticipationGroupSelectCreateManyAndReturn<ExtArgs extends runtime.
   isPublic?: boolean
   isActivityPublicVisible?: boolean
   isMemberListPublicVisible?: boolean
+  isMediaPublicVisible?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   event?: boolean | Prisma.ParticipationGroup$eventArgs<ExtArgs>
@@ -1115,6 +1162,7 @@ export type ParticipationGroupSelectUpdateManyAndReturn<ExtArgs extends runtime.
   isPublic?: boolean
   isActivityPublicVisible?: boolean
   isMemberListPublicVisible?: boolean
+  isMediaPublicVisible?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   event?: boolean | Prisma.ParticipationGroup$eventArgs<ExtArgs>
@@ -1129,11 +1177,12 @@ export type ParticipationGroupSelectScalar = {
   isPublic?: boolean
   isActivityPublicVisible?: boolean
   isMemberListPublicVisible?: boolean
+  isMediaPublicVisible?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ParticipationGroupOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "eventId" | "ownerId" | "name" | "isMemberInviteAllowed" | "isPublic" | "isActivityPublicVisible" | "isMemberListPublicVisible" | "createdAt" | "updatedAt", ExtArgs["result"]["participationGroup"]>
+export type ParticipationGroupOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "eventId" | "ownerId" | "name" | "isMemberInviteAllowed" | "isPublic" | "isActivityPublicVisible" | "isMemberListPublicVisible" | "isMediaPublicVisible" | "createdAt" | "updatedAt", ExtArgs["result"]["participationGroup"]>
 export type ParticipationGroupInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   event?: boolean | Prisma.ParticipationGroup$eventArgs<ExtArgs>
   joinRequests?: boolean | Prisma.ParticipationGroup$joinRequestsArgs<ExtArgs>
@@ -1167,6 +1216,7 @@ export type $ParticipationGroupPayload<ExtArgs extends runtime.Types.Extensions.
     isPublic: boolean
     isActivityPublicVisible: boolean
     isMemberListPublicVisible: boolean
+    isMediaPublicVisible: boolean
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["participationGroup"]>
@@ -1605,6 +1655,7 @@ export interface ParticipationGroupFieldRefs {
   readonly isPublic: Prisma.FieldRef<"ParticipationGroup", 'Boolean'>
   readonly isActivityPublicVisible: Prisma.FieldRef<"ParticipationGroup", 'Boolean'>
   readonly isMemberListPublicVisible: Prisma.FieldRef<"ParticipationGroup", 'Boolean'>
+  readonly isMediaPublicVisible: Prisma.FieldRef<"ParticipationGroup", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"ParticipationGroup", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"ParticipationGroup", 'DateTime'>
 }

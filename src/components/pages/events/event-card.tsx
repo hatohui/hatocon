@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { format } from "date-fns";
-import { CalendarCheck, Link, Pencil, Clock, MapPin } from "lucide-react";
+import { CalendarCheck, Lock, Pencil, Clock, MapPin } from "lucide-react";
 import type { Event } from "@prisma/client";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { durationLabel } from "@/lib/utils";
-import NextLink from "next/link";
+import Link from "next/link";
 
 interface EventCardProps {
   event: Event;
@@ -69,6 +69,12 @@ const EventCard = ({
           <Badge variant="secondary" className="text-[10px] h-4 px-1.5">
             {durationLabel(start, end)}
           </Badge>
+          {event.visibility === "PRIVATE" && (
+            <Badge variant="outline" className="text-[10px] h-4 px-1.5 gap-0.5">
+              <Lock className="h-2.5 w-2.5" />
+              Private
+            </Badge>
+          )}
           {event.location && (
             <span className="flex items-center gap-1 text-xs text-muted-foreground truncate max-w-45">
               <MapPin className="h-3 w-3 shrink-0" />
@@ -83,10 +89,10 @@ const EventCard = ({
               className="mt-1 h-7 gap-1.5 text-xs"
               onClick={(e) => e.stopPropagation()}
             >
-              <NextLink href={`/participations/${participationId}`}>
+              <Link href={`/participations/${participationId}`}>
                 <CalendarCheck className="h-3 w-3" />
                 See your plan
-              </NextLink>
+              </Link>
             </Button>
           )}
         </div>

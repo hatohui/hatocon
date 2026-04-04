@@ -26,8 +26,10 @@ export const participationSchema = participationBaseSchema.refine(
 );
 
 export const participationGroupSettingsSchema = zod.object({
+  name: zod.string().min(1).max(100).optional(),
   isMemberInviteAllowed: zod.boolean().optional(),
   isPublic: zod.boolean().optional(),
   isActivityPublicVisible: zod.boolean().optional(),
   isMemberListPublicVisible: zod.boolean().optional(),
+  isMediaPublicVisible: zod.boolean().optional(),
 });

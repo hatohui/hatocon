@@ -51,16 +51,16 @@ const POST = async (req: NextRequest, ctx: RouteContext) => {
     return BadRequest("userId is required");
   }
 
-  // Check if invite is allowed (via group)
+  // Only the group owner or an admin may directly add members
   const group = await participationRepository.getOrCreateGroupForParticipation(
     id,
     participation.userId,
   );
-  if (group && !group.isMemberInviteAllowed) {
-    // Only owner can add members when invite is disabled
-    if (group.ownerId !== session.user.id && !session.user.isAdmin) {
-      return Forbidden(messages.participationGroup.inviteNotAllowed);
-    }
+  const isOwner = group
+    ? group.ownerId === session.user.id
+    : participation.userId === session.user.id;
+  if (!isOwner && !session.user.isAdmin) {
+    return Forbidden(messages.participationGroup.notOwner);
   }
 
   // Check the event exists

@@ -1,7 +1,18 @@
 "use client";
 
 import { formatDistanceToNow } from "date-fns";
-import { Check, CheckCheck, UserCheck, UserX, Eye } from "lucide-react";
+import {
+  CheckCheck,
+  CheckCircle2,
+  UserCheck,
+  UserX,
+  XCircle,
+} from "lucide-react";
+
+import {
+  useAcceptInvite,
+  useDeclineInvite,
+} from "@/hooks/participations/useParticipations";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -27,6 +38,8 @@ const NOTIFICATION_LABELS: Record<string, string> = {
   OWNERSHIP_TRANSFERRED: "You are now the owner of",
   USER_KICKED: "You were removed from",
   INVITED_TO_JOIN: "invited you to join",
+  INVITE_ACCEPTED: "You accepted the invitation to",
+  INVITE_DECLINED: "You declined the invitation to",
 };
 
 function NotificationMessage({
@@ -53,6 +66,13 @@ function NotificationMessage({
       </span>
     );
   }
+  if (type === "INVITE_ACCEPTED" || type === "INVITE_DECLINED") {
+    return (
+      <span>
+        {NOTIFICATION_LABELS[type]} <strong>{data.eventTitle}</strong>
+      </span>
+    );
+  }
   return (
     <span>
       {NOTIFICATION_LABELS[type]} <strong>{data.eventTitle}</strong>
@@ -73,6 +93,11 @@ function NotificationItem({
   const rejectJoin = useRejectJoinRequest();
   const data = notification.data as NotificationData;
   const isJoinRequest = notification.type === "JOIN_REQUEST";
+  const isInvite = notification.type === "INVITED_TO_JOIN";
+  const isAccepted = notification.type === "INVITE_ACCEPTED";
+  const isDeclined = notification.type === "INVITE_DECLINED";
+  const acceptInvite = useAcceptInvite();
+  const declineInvite = useDeclineInvite();
 
   const handleClick = () => {
     if (!notification.isRead) {
@@ -114,6 +139,46 @@ function NotificationItem({
     );
   };
 
+  const handleAcceptInvite = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!data.participationId) return;
+    acceptInvite.mutate(
+      {
+        participationId: data.participationId,
+        notificationId: notification.id,
+      },
+      {
+        onSuccess: () => {
+          toast.success("Invitation accepted!");
+        },
+        onError: (err: unknown) => {
+          const msg = (err as { response?: { data?: { message?: string } } })
+            ?.response?.data?.message;
+          if (msg === "ALREADY_MEMBER") {
+            toast.info("You are already a member");
+          } else {
+            toast.error("Failed to accept invitation");
+          }
+        },
+      },
+    );
+  };
+
+  const handleDeclineInvite = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!data.participationId) return;
+    declineInvite.mutate(
+      {
+        participationId: data.participationId,
+        notificationId: notification.id,
+      },
+      {
+        onSuccess: () => toast.success("Invitation declined"),
+        onError: () => toast.error("Failed to decline invitation"),
+      },
+    );
+  };
+
   return (
     <button
       type="button"
@@ -124,11 +189,14 @@ function NotificationItem({
       )}
     >
       <div className="flex items-start gap-3">
-        {!notification.isRead && (
-          <div className="mt-1.5 h-2 w-2 rounded-full bg-primary shrink-0" />
-        )}
-        <div className="flex-1 min-w-0 space-y-1">
-          <p className="text-sm leading-snug">
+        {/* Always reserve dot space to avoid layout shift */}
+        <div className="mt-1.5 h-2 w-2 shrink-0">
+          {!notification.isRead && (
+            <span className="block h-2 w-2 rounded-full bg-primary" />
+          )}
+        </div>
+        <div className="min-w-0 flex-1 space-y-1">
+          <p className="text-sm leading-snug wrap-break-word">
             <NotificationMessage notification={notification} />
           </p>
           <p className="text-xs text-muted-foreground">
@@ -160,17 +228,40 @@ function NotificationItem({
               </Button>
             </div>
           )}
-          {!isJoinRequest && !notification.isRead && (
+          {isInvite && (
             <div className="flex gap-2 pt-1">
+              <Button
+                size="sm"
+                variant="default"
+                className="h-7 text-xs gap-1"
+                onClick={handleAcceptInvite}
+                disabled={acceptInvite.isPending || declineInvite.isPending}
+              >
+                <UserCheck className="h-3 w-3" />
+                Accept
+              </Button>
               <Button
                 size="sm"
                 variant="outline"
                 className="h-7 text-xs gap-1"
-                onClick={handleClick}
+                onClick={handleDeclineInvite}
+                disabled={acceptInvite.isPending || declineInvite.isPending}
               >
-                <Eye className="h-3 w-3" />
-                View
+                <UserX className="h-3 w-3" />
+                Decline
               </Button>
+            </div>
+          )}
+          {isAccepted && (
+            <div className="flex items-center gap-1 pt-1 text-xs text-emerald-600">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              Accepted
+            </div>
+          )}
+          {isDeclined && (
+            <div className="flex items-center gap-1 pt-1 text-xs text-muted-foreground">
+              <XCircle className="h-3.5 w-3.5" />
+              Declined
             </div>
           )}
         </div>
@@ -186,7 +277,7 @@ export default function NotificationList({ onClose }: { onClose: () => void }) {
   const hasUnread = notifications?.some((n) => !n.isRead);
 
   return (
-    <div className="w-80 sm:w-96">
+    <div className="w-[min(20rem,calc(100vw-2rem))]">
       <div className="flex items-center justify-between px-4 py-3 border-b">
         <h3 className="font-semibold text-sm">Notifications</h3>
         {hasUnread && (

@@ -22,21 +22,31 @@ type RouteContext = { params: Promise<{ id: string }> };
 /** GET /api/participations/[id]/images — list images for a participation's group */
 const GET = async (_req: NextRequest, ctx: RouteContext) => {
   const session = await auth();
-  if (!session?.user?.id) return Unauthorized();
 
   const { id } = await ctx.params;
   const participation = await participationRepository.getById(id);
   if (!participation) return NotFound("Participation not found");
 
-  const isMember = await participationRepository.isMember(id, session.user.id);
-  if (!isMember && !session.user.isAdmin) {
-    return Forbidden("You can only view images for groups you belong to");
-  }
-
   const group = await participationRepository.getOrCreateGroupForParticipation(
     id,
     participation.userId,
   );
+
+  const isMember = session?.user?.id
+    ? await participationRepository.isMember(id, session.user.id)
+    : false;
+  const isAdmin = session?.user?.isAdmin ?? false;
+
+  if (!isMember && !isAdmin) {
+    // Non-members: only allowed if group is public AND media is publicly visible
+    if (!group?.isPublic || !group?.isMediaPublicVisible) {
+      return session?.user?.id
+        ? Forbidden("Media is not available")
+        : Unauthorized();
+    }
+  }
+
+  // Members/admins: also blocked if media flag is off... no, members always see media
   if (!group) return OK([]);
 
   const images = await participationRepository.getImages(group.id);

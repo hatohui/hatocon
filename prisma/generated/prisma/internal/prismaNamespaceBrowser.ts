@@ -65,7 +65,10 @@ export const ModelName = {
   EventInvitee: 'EventInvitee',
   ParticipationGroup: 'ParticipationGroup',
   JoinRequest: 'JoinRequest',
-  Notification: 'Notification'
+  Notification: 'Notification',
+  WorkSchedule: 'WorkSchedule',
+  ScheduleException: 'ScheduleException',
+  CustomHoliday: 'CustomHoliday'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -242,7 +245,11 @@ export const HolidayScalarFieldEnum = {
   date: 'date',
   description: 'description',
   country: 'country',
-  isGlobal: 'isGlobal'
+  isGlobal: 'isGlobal',
+  isRecurring: 'isRecurring',
+  isLunar: 'isLunar',
+  lunarMonth: 'lunarMonth',
+  lunarDay: 'lunarDay'
 } as const
 
 export type HolidayScalarFieldEnum = (typeof HolidayScalarFieldEnum)[keyof typeof HolidayScalarFieldEnum]
@@ -267,6 +274,7 @@ export const ParticipationGroupScalarFieldEnum = {
   isPublic: 'isPublic',
   isActivityPublicVisible: 'isActivityPublicVisible',
   isMemberListPublicVisible: 'isMemberListPublicVisible',
+  isMediaPublicVisible: 'isMediaPublicVisible',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -292,10 +300,51 @@ export const NotificationScalarFieldEnum = {
   type: 'type',
   data: 'data',
   isRead: 'isRead',
+  createdBy: 'createdBy',
   createdAt: 'createdAt'
 } as const
 
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
+export const WorkScheduleScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  sunday: 'sunday',
+  monday: 'monday',
+  tuesday: 'tuesday',
+  wednesday: 'wednesday',
+  thursday: 'thursday',
+  friday: 'friday',
+  saturday: 'saturday',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WorkScheduleScalarFieldEnum = (typeof WorkScheduleScalarFieldEnum)[keyof typeof WorkScheduleScalarFieldEnum]
+
+
+export const ScheduleExceptionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  date: 'date',
+  isWorkDay: 'isWorkDay',
+  reason: 'reason',
+  createdAt: 'createdAt'
+} as const
+
+export type ScheduleExceptionScalarFieldEnum = (typeof ScheduleExceptionScalarFieldEnum)[keyof typeof ScheduleExceptionScalarFieldEnum]
+
+
+export const CustomHolidayScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  date: 'date',
+  name: 'name',
+  createdAt: 'createdAt'
+} as const
+
+export type CustomHolidayScalarFieldEnum = (typeof CustomHolidayScalarFieldEnum)[keyof typeof CustomHolidayScalarFieldEnum]
 
 
 export const SortOrder = {

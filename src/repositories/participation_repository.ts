@@ -2,19 +2,84 @@ import { db } from "@/config/prisma";
 import { ParticipationCreateDTO } from "@/types/participation.d";
 import { JoinRequestStatus, LeaveType } from "@prisma/client";
 import type { ParticipationGroupSettingsUpdate } from "@/types/notification.d";
+import workScheduleRepository from "./work_schedule_repository";
+import { isPublicHoliday } from "@/lib/holidays";
 
 /**
- * Counts weekdays (Mon–Fri) between two dates inclusive of both endpoints.
+ * Counts working days between two dates inclusive, respecting:
+ * - User's work schedule (default Mon–Fri)
+ * - Schedule exceptions (forced work/off days)
+ * - Public holidays
+ * - Custom holidays
  */
-function countWeekdays(from: Date, to: Date): number {
+async function countWorkingDays(
+  from: Date,
+  to: Date,
+  userId: string,
+): Promise<number> {
+  const schedule = await workScheduleRepository.getByUserId(userId);
+  const workDays = schedule
+    ? [
+        schedule.sunday,
+        schedule.monday,
+        schedule.tuesday,
+        schedule.wednesday,
+        schedule.thursday,
+        schedule.friday,
+        schedule.saturday,
+      ]
+    : [false, true, true, true, true, true, false]; // default Mon-Fri
+
+  const [exceptions, customHolidays, holidays] = await Promise.all([
+    workScheduleRepository.getScheduleExceptions(userId, from, to),
+    workScheduleRepository.getCustomHolidays(userId, from, to),
+    workScheduleRepository.getHolidays(from, to),
+  ]);
+
+  // Build lookup sets for quick date matching
+  const exceptionMap = new Map<string, boolean>();
+  for (const e of exceptions) {
+    exceptionMap.set(new Date(e.date).toDateString(), e.isWorkDay);
+  }
+
+  const customHolidaySet = new Set<string>();
+  for (const ch of customHolidays) {
+    customHolidaySet.add(new Date(ch.date).toDateString());
+  }
+
   let count = 0;
   const cursor = new Date(from);
   cursor.setHours(0, 0, 0, 0);
   const end = new Date(to);
   end.setHours(0, 0, 0, 0);
+
   while (cursor <= end) {
+    const dateKey = cursor.toDateString();
+
+    // 1. Check schedule exceptions first (highest priority)
+    const exception = exceptionMap.get(dateKey);
+    if (exception !== undefined) {
+      if (exception) count++;
+      cursor.setDate(cursor.getDate() + 1);
+      continue;
+    }
+
+    // 2. Check custom holidays
+    if (customHolidaySet.has(dateKey)) {
+      cursor.setDate(cursor.getDate() + 1);
+      continue;
+    }
+
+    // 3. Check public holidays
+    if (isPublicHoliday(cursor, ["VN", "SG"], holidays)) {
+      cursor.setDate(cursor.getDate() + 1);
+      continue;
+    }
+
+    // 4. Check work schedule
     const day = cursor.getDay();
-    if (day !== 0 && day !== 6) count++;
+    if (workDays[day]) count++;
+
     cursor.setDate(cursor.getDate() + 1);
   }
   return count;
@@ -152,10 +217,10 @@ const participationRepository = {
       },
       select: { from: true, to: true },
     });
-    return participations.reduce(
-      (sum, p) => sum + countWeekdays(p.from, p.to),
-      0,
+    const days = await Promise.all(
+      participations.map((p) => countWorkingDays(p.from, p.to, userId)),
     );
+    return days.reduce((sum, d) => sum + d, 0);
   },
 
   create: async (
@@ -221,6 +286,13 @@ const participationRepository = {
         },
       },
       orderBy: { createdAt: "desc" },
+    });
+  },
+
+  updateDates: async (id: string, data: { from: Date; to: Date }) => {
+    return db.participation.update({
+      where: { id },
+      data: { from: data.from, to: data.to },
     });
   },
 
@@ -440,6 +512,40 @@ const participationRepository = {
     return db.joinRequest.update({
       where: { id },
       data: { status },
+    });
+  },
+
+  /** Fetch minimal public-facing data for a participation share page */
+  getShareData: async (participationId: string) => {
+    return db.participation.findUnique({
+      where: { id: participationId },
+      select: {
+        id: true,
+        from: true,
+        to: true,
+        leaveType: true,
+        user: { select: { id: true, name: true, image: true } },
+        event: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            image: true,
+            startAt: true,
+            endAt: true,
+            location: true,
+          },
+        },
+        group: {
+          select: {
+            id: true,
+            name: true,
+            isPublic: true,
+            ownerId: true,
+            _count: { select: { participations: true } },
+          },
+        },
+      },
     });
   },
 };

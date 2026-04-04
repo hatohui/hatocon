@@ -18,7 +18,6 @@ type RouteContext = { params: Promise<{ id: string }> };
 /** GET /api/participations/[id]/activities — list activities */
 const GET = async (_req: NextRequest, ctx: RouteContext) => {
   const session = await auth();
-  if (!session?.user?.id) return Unauthorized();
 
   const { id } = await ctx.params;
   const participation = await participationRepository.getById(id);
@@ -30,6 +29,16 @@ const GET = async (_req: NextRequest, ctx: RouteContext) => {
     participation.userId,
   );
   if (!group) return OK([]);
+
+  const isMember = session?.user?.id
+    ? await participationRepository.isMember(id, session.user.id)
+    : false;
+  const isAdmin = session?.user?.isAdmin ?? false;
+
+  // Non-members are blocked when isActivityPublicVisible is false; returns 404 per settings description
+  if (!isMember && !isAdmin && !group.isActivityPublicVisible) {
+    return NotFound(messages.participation.notFound);
+  }
 
   const activities = await activityRepository.getByGroup(group.id);
   return OK(activities);
