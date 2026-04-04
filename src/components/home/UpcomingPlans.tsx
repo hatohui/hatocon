@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  format,
-  addMonths,
-  startOfToday,
-  differenceInDays,
-  isToday,
-  isTomorrow,
-} from "date-fns";
+import { format, addMonths, startOfToday, differenceInDays } from "date-fns";
 import { Plane, ArrowRight, ClipboardList, Plus } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -55,14 +48,6 @@ function countWeekdays(from: Date, to: Date): number {
   return count;
 }
 
-function startsInLabel(from: Date): string {
-  if (isToday(from)) return "Today";
-  if (isTomorrow(from)) return "Tomorrow";
-  const diff = differenceInDays(from, startOfToday());
-  if (diff <= 7) return `In ${diff} days`;
-  return format(from, "EEE, MMM d");
-}
-
 function PlanRow({ plan }: { plan: ParticipationWithEvent }) {
   const from = new Date(plan.from);
   const to = new Date(plan.to);
@@ -97,21 +82,12 @@ function PlanRow({ plan }: { plan: ParticipationWithEvent }) {
           {format(from, "MMM d")} – {format(to, "MMM d, yyyy")}
         </p>
         <div className="flex items-center gap-2 mt-1.5">
-          <Badge
-            variant="secondary"
-            className={cn(
-              "text-[10px] px-1.5 py-0 font-normal border-0",
-              meta.badgeClass,
-            )}
-          >
-            {meta.label}
-          </Badge>
           <span className="text-[11px] text-muted-foreground/70">
-            {weekdays === 1 ? "1 day" : `${weekdays} days`}
+            uses {weekdays === 1 ? "1 day" : `${weekdays} leave days`}
           </span>
         </div>
         <p className="text-[11px] text-muted-foreground/60 mt-0.5">
-          {startsInLabel(from)}
+          in {differenceInDays(from, startOfToday())} days
         </p>
       </div>
 
@@ -120,106 +96,11 @@ function PlanRow({ plan }: { plan: ParticipationWithEvent }) {
   );
 }
 
-// TODO: remove fake data
-const DEBUG_PLANS: ParticipationWithEvent[] = [
-  {
-    id: "d1",
-    userId: "u1",
-    eventId: null,
-    from: addMonths(startOfToday(), 0),
-    to: addMonths(startOfToday(), 0),
-    leaveType: "ANNUAL",
-    createdBy: "u1",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    event: null,
-  },
-  {
-    id: "d2",
-    userId: "u1",
-    eventId: "e1",
-    from: addMonths(startOfToday(), 1),
-    to: new Date(addMonths(startOfToday(), 1).getTime() + 3 * 86400000),
-    leaveType: "SICK",
-    createdBy: "u1",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    event: {
-      id: "e1",
-      title: "Team Offsite",
-      startAt: addMonths(startOfToday(), 1),
-      endAt: addMonths(startOfToday(), 1),
-    },
-  },
-  {
-    id: "d3",
-    userId: "u1",
-    eventId: null,
-    from: addMonths(startOfToday(), 2),
-    to: new Date(addMonths(startOfToday(), 2).getTime() + 5 * 86400000),
-    leaveType: "UNPAID",
-    createdBy: "u1",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    event: null,
-  },
-  {
-    id: "d4",
-    userId: "u1",
-    eventId: "e2",
-    from: addMonths(startOfToday(), 2),
-    to: new Date(addMonths(startOfToday(), 2).getTime() + 2 * 86400000),
-    leaveType: "ANNUAL",
-    createdBy: "u1",
-
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    event: {
-      id: "e2",
-      title: "Company Retreat",
-      startAt: addMonths(startOfToday(), 2),
-      endAt: addMonths(startOfToday(), 2),
-    },
-  },
-  {
-    id: "d5",
-    userId: "u1",
-    eventId: null,
-    from: addMonths(startOfToday(), 3),
-    to: new Date(addMonths(startOfToday(), 3).getTime() + 1 * 86400000),
-    leaveType: "SICK",
-    createdBy: "u1",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    event: null,
-  },
-  {
-    id: "d6",
-    userId: "u1",
-    eventId: "e3",
-    from: addMonths(startOfToday(), 4),
-    to: new Date(addMonths(startOfToday(), 4).getTime() + 7 * 86400000),
-    leaveType: "ANNUAL",
-    createdBy: "u1",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    event: {
-      id: "e3",
-      title: "Summer Conference",
-      startAt: addMonths(startOfToday(), 4),
-      endAt: addMonths(startOfToday(), 4),
-    },
-  },
-];
-
 export default function UpcomingPlans() {
   const today = startOfToday();
   const sixMonthsLater = addMonths(today, 6);
 
-  // const { data: plans, isLoading } = useMyParticipations(today, sixMonthsLater);
-  // TODO: remove fake data
-  const plans = DEBUG_PLANS;
-  const isLoading = false;
+  const { data: plans, isLoading } = useMyParticipations(today, sixMonthsLater);
 
   const upcoming = plans
     ? [...plans]
@@ -289,7 +170,7 @@ export default function UpcomingPlans() {
           </Button>
         </div>
       ) : (
-        <ScrollArea className="max-h-105">
+        <ScrollArea className="md:h-100">
           <div className="divide-y">
             {upcoming.map((plan) => (
               <PlanRow key={plan.id} plan={plan} />
