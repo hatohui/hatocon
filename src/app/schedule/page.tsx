@@ -93,23 +93,16 @@ function ScheduleCalendar({
   const monthTo = endOfMonth(currentMonth).toISOString();
   const { data: holidays } = useHolidays(monthFrom, monthTo);
 
-  // Build a set of holiday date strings for quick lookup
+  // Build a map of date → holiday name for quick lookup
   const holidayMap = useMemo(() => {
     const map = new Map<string, string>();
     if (!holidays) return map;
     for (const h of holidays) {
-      const hDate = new Date(h.date);
-      if (h.isRecurring) {
-        // Match month/day in current displayed month's year
-        const d = new Date(currentMonth.getFullYear(), hDate.getMonth(), hDate.getDate());
-        map.set(d.toDateString(), h.description);
-      } else {
-        hDate.setHours(0, 0, 0, 0);
-        map.set(hDate.toDateString(), h.description);
-      }
+      const d = new Date(h.date + "T00:00:00");
+      map.set(d.toDateString(), h.name);
     }
     return map;
-  }, [holidays, currentMonth]);
+  }, [holidays]);
 
   const getLeaveForDay = (day: Date) =>
     participations.filter((p) =>

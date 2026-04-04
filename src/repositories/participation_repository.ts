@@ -3,7 +3,7 @@ import { ParticipationCreateDTO } from "@/types/participation.d";
 import { JoinRequestStatus, LeaveType } from "@prisma/client";
 import type { ParticipationGroupSettingsUpdate } from "@/types/notification.d";
 import workScheduleRepository from "./work_schedule_repository";
-import { isPublicHoliday } from "@/lib/holidays";
+import { getPublicHolidaySet } from "@/lib/holidays";
 
 /**
  * Counts working days between two dates inclusive, respecting:
@@ -30,10 +30,11 @@ async function countWorkingDays(
       ]
     : [false, true, true, true, true, true, false]; // default Mon-Fri
 
-  const [exceptions, customHolidays, holidays] = await Promise.all([
+  const years = Array.from(new Set([from.getFullYear(), to.getFullYear()]));
+  const [exceptions, customHolidays, publicHolidaySet] = await Promise.all([
     workScheduleRepository.getScheduleExceptions(userId, from, to),
     workScheduleRepository.getCustomHolidays(userId, from, to),
-    workScheduleRepository.getHolidays(from, to),
+    getPublicHolidaySet(["VN", "SG"], years),
   ]);
 
   // Build lookup sets for quick date matching
@@ -71,7 +72,8 @@ async function countWorkingDays(
     }
 
     // 3. Check public holidays
-    if (isPublicHoliday(cursor, ["VN", "SG"], holidays)) {
+    const dateStr = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, "0")}-${String(cursor.getDate()).padStart(2, "0")}`;
+    if (publicHolidaySet.has(dateStr)) {
       cursor.setDate(cursor.getDate() + 1);
       continue;
     }

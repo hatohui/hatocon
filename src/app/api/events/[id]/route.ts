@@ -7,6 +7,7 @@ import {
   Unauthorized,
 } from "@/common/response";
 import { db } from "@/config/prisma";
+import { cacheDelPattern } from "@/config/redis";
 import eventRepository from "@/repositories/event_repository";
 import { eventBaseSchema } from "@/validations/eventSchema";
 import type { NextRequest } from "next/server";
@@ -82,6 +83,7 @@ const PATCH = async (req: NextRequest, ctx: Context) => {
   }
 
   const updated = await eventRepository.update(id, updatePayload);
+  await cacheDelPattern("events:*");
   return OK(updated);
 };
 
@@ -98,6 +100,7 @@ const DELETE = async (_req: NextRequest, ctx: Context) => {
   if (!isOwner && !isAdmin) return Forbidden();
 
   await eventRepository.softDelete(id);
+  await cacheDelPattern("events:*");
   return OK({ id });
 };
 

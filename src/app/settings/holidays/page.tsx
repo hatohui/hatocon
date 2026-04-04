@@ -178,14 +178,12 @@ export default function SettingsHolidaysPage() {
               <div className="space-y-1">
                 {vnHolidays.map((h) => (
                   <div
-                    key={h.id}
+                    key={h.date}
                     className="flex items-center justify-between rounded-md px-3 py-1.5 text-sm"
                   >
-                    <span>{h.description}</span>
+                    <span>{h.name}</span>
                     <span className="text-xs text-muted-foreground">
-                      {h.isRecurring
-                        ? `Every ${format(new Date(h.date), "MMM d")}`
-                        : format(new Date(h.date), "MMM d, yyyy")}
+                      {format(new Date(h.date + "T00:00:00"), "MMM d, yyyy")}
                     </span>
                   </div>
                 ))}
@@ -204,14 +202,12 @@ export default function SettingsHolidaysPage() {
               <div className="space-y-1">
                 {sgHolidays.map((h) => (
                   <div
-                    key={h.id}
+                    key={h.date}
                     className="flex items-center justify-between rounded-md px-3 py-1.5 text-sm"
                   >
-                    <span>{h.description}</span>
+                    <span>{h.name}</span>
                     <span className="text-xs text-muted-foreground">
-                      {h.isRecurring
-                        ? `Every ${format(new Date(h.date), "MMM d")}`
-                        : format(new Date(h.date), "MMM d, yyyy")}
+                      {format(new Date(h.date + "T00:00:00"), "MMM d, yyyy")}
                     </span>
                   </div>
                 ))}

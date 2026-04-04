@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { OK, Unauthorized } from "@/common/response";
-import workScheduleRepository from "@/repositories/work_schedule_repository";
+import { getPublicHolidaysForYear } from "@/lib/holidays";
 import type { NextRequest } from "next/server";
 
 const GET = async (req: NextRequest) => {
@@ -15,10 +15,24 @@ const GET = async (req: NextRequest) => {
     return OK([]);
   }
 
-  const holidays = await workScheduleRepository.getHolidays(
-    new Date(from),
-    new Date(to),
+  const fromYear = new Date(from).getFullYear();
+  const toYear = new Date(to).getFullYear();
+  const years = Array.from(
+    { length: toYear - fromYear + 1 },
+    (_, i) => fromYear + i,
   );
+
+  const results = await Promise.all(
+    ["VN", "SG"].flatMap((country) =>
+      years.map((year) => getPublicHolidaysForYear(country, year)),
+    ),
+  );
+
+  const fromStr = from.slice(0, 10);
+  const toStr = to.slice(0, 10);
+  const holidays = results
+    .flat()
+    .filter((h) => h.date >= fromStr && h.date <= toStr);
 
   return OK(holidays);
 };

@@ -13,7 +13,8 @@ function getRedis(): Redis | null {
       maxRetriesPerRequest: 1,
       lazyConnect: true,
       connectTimeout: 3000,
-      retryStrategy: (times) => (times > 2 ? null : Math.min(times * 200, 1000)),
+      retryStrategy: (times) =>
+        times > 2 ? null : Math.min(times * 200, 1000),
     });
     redis.on("error", () => {
       // Silently ignore – we treat Redis as optional
@@ -40,7 +41,11 @@ export async function cacheGet<T>(key: string): Promise<T | null> {
 }
 
 /** Set a cached value with TTL in seconds. Silently fails if Redis is unavailable. */
-export async function cacheSet(key: string, value: unknown, ttlSeconds = 300): Promise<void> {
+export async function cacheSet(
+  key: string,
+  value: unknown,
+  ttlSeconds = 300,
+): Promise<void> {
   try {
     const client = getRedis();
     if (!client) return;
@@ -56,6 +61,28 @@ export async function cacheDel(key: string): Promise<void> {
     const client = getRedis();
     if (!client) return;
     await client.del(key);
+  } catch {
+    // no-op
+  }
+}
+
+/** Delete all keys matching a glob pattern (uses SCAN to avoid blocking). */
+export async function cacheDelPattern(pattern: string): Promise<void> {
+  try {
+    const client = getRedis();
+    if (!client) return;
+    let cursor = "0";
+    do {
+      const [next, keys] = await client.scan(
+        cursor,
+        "MATCH",
+        pattern,
+        "COUNT",
+        100,
+      );
+      cursor = next;
+      if (keys.length > 0) await client.del(...keys);
+    } while (cursor !== "0");
   } catch {
     // no-op
   }

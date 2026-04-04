@@ -29,13 +29,10 @@ export type CustomHolidayData = {
 };
 
 export type HolidayData = {
-  id: string;
-  date: string;
-  description: string;
-  country: string | null;
-  isGlobal: boolean;
-  isRecurring: boolean;
-  isLunar: boolean;
+  date: string;    // YYYY-MM-DD
+  name: string;
+  type: string;
+  country: string;
 };
 
 const scheduleService = {

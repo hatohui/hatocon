@@ -78,23 +78,6 @@ const workScheduleRepository = {
     });
   },
 
-  getHolidays: async (from: Date, to: Date, country?: string) => {
-    return db.holiday.findMany({
-      where: {
-        OR: [
-          // Recurring holidays (match any year)
-          { isRecurring: true, ...(country ? { country } : {}) },
-          // Non-recurring holidays in range
-          {
-            isRecurring: false,
-            date: { gte: from, lte: to },
-            ...(country ? { country } : {}),
-          },
-        ],
-      },
-      orderBy: { date: "asc" },
-    });
-  },
 };
 
 export default workScheduleRepository;

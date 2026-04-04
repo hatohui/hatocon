@@ -196,21 +196,6 @@ model ActivityMedia {
   @@index([activityId])
 }
 
-model Holiday {
-  id          String   @id @default(uuid())
-  date        DateTime
-  description String?
-  country     String?
-  isGlobal    Boolean  @default(false)
-  isRecurring Boolean  @default(true)  // repeats every year on same date
-  isLunar     Boolean  @default(false) // follows lunar calendar
-  lunarMonth  Int?     // lunar month (1-12) for lunar holidays
-  lunarDay    Int?     // lunar day (1-30) for lunar holidays
-
-  @@index([country])
-  @@index([date])
-}
-
 model EventInvitee {
   id      String @id @default(uuid())
   eventId String

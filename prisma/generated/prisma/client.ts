@@ -92,11 +92,6 @@ export type Activity = Prisma.ActivityModel
  */
 export type ActivityMedia = Prisma.ActivityMediaModel
 /**
- * Model Holiday
- * 
- */
-export type Holiday = Prisma.HolidayModel
-/**
  * Model EventInvitee
  * 
  */

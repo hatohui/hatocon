@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { BadRequest, Created, OK, Unauthorized } from "@/common/response";
+import { cacheDelPattern, cacheGet, cacheSet } from "@/config/redis";
 import eventRepository from "@/repositories/event_repository";
 import { eventSchema } from "@/validations/eventSchema";
 import type { NextRequest } from "next/server";
@@ -23,13 +24,25 @@ const GET = async (req: NextRequest) => {
   if (to && isNaN(to.getTime()))
     return BadRequest("Invalid date format for 'to'");
 
-  const events = await eventRepository.getAllFiltered({
-    q,
-    from,
-    to,
-    userId,
-    limit,
-  });
+  // Cache the full per-user list; filter in memory so date/query params don't fragment the cache
+  const cacheKey = `events:list:${userId ?? "anon"}`;
+  type EventRow = Awaited<
+    ReturnType<typeof eventRepository.getAllFiltered>
+  >[number];
+  let events = await cacheGet<EventRow[]>(cacheKey);
+
+  if (!events) {
+    events = await eventRepository.getAllFiltered({ userId });
+    await cacheSet(cacheKey, events, 3600);
+  }
+
+  if (from) events = events.filter((e) => new Date(e.endAt) >= from);
+  if (to) events = events.filter((e) => new Date(e.startAt) <= to);
+  if (q) {
+    const lower = q.toLowerCase();
+    events = events.filter((e) => e.title.toLowerCase().includes(lower));
+  }
+  if (limit) events = events.slice(0, limit);
 
   return OK(events);
 };
@@ -54,6 +67,7 @@ const POST = async (req: NextRequest) => {
     session.user.isAdmin ?? false,
   );
 
+  await cacheDelPattern("events:*");
   return Created(event);
 };
 
