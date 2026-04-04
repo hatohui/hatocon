@@ -68,9 +68,6 @@ const EventPage = () => {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold">Events</h1>
-          <p className="text-muted-foreground text-sm mt-0.5">
-            Browse, search and track all approved events
-          </p>
         </div>
         <Button asChild className="gap-2">
           <Link href="/events/new">

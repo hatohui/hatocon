@@ -1,6 +1,5 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import { Separator } from "@/components/ui/separator";
 import {
   Sheet,
@@ -12,7 +11,14 @@ import { useMyParticipationForEvent } from "@/hooks/events/useEvents";
 import { cn, durationLabel } from "@/lib/utils";
 import { Event } from "@prisma/client";
 import { format } from "date-fns";
-import { Clock, ExternalLink, MapPin, Pencil, Plane } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  ExternalLink,
+  MapPin,
+  Pencil,
+  Plane,
+} from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";

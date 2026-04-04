@@ -120,11 +120,106 @@ function PlanRow({ plan }: { plan: ParticipationWithEvent }) {
   );
 }
 
+// TODO: remove fake data
+const DEBUG_PLANS: ParticipationWithEvent[] = [
+  {
+    id: "d1",
+    userId: "u1",
+    eventId: null,
+    from: addMonths(startOfToday(), 0),
+    to: addMonths(startOfToday(), 0),
+    leaveType: "ANNUAL",
+    createdBy: "u1",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    event: null,
+  },
+  {
+    id: "d2",
+    userId: "u1",
+    eventId: "e1",
+    from: addMonths(startOfToday(), 1),
+    to: new Date(addMonths(startOfToday(), 1).getTime() + 3 * 86400000),
+    leaveType: "SICK",
+    createdBy: "u1",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    event: {
+      id: "e1",
+      title: "Team Offsite",
+      startAt: addMonths(startOfToday(), 1),
+      endAt: addMonths(startOfToday(), 1),
+    },
+  },
+  {
+    id: "d3",
+    userId: "u1",
+    eventId: null,
+    from: addMonths(startOfToday(), 2),
+    to: new Date(addMonths(startOfToday(), 2).getTime() + 5 * 86400000),
+    leaveType: "UNPAID",
+    createdBy: "u1",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    event: null,
+  },
+  {
+    id: "d4",
+    userId: "u1",
+    eventId: "e2",
+    from: addMonths(startOfToday(), 2),
+    to: new Date(addMonths(startOfToday(), 2).getTime() + 2 * 86400000),
+    leaveType: "ANNUAL",
+    createdBy: "u1",
+
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    event: {
+      id: "e2",
+      title: "Company Retreat",
+      startAt: addMonths(startOfToday(), 2),
+      endAt: addMonths(startOfToday(), 2),
+    },
+  },
+  {
+    id: "d5",
+    userId: "u1",
+    eventId: null,
+    from: addMonths(startOfToday(), 3),
+    to: new Date(addMonths(startOfToday(), 3).getTime() + 1 * 86400000),
+    leaveType: "SICK",
+    createdBy: "u1",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    event: null,
+  },
+  {
+    id: "d6",
+    userId: "u1",
+    eventId: "e3",
+    from: addMonths(startOfToday(), 4),
+    to: new Date(addMonths(startOfToday(), 4).getTime() + 7 * 86400000),
+    leaveType: "ANNUAL",
+    createdBy: "u1",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    event: {
+      id: "e3",
+      title: "Summer Conference",
+      startAt: addMonths(startOfToday(), 4),
+      endAt: addMonths(startOfToday(), 4),
+    },
+  },
+];
+
 export default function UpcomingPlans() {
   const today = startOfToday();
   const sixMonthsLater = addMonths(today, 6);
 
-  const { data: plans, isLoading } = useMyParticipations(today, sixMonthsLater);
+  // const { data: plans, isLoading } = useMyParticipations(today, sixMonthsLater);
+  // TODO: remove fake data
+  const plans = DEBUG_PLANS;
+  const isLoading = false;
 
   const upcoming = plans
     ? [...plans]
@@ -194,7 +289,7 @@ export default function UpcomingPlans() {
           </Button>
         </div>
       ) : (
-        <ScrollArea className="flex-1">
+        <ScrollArea className="max-h-105">
           <div className="divide-y">
             {upcoming.map((plan) => (
               <PlanRow key={plan.id} plan={plan} />

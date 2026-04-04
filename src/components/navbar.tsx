@@ -28,6 +28,7 @@ import {
   Menu,
   Settings,
 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import AppIcon from "./common/AppIcon";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
@@ -40,10 +41,31 @@ const NAV_LINKS = [
 ];
 
 export default function Navbar() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const pathname = usePathname();
   const isAdmin = session?.user.isAdmin;
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  if (status === "loading") {
+    return (
+      <nav className="border-b bg-background">
+        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
+          <div className="flex items-center gap-6">
+            <div className="flex items-end gap-2">
+              <Skeleton className="h-7 w-7 rounded" />
+              <Skeleton className="hidden sm:block h-5 w-16" />
+            </div>
+            <div className="hidden md:flex items-center gap-6">
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-16" />
+            </div>
+          </div>
+          <Skeleton className="h-8 w-8 rounded-full" />
+        </div>
+      </nav>
+    );
+  }
 
   if (!session) return null;
 
@@ -66,7 +88,7 @@ export default function Navbar() {
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
         {/* Mobile hamburger */}
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-          <SheetTrigger>
+          <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="md:hidden">
               <Menu className="h-5 w-5" />
               <span className="sr-only">Open menu</span>
