@@ -64,14 +64,88 @@ export default function Navbar() {
   return (
     <nav className="border-b bg-background">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
-        {/* Logo + desktop nav */}
+        {/* Mobile hamburger */}
+        <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+          <SheetTrigger>
+            <Button variant="ghost" size="icon" className="md:hidden">
+              <Menu className="h-5 w-5" />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-64 p-0">
+            <SheetHeader className="px-4 py-4 border-b">
+              <SheetTitle asChild>
+                <Link
+                  href="/"
+                  className="text-xl flex items-end gap-2 font-semibold"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <AppIcon />
+                  <span>Hatocon</span>
+                </Link>
+              </SheetTitle>
+            </SheetHeader>
+            <div className="flex flex-col gap-1 px-2 py-3">
+              {isAdmin && (
+                <Link
+                  href="/admin/events"
+                  className={cn(
+                    "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                    pathname.startsWith("/admin")
+                      ? "bg-accent text-foreground"
+                      : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                  )}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <LayoutDashboard className="h-4 w-4" />
+                  Dashboard
+                </Link>
+              )}
+              {NAV_LINKS.map(({ href, label, icon: Icon }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className={cn(
+                    "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                    pathname.startsWith(href)
+                      ? "bg-accent text-foreground"
+                      : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                  )}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <Icon className="h-4 w-4" />
+                  {label}
+                </Link>
+              ))}
+              <hr className="my-2" />
+              <Link
+                href="/settings/profile"
+                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+                onClick={() => setMobileOpen(false)}
+              >
+                <Settings className="h-4 w-4" />
+                Settings
+              </Link>
+              <button
+                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-destructive hover:bg-accent transition-colors text-left"
+                onClick={() => {
+                  setMobileOpen(false);
+                  signOut();
+                }}
+              >
+                <LogOut className="h-4 w-4" />
+                Sign out
+              </button>
+            </div>
+          </SheetContent>
+        </Sheet>
         <div className="flex items-center gap-6">
           <Link
             href="/"
             className="text-xl flex items-end gap-2 justify-center font-semibold"
           >
             <AppIcon />
-            <p>Hatocon</p>
+            <p className="hidden sm:block">Hatocon</p>
           </Link>
 
           {/* Desktop links */}
@@ -92,82 +166,6 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Mobile hamburger */}
-          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Open menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-64 p-0">
-              <SheetHeader className="px-4 py-4 border-b">
-                <SheetTitle asChild>
-                  <Link
-                    href="/"
-                    className="text-xl flex items-end gap-2 font-semibold"
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    <AppIcon />
-                    <span>Hatocon</span>
-                  </Link>
-                </SheetTitle>
-              </SheetHeader>
-              <div className="flex flex-col gap-1 px-2 py-3">
-                {isAdmin && (
-                  <Link
-                    href="/admin/events"
-                    className={cn(
-                      "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                      pathname.startsWith("/admin")
-                        ? "bg-accent text-foreground"
-                        : "text-muted-foreground hover:bg-accent hover:text-foreground",
-                    )}
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    <LayoutDashboard className="h-4 w-4" />
-                    Dashboard
-                  </Link>
-                )}
-                {NAV_LINKS.map(({ href, label, icon: Icon }) => (
-                  <Link
-                    key={href}
-                    href={href}
-                    className={cn(
-                      "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                      pathname.startsWith(href)
-                        ? "bg-accent text-foreground"
-                        : "text-muted-foreground hover:bg-accent hover:text-foreground",
-                    )}
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    <Icon className="h-4 w-4" />
-                    {label}
-                  </Link>
-                ))}
-                <hr className="my-2" />
-                <Link
-                  href="/settings/profile"
-                  className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  <Settings className="h-4 w-4" />
-                  Settings
-                </Link>
-                <button
-                  className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-destructive hover:bg-accent transition-colors text-left"
-                  onClick={() => {
-                    setMobileOpen(false);
-                    signOut();
-                  }}
-                >
-                  <LogOut className="h-4 w-4" />
-                  Sign out
-                </button>
-              </div>
-            </SheetContent>
-          </Sheet>
-
           {/* Avatar dropdown (all screen sizes) */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

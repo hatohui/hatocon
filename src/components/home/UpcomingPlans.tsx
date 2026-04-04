@@ -149,7 +149,7 @@ export default function UpcomingPlans() {
           <Button
             size="sm"
             variant="outline"
-            className="h-8 gap-1.5 text-xs"
+            className="h-8 gap-1.5 text-xs hidden sm:flex"
             asChild
           >
             <Link href="/leave/new">

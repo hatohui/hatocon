@@ -1,7 +1,7 @@
 "use client";
 
-import { signIn } from "next-auth/react";
-import { useActionState } from "react";
+import { signIn, useSession } from "next-auth/react";
+import { useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 type FormState = { error?: string } | undefined;
@@ -24,6 +24,14 @@ async function loginAction(
 }
 
 export default function LoginPage() {
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    if (session) {
+      router.push("/");
+    }
+  });
+
   const router = useRouter();
   const [state, action, pending] = useActionState(
     async (prev: FormState, formData: FormData) => {

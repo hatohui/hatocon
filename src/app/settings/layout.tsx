@@ -18,13 +18,13 @@ export default function SettingsLayout({
   const pathname = usePathname();
 
   return (
-    <div className="mx-auto max-w-4xl p-6">
-      <h1 className="mb-6 text-2xl font-bold">Settings</h1>
-      <div className="flex gap-6">
-        <nav className="w-48 shrink-0">
-          <ul className="space-y-1">
+    <div className="mx-auto max-w-4xl p-4 md:p-6">
+      <h1 className="mb-4 text-2xl font-bold md:mb-6">Settings</h1>
+      <div className="flex flex-col gap-4 md:flex-row md:gap-6">
+        <nav className="shrink-0 md:w-48">
+          <ul className="flex flex-row gap-1 overflow-x-auto md:flex-col md:space-y-1">
             {links.map(({ href, label, icon: Icon }) => (
-              <li key={href}>
+              <li key={href} className="shrink-0">
                 <Link
                   href={href}
                   className={cn(

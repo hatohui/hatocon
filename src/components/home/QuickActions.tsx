@@ -61,7 +61,7 @@ export default function QuickActions() {
   const firstName = session?.user?.name?.split(" ")[0] || "there";
 
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[2fr_1fr]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[2fr_1fr] lg:gap-8">
       {/* LEFT SIDE: Greeting + Quick Actions */}
       <div className="space-y-5">
         <div className="space-y-1">

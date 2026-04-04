@@ -206,7 +206,10 @@ function ProfileInfoSection() {
             {updateMe.isSuccess && (
               <p className="text-sm text-green-600">Profile updated.</p>
             )}
-            <Button type="submit" disabled={updateMe.isPending}>
+            <Button
+              type="submit"
+              disabled={updateMe.isPending || !form.formState.isDirty}
+            >
               {updateMe.isPending && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
@@ -303,7 +306,10 @@ function PasswordSection() {
             {changePassword.isSuccess && (
               <p className="text-sm text-green-600">Password updated.</p>
             )}
-            <Button type="submit" disabled={changePassword.isPending}>
+            <Button
+              type="submit"
+              disabled={changePassword.isPending || !form.formState.isDirty}
+            >
               {changePassword.isPending && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
