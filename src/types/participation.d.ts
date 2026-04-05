@@ -19,6 +19,7 @@ export type ParticipationImageDTO = {
   groupId: string;
   url: string;
   caption?: string | null;
+  uploadedBy?: string | null;
   createdAt: Date;
 };
 
