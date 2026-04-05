@@ -7,7 +7,8 @@ import { Camera, Download, Filter, ImageIcon, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import {
   Select,
   SelectContent,
@@ -279,6 +280,9 @@ export default function MediaGallery({
       {/* Lightbox */}
       <Dialog open={!!lightbox} onOpenChange={() => setLightbox(null)}>
         <DialogContent className="max-w-4xl p-0 bg-black/90 border-0">
+          <VisuallyHidden>
+            <DialogTitle>Image preview</DialogTitle>
+          </VisuallyHidden>
           <button
             type="button"
             className="absolute top-2 right-2 z-50 text-white/80 hover:text-white"

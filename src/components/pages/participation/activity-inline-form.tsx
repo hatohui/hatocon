@@ -781,7 +781,7 @@ const ActivityInlineForm = ({
                 <CardContent className="p-4">
                   <div className="flex gap-3">
                     {displayImageUrl && (
-                      <div className="relative w-24 shrink-0 self-stretch min-h-[54px] rounded-md overflow-hidden">
+                      <div className="relative w-24 shrink-0 self-stretch min-h-13.5 rounded-md overflow-hidden">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={displayImageUrl}

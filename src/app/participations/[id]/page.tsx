@@ -24,6 +24,7 @@ import {
   ExternalLink,
   ImageIcon,
   Link2,
+  LogIn,
   Mail,
   MapPin,
   Pencil,
@@ -48,9 +49,12 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -398,6 +402,9 @@ function PhotoGallery({
       {/* Lightbox */}
       <Dialog open={!!lightbox} onOpenChange={() => setLightbox(null)}>
         <DialogContent className="max-w-4xl p-0 bg-black/90 border-0">
+          <VisuallyHidden>
+            <DialogTitle>Image preview</DialogTitle>
+          </VisuallyHidden>
           <button
             type="button"
             className="absolute top-2 right-2 z-50 text-white/80 hover:text-white"
@@ -927,6 +934,7 @@ export default function ParticipationDetailPage() {
   const router = useRouter();
   const session = useSession();
   const { data: participation, isLoading } = useParticipationById(params.id);
+  const [loginPromptDismissed, setLoginPromptDismissed] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
   const [editNameOpen, setEditNameOpen] = useState(false);
   const [acceptDatesOpen, setAcceptDatesOpen] = useState(false);
@@ -1049,6 +1057,58 @@ export default function ParticipationDetailPage() {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-8 space-y-6">
+      {/* Login prompt for unauthenticated visitors (e.g. from shared link) */}
+      <Dialog
+        open={session.status === "unauthenticated" && !loginPromptDismissed}
+        onOpenChange={(open) => { if (!open) setLoginPromptDismissed(true); }}
+      >
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <LogIn className="h-5 w-5" />
+              Sign in to view this plan
+            </DialogTitle>
+            <DialogDescription>
+              You&apos;re viewing this plan via a shared link. Sign in to join,
+              interact with activities, and get the full experience.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex-row gap-2 sm:flex-row">
+            <Button
+              variant="outline"
+              onClick={() => setLoginPromptDismissed(true)}
+              className="flex-1"
+            >
+              Continue as guest
+            </Button>
+            <Button asChild className="flex-1">
+              <Link href={`/login?callbackUrl=${encodeURIComponent(`/participations/${params.id}`)}`}>
+                <LogIn className="h-4 w-4 mr-1.5" />
+                Sign in
+              </Link>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Guest banner — shown to unauthenticated visitors */}
+      {session.status === "unauthenticated" && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-muted/40 px-4 py-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <LogIn className="h-4 w-4 text-muted-foreground shrink-0" />
+            <p className="text-sm text-muted-foreground">
+              You&apos;re viewing as a guest. Sign in to join, upload photos, and interact.
+            </p>
+          </div>
+          <Button size="sm" asChild>
+            <Link href={`/login?callbackUrl=${encodeURIComponent(`/participations/${params.id}`)}`}>
+              <LogIn className="h-3.5 w-3.5 mr-1.5" />
+              Sign in
+            </Link>
+          </Button>
+        </div>
+      )}
+
       {/* Invite banner — shown when the current user has a pending invitation */}
       {showInviteBanner && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3">
