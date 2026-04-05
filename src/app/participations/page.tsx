@@ -41,7 +41,7 @@ export default function MyParticipationsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">My Plans</h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground" suppressHydrationWarning>
             {new Date().getFullYear()} leave plans &amp; trip photos
           </p>
         </div>
