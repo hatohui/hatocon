@@ -1025,15 +1025,17 @@ export default function ParticipationDetailPage() {
 
       {/* Header */}
       <div className="space-y-3">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="gap-1.5 -ml-2"
-          onClick={() => router.back()}
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back
-        </Button>
+        {session.data && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="gap-1.5 -ml-2"
+            onClick={() => router.back()}
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+        )}
 
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
