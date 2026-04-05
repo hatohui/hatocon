@@ -55,8 +55,42 @@ const useUpdateGroupSettings = () => {
       participationId: string;
       data: ParticipationGroupSettingsUpdate;
     }) => participationService.updateSettings(participationId, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["participation"] });
+    onMutate: async ({ participationId, data }) => {
+      // Cancel any in-flight refetch so it doesn't overwrite our optimistic update
+      await queryClient.cancelQueries({
+        queryKey: ["participation", participationId],
+      });
+
+      // Snapshot the previous value
+      const previous = queryClient.getQueryData([
+        "participation",
+        participationId,
+      ]);
+
+      // Optimistically update the cache
+      queryClient.setQueryData(
+        ["participation", participationId],
+        (old: { group?: Record<string, unknown> } | undefined) => {
+          if (!old?.group) return old;
+          return { ...old, group: { ...old.group, ...data } };
+        },
+      );
+
+      return { previous, participationId };
+    },
+    onError: (_err, _vars, context) => {
+      // Roll back on failure
+      if (context?.previous !== undefined) {
+        queryClient.setQueryData(
+          ["participation", context.participationId],
+          context.previous,
+        );
+      }
+    },
+    onSettled: (_data, _err, { participationId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ["participation", participationId],
+      });
     },
   });
 };

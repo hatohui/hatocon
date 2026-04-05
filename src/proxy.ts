@@ -7,6 +7,6 @@ export { auth as proxy };
 
 export const config = {
   matcher: [
-    "/((?!login|api/auth|_next/static|participations/[^/]+|_next/image|favicon\\.ico).*)",
+    "/((?!login|api/auth|_next/static|share/[^/]+|participations/[^/]+|_next/image|favicon\\.ico).*)",
   ],
 };
