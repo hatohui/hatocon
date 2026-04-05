@@ -3,7 +3,12 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 import { useSession } from "next-auth/react";
 import {
   differenceInCalendarDays,
@@ -933,10 +938,21 @@ function UpcomingActivities({
 export default function ParticipationDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const session = useSession();
   const { data: participation, isLoading } = useParticipationById(params.id);
   const [loginPromptDismissed, setLoginPromptDismissed] = useState(false);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState(
+    searchParams.get("tab") ?? "overview",
+  );
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    const sp = new URLSearchParams(searchParams.toString());
+    sp.set("tab", tab);
+    router.replace(`${pathname}?${sp.toString()}`, { scroll: false });
+  };
   const [editNameOpen, setEditNameOpen] = useState(false);
   const [acceptDatesOpen, setAcceptDatesOpen] = useState(false);
   const [acceptFromInput, setAcceptFromInput] = useState("");
@@ -1488,7 +1504,7 @@ export default function ParticipationDetailPage() {
       {/* Tabs */}
       <Tabs
         value={activeTab}
-        onValueChange={setActiveTab}
+        onValueChange={handleTabChange}
         className="space-y-6"
       >
         <TabsList>
@@ -1512,7 +1528,7 @@ export default function ParticipationDetailPage() {
                 <PhotoGallery
                   images={participation.group?.images ?? []}
                   participationId={participation.id}
-                  onViewAll={() => setActiveTab("media")}
+                  onViewAll={() => handleTabChange("media")}
                   isOwner={isOwner}
                   isAdmin={isAdmin}
                   userId={currentUserId}
@@ -1537,7 +1553,7 @@ export default function ParticipationDetailPage() {
                 members={members}
                 participants={participation.participants}
                 event={participation.event}
-                onViewAll={() => setActiveTab("timeline")}
+                onViewAll={() => handleTabChange("timeline")}
               />
             </div>
             <div className="space-y-6">
