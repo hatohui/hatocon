@@ -82,7 +82,7 @@ export function ActivityCard({
         <div className="flex gap-2.5">
           {/* Image thumbnail */}
           {activity.imageUrl && (
-            <div className="relative h-14 w-14 rounded-md overflow-hidden shrink-0">
+            <div className="relative w-24 shrink-0 self-stretch min-h-[54px] rounded-md overflow-hidden">
               <Image
                 src={activity.imageUrl}
                 alt={activity.name}
@@ -185,7 +185,7 @@ export function ActivityCard({
                         <Pencil className="h-3.5 w-3.5" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent align="end" className="w-52">
                       {mergedMembers.map((m) => (
                         <DropdownMenuItem
                           key={m.userId}
@@ -198,7 +198,7 @@ export function ActivityCard({
                             )
                           }
                         >
-                          <Avatar className="h-5 w-5 mr-2 shrink-0">
+                          <Avatar className="h-5 w-5 shrink-0">
                             <AvatarImage
                               src={
                                 allUsers.find((u) => u.id === m.userId)
@@ -209,7 +209,7 @@ export function ActivityCard({
                               {initials(m.name)}
                             </AvatarFallback>
                           </Avatar>
-                          {m.name}
+                          <span className="flex-1 truncate">{m.name}</span>
                         </DropdownMenuItem>
                       ))}
                     </DropdownMenuContent>

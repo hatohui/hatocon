@@ -16,3 +16,11 @@ export function durationLabel(start: Date, end: Date) {
 export function getRandomQuote() {
   return QUOTES[Math.floor(Math.random() * QUOTES.length)];
 }
+
+export function initials(name: string) {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
+}

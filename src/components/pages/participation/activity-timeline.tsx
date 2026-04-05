@@ -33,6 +33,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 import { useActivities } from "@/hooks/activities/useActivities";
 import { useUpdateParticipationDates } from "@/hooks/participations/useParticipations";
+import { useArrivalDepartureItems } from "@/hooks/participations/useArrivalDepartureItems";
 import type { ParticipationParticipant } from "@/types/participation.d";
 import { cn } from "@/lib/utils";
 import ActivityInlineForm from "@/components/pages/participation/activity-inline-form";
@@ -125,194 +126,16 @@ const ActivityTimeline = ({
   };
 
   // Synthetic arrival / departure items for ALL participants
-  const arrivalDepartureItems: EventActivity[] = (() => {
-    // If we have participants list, generate items for each member
-    if (participants.length > 0) {
-      const items: EventActivity[] = [];
-      for (const p of participants) {
-        // Skip "already here" members — they don't need arrival/departure markers
-        if (p.isAlreadyHere) continue;
-
-        const isMe = p.userId === currentUserId;
-        const memberName = p.user.name;
-        const arrivalLabel = isMe ? "You arrive" : `${memberName} arrives`;
-        const departureLabel = isMe ? "You depart" : `${memberName} departs`;
-        const isEditable = isOwner || p.userId === participantUser?.id;
-
-        if (p.from) {
-          items.push({
-            id: `__arriving_${p.userId}`,
-            name: arrivalLabel,
-            from: p.from,
-            to: p.from,
-            location: null,
-            locationUrl: null,
-            imageUrl: null,
-            involvedPeople: [p.userId],
-            note: null,
-            media: [],
-            isSynthetic: true,
-            ...(isEditable
-              ? { editableDateField: "from" as const, participationId: p.id }
-              : {}),
-          });
-        }
-        if (p.to) {
-          items.push({
-            id: `__departing_${p.userId}`,
-            name: departureLabel,
-            from: p.to,
-            to: p.to,
-            location: null,
-            locationUrl: null,
-            imageUrl: null,
-            involvedPeople: [p.userId],
-            note: null,
-            media: [],
-            isSynthetic: true,
-            ...(isEditable
-              ? { editableDateField: "to" as const, participationId: p.id }
-              : {}),
-          });
-        }
-      }
-
-      // Merge arrivals at the same timestamp into one card
-      const mergeByTime = (
-        src: EventActivity[],
-        kind: "arriving" | "departing",
-      ): EventActivity[] => {
-        const byTime = new Map<number, EventActivity[]>();
-        for (const item of src) {
-          const t = new Date(item.from).getTime();
-          const bucket = byTime.get(t) ?? [];
-          bucket.push(item);
-          byTime.set(t, bucket);
-        }
-        return Array.from(byTime.values()).map((bucket) => {
-          if (bucket.length === 1) return bucket[0];
-          const allUserIds = bucket.flatMap((b) => b.involvedPeople);
-          const hasMe = allUserIds.includes(currentUserId ?? "");
-          const otherCount = hasMe ? allUserIds.length - 1 : allUserIds.length;
-          let name: string;
-          if (kind === "arriving") {
-            name =
-              allUserIds.length ===
-              participants.length - /* already-here already excluded */ 0
-                ? "Everyone arrives"
-                : hasMe && otherCount === 1
-                  ? `You & ${members.find((m) => allUserIds.find((id) => id !== currentUserId && id === m.id))?.name ?? "1 other"} arrive`
-                  : hasMe
-                    ? `You & ${otherCount} others arrive`
-                    : `${allUserIds.length} members arrive`;
-          } else {
-            name =
-              hasMe && otherCount === 1
-                ? `You & ${members.find((m) => allUserIds.find((id) => id !== currentUserId && id === m.id))?.name ?? "1 other"} depart`
-                : hasMe
-                  ? `You & ${otherCount} others depart`
-                  : `${allUserIds.length} members depart`;
-          }
-          const editableBucket = bucket.filter((b) => b.editableDateField);
-          const mergedMembers =
-            editableBucket.length > 1
-              ? editableBucket.map((b) => ({
-                  userId: b.involvedPeople[0],
-                  participationId: b.participationId!,
-                  name:
-                    members.find((m) => m.id === b.involvedPeople[0])?.name ??
-                    b.involvedPeople[0],
-                  dateField: b.editableDateField as "from" | "to",
-                  datetime: b.from,
-                }))
-              : undefined;
-          return {
-            ...bucket[0],
-            id: `__${kind}_group_${new Date(bucket[0].from).getTime()}`,
-            name,
-            involvedPeople: allUserIds,
-            // single editable: keep editableDateField + participationId
-            editableDateField:
-              editableBucket.length === 1
-                ? editableBucket[0].editableDateField
-                : undefined,
-            participationId:
-              editableBucket.length === 1
-                ? editableBucket[0].participationId
-                : undefined,
-            mergedMembers,
-          };
-        });
-      };
-
-      const arrivalItems = items.filter((i) => i.id.startsWith("__arriving_"));
-      const departureItems = items.filter((i) =>
-        i.id.startsWith("__departing_"),
-      );
-      const otherItems = items.filter(
-        (i) =>
-          !i.id.startsWith("__arriving_") && !i.id.startsWith("__departing_"),
-      );
-
-      return [
-        ...mergeByTime(arrivalItems, "arriving"),
-        ...mergeByTime(departureItems, "departing"),
-        ...otherItems,
-      ];
-    }
-
-    // Fallback: only the current participation's owner
-    const isOwnParticipation =
-      !participantUser || participantUser.id === currentUserId;
-    const arrivalName = isOwnParticipation
-      ? "You arrive"
-      : `${participantUser!.name} arrives`;
-    const departureName = isOwnParticipation
-      ? "You depart"
-      : `${participantUser!.name} departs`;
-    const participantTag = participantUser ? [participantUser.id] : [];
-
-    return [
-      ...(participationFrom
-        ? [
-            {
-              id: "__arriving",
-              name: arrivalName,
-              from: participationFrom,
-              to: participationFrom,
-              location: null,
-              locationUrl: null,
-              imageUrl: null,
-              involvedPeople: participantTag,
-              note: null as null,
-              media: [],
-              isSynthetic: true as const,
-              editableDateField: "from" as const,
-              participationId,
-            },
-          ]
-        : []),
-      ...(participationTo
-        ? [
-            {
-              id: "__departing",
-              name: departureName,
-              from: participationTo,
-              to: participationTo,
-              location: null,
-              locationUrl: null,
-              imageUrl: null,
-              involvedPeople: participantTag,
-              note: null as null,
-              media: [],
-              isSynthetic: true as const,
-              editableDateField: "to" as const,
-              participationId,
-            },
-          ]
-        : []),
-    ];
-  })();
+  const arrivalDepartureItems = useArrivalDepartureItems({
+    participants,
+    members,
+    currentUserId,
+    participantUser,
+    participationId,
+    participationFrom,
+    participationTo,
+    isOwner,
+  });
 
   // Synthetic event boundary items
   const syntheticItems: EventActivity[] = event

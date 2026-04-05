@@ -722,7 +722,7 @@ const ActivityInlineForm = ({
               <img
                 src={displayImageUrl}
                 alt="Cover thumbnail"
-                className="h-9 w-16 rounded object-cover shrink-0"
+                className="h-9 w-9 rounded object-cover shrink-0"
               />
               <span className="flex-1 truncate text-xs text-muted-foreground">
                 {pendingImageFile ? pendingImageFile.name : "Current cover"}
@@ -764,7 +764,7 @@ const ActivityInlineForm = ({
         <ImageCropDialog
           file={cropFile}
           aspect={16 / 9}
-          maxWidth={1200}
+          maxWidth={960}
           quality={0.85}
           onComplete={handleCropComplete}
         />
@@ -781,12 +781,12 @@ const ActivityInlineForm = ({
                 <CardContent className="p-4">
                   <div className="flex gap-3">
                     {displayImageUrl && (
-                      <div className="relative h-16 w-16 rounded-lg overflow-hidden shrink-0">
+                      <div className="relative w-24 shrink-0 self-stretch min-h-[54px] rounded-md overflow-hidden">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={displayImageUrl}
                           alt={name || "Cover"}
-                          className="h-full w-full object-cover"
+                          className="absolute inset-0 h-full w-full object-cover"
                         />
                       </div>
                     )}

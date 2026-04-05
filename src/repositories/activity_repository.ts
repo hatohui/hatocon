@@ -72,6 +72,31 @@ const activityRepository = {
     return db.activity.delete({ where: { id } });
   },
 
+  removeUserFromGroup: async (groupId: string, userId: string) => {
+    // Delete activities created by the user in this group
+    await db.activity.deleteMany({
+      where: { participationGroupId: groupId, createdBy: userId },
+    });
+
+    // Remove the user from involvedPeople in remaining activities
+    const affected = await db.activity.findMany({
+      where: {
+        participationGroupId: groupId,
+        involvedPeople: { has: userId },
+      },
+      select: { id: true, involvedPeople: true },
+    });
+
+    for (const activity of affected) {
+      await db.activity.update({
+        where: { id: activity.id },
+        data: {
+          involvedPeople: activity.involvedPeople.filter((p) => p !== userId),
+        },
+      });
+    }
+  },
+
   // ─── Activity Media ──────────────────────────────────────────────
   getMedia: async (activityId: string) => {
     return db.activityMedia.findMany({

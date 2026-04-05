@@ -16,7 +16,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Loader2, Lock } from "lucide-react";
 
 type ImageCropDialogProps = {
   /** The file the user just selected */
@@ -76,6 +77,12 @@ export default function ImageCropDialog({
   quality = 0.85,
   onComplete,
 }: ImageCropDialogProps) {
+  const aspectLabel =
+    aspect === 1
+      ? "1:1"
+      : aspect === 16 / 9
+        ? "16:9"
+        : `${aspect.toFixed(2)}:1`;
   const [crop, setCrop] = useState<Crop>();
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const [saving, setSaving] = useState(false);
@@ -135,17 +142,24 @@ export default function ImageCropDialog({
     >
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Crop Image</DialogTitle>
+          <div className="flex items-center gap-2">
+            <DialogTitle>Crop Image</DialogTitle>
+            <Badge variant="secondary" className="gap-1 text-xs font-mono">
+              <Lock className="h-3 w-3" />
+              {aspectLabel}
+            </Badge>
+          </div>
         </DialogHeader>
 
         {previewUrl && (
-          <div className="flex justify-center max-h-[60vh] overflow-auto">
+          <div className="flex justify-center overflow-hidden">
             <ReactCrop
               crop={crop}
               onChange={(c) => setCrop(c)}
               onComplete={(c) => setCompletedCrop(c)}
               aspect={aspect}
               circularCrop={aspect === 1}
+              style={{ maxHeight: "60vh", maxWidth: "100%" }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -153,7 +167,11 @@ export default function ImageCropDialog({
                 src={previewUrl}
                 alt="Crop preview"
                 onLoad={onImageLoad}
-                style={{ maxHeight: "55vh" }}
+                style={{
+                  maxHeight: "60vh",
+                  maxWidth: "100%",
+                  display: "block",
+                }}
               />
             </ReactCrop>
           </div>

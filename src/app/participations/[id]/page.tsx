@@ -574,6 +574,7 @@ function UpcomingActivities({
   currentUserId,
   isOwner,
   showActivityDetails,
+  members = [],
   participants = [],
   event,
   onViewAll,
@@ -585,6 +586,7 @@ function UpcomingActivities({
   currentUserId?: string;
   isOwner: boolean;
   showActivityDetails: boolean;
+  members?: { id: string; name: string; image: string | null; email: string }[];
   participants?: Array<{
     id: string;
     userId: string;
@@ -898,13 +900,16 @@ function UpcomingActivities({
         open={editingActivityId !== null}
         onOpenChange={(open) => !open && setEditingActivityId(null)}
       >
-        <DialogContent className="max-w-xl p-0 gap-0 overflow-y-auto max-h-[90vh]">
+        <DialogContent className="max-w-2xl p-0 gap-0 overflow-y-auto max-h-[90vh]">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Edit Activity</DialogTitle>
+          </DialogHeader>
           <div className="p-4">
             {editingActivityId && (
               <ActivityInlineForm
                 participationId={participationId}
                 activity={activities?.find((a) => a.id === editingActivityId)}
-                allUsers={[]}
+                allUsers={members}
                 onDone={() => setEditingActivityId(null)}
               />
             )}
@@ -1374,6 +1379,7 @@ export default function ParticipationDetailPage() {
                 showActivityDetails={
                   isMemberOfGroup || isAdmin || isActivityVisible
                 }
+                members={members}
                 participants={participation.participants}
                 event={participation.event}
                 onViewAll={() => setActiveTab("timeline")}

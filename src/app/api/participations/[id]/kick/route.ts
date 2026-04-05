@@ -7,6 +7,7 @@ import {
   OK,
   Unauthorized,
 } from "@/common/response";
+import activityRepository from "@/repositories/activity_repository";
 import notificationRepository from "@/repositories/notification_repository";
 import participationRepository from "@/repositories/participation_repository";
 import type { NextRequest } from "next/server";
@@ -49,6 +50,9 @@ const POST = async (req: NextRequest, ctx: RouteContext) => {
   if (!targetParticipation) {
     return NotFound(messages.participationGroup.targetNotMember);
   }
+
+  // Delete the target's activities and remove them from other activities in the group
+  await activityRepository.removeUserFromGroup(group.id, userId);
 
   // Delete the target's participation
   await participationRepository.delete(targetParticipation.id);
