@@ -34,6 +34,8 @@ export type ParticipationMinAggregateOutputType = {
   leaveType: $Enums.LeaveType | null
   createdBy: string | null
   isAlreadyHere: boolean | null
+  entryFlight: string | null
+  exitFlight: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -48,6 +50,8 @@ export type ParticipationMaxAggregateOutputType = {
   leaveType: $Enums.LeaveType | null
   createdBy: string | null
   isAlreadyHere: boolean | null
+  entryFlight: string | null
+  exitFlight: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -62,6 +66,8 @@ export type ParticipationCountAggregateOutputType = {
   leaveType: number
   createdBy: number
   isAlreadyHere: number
+  entryFlight: number
+  exitFlight: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -78,6 +84,8 @@ export type ParticipationMinAggregateInputType = {
   leaveType?: true
   createdBy?: true
   isAlreadyHere?: true
+  entryFlight?: true
+  exitFlight?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -92,6 +100,8 @@ export type ParticipationMaxAggregateInputType = {
   leaveType?: true
   createdBy?: true
   isAlreadyHere?: true
+  entryFlight?: true
+  exitFlight?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -106,6 +116,8 @@ export type ParticipationCountAggregateInputType = {
   leaveType?: true
   createdBy?: true
   isAlreadyHere?: true
+  entryFlight?: true
+  exitFlight?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -193,6 +205,8 @@ export type ParticipationGroupByOutputType = {
   leaveType: $Enums.LeaveType
   createdBy: string | null
   isAlreadyHere: boolean
+  entryFlight: string | null
+  exitFlight: string | null
   createdAt: Date
   updatedAt: Date
   _count: ParticipationCountAggregateOutputType | null
@@ -228,6 +242,8 @@ export type ParticipationWhereInput = {
   leaveType?: Prisma.EnumLeaveTypeFilter<"Participation"> | $Enums.LeaveType
   createdBy?: Prisma.StringNullableFilter<"Participation"> | string | null
   isAlreadyHere?: Prisma.BoolFilter<"Participation"> | boolean
+  entryFlight?: Prisma.StringNullableFilter<"Participation"> | string | null
+  exitFlight?: Prisma.StringNullableFilter<"Participation"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Participation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Participation"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -245,6 +261,8 @@ export type ParticipationOrderByWithRelationInput = {
   leaveType?: Prisma.SortOrder
   createdBy?: Prisma.SortOrderInput | Prisma.SortOrder
   isAlreadyHere?: Prisma.SortOrder
+  entryFlight?: Prisma.SortOrderInput | Prisma.SortOrder
+  exitFlight?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -265,6 +283,8 @@ export type ParticipationWhereUniqueInput = Prisma.AtLeast<{
   leaveType?: Prisma.EnumLeaveTypeFilter<"Participation"> | $Enums.LeaveType
   createdBy?: Prisma.StringNullableFilter<"Participation"> | string | null
   isAlreadyHere?: Prisma.BoolFilter<"Participation"> | boolean
+  entryFlight?: Prisma.StringNullableFilter<"Participation"> | string | null
+  exitFlight?: Prisma.StringNullableFilter<"Participation"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Participation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Participation"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -282,6 +302,8 @@ export type ParticipationOrderByWithAggregationInput = {
   leaveType?: Prisma.SortOrder
   createdBy?: Prisma.SortOrderInput | Prisma.SortOrder
   isAlreadyHere?: Prisma.SortOrder
+  entryFlight?: Prisma.SortOrderInput | Prisma.SortOrder
+  exitFlight?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ParticipationCountOrderByAggregateInput
@@ -302,6 +324,8 @@ export type ParticipationScalarWhereWithAggregatesInput = {
   leaveType?: Prisma.EnumLeaveTypeWithAggregatesFilter<"Participation"> | $Enums.LeaveType
   createdBy?: Prisma.StringNullableWithAggregatesFilter<"Participation"> | string | null
   isAlreadyHere?: Prisma.BoolWithAggregatesFilter<"Participation"> | boolean
+  entryFlight?: Prisma.StringNullableWithAggregatesFilter<"Participation"> | string | null
+  exitFlight?: Prisma.StringNullableWithAggregatesFilter<"Participation"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Participation"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Participation"> | Date | string
 }
@@ -313,6 +337,8 @@ export type ParticipationCreateInput = {
   leaveType: $Enums.LeaveType
   createdBy?: string | null
   isAlreadyHere?: boolean
+  entryFlight?: string | null
+  exitFlight?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutParticipationsInput
@@ -330,6 +356,8 @@ export type ParticipationUncheckedCreateInput = {
   leaveType: $Enums.LeaveType
   createdBy?: string | null
   isAlreadyHere?: boolean
+  entryFlight?: string | null
+  exitFlight?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -341,6 +369,8 @@ export type ParticipationUpdateInput = {
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  entryFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exitFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutParticipationsNestedInput
@@ -358,6 +388,8 @@ export type ParticipationUncheckedUpdateInput = {
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  entryFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exitFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -372,6 +404,8 @@ export type ParticipationCreateManyInput = {
   leaveType: $Enums.LeaveType
   createdBy?: string | null
   isAlreadyHere?: boolean
+  entryFlight?: string | null
+  exitFlight?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -383,6 +417,8 @@ export type ParticipationUpdateManyMutationInput = {
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  entryFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exitFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -397,6 +433,8 @@ export type ParticipationUncheckedUpdateManyInput = {
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  entryFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exitFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -421,6 +459,8 @@ export type ParticipationCountOrderByAggregateInput = {
   leaveType?: Prisma.SortOrder
   createdBy?: Prisma.SortOrder
   isAlreadyHere?: Prisma.SortOrder
+  entryFlight?: Prisma.SortOrder
+  exitFlight?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -435,6 +475,8 @@ export type ParticipationMaxOrderByAggregateInput = {
   leaveType?: Prisma.SortOrder
   createdBy?: Prisma.SortOrder
   isAlreadyHere?: Prisma.SortOrder
+  entryFlight?: Prisma.SortOrder
+  exitFlight?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -449,6 +491,8 @@ export type ParticipationMinOrderByAggregateInput = {
   leaveType?: Prisma.SortOrder
   createdBy?: Prisma.SortOrder
   isAlreadyHere?: Prisma.SortOrder
+  entryFlight?: Prisma.SortOrder
+  exitFlight?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -590,6 +634,8 @@ export type ParticipationCreateWithoutUserInput = {
   leaveType: $Enums.LeaveType
   createdBy?: string | null
   isAlreadyHere?: boolean
+  entryFlight?: string | null
+  exitFlight?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   event?: Prisma.EventCreateNestedOneWithoutParticipationsInput
@@ -605,6 +651,8 @@ export type ParticipationUncheckedCreateWithoutUserInput = {
   leaveType: $Enums.LeaveType
   createdBy?: string | null
   isAlreadyHere?: boolean
+  entryFlight?: string | null
+  exitFlight?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -648,6 +696,8 @@ export type ParticipationScalarWhereInput = {
   leaveType?: Prisma.EnumLeaveTypeFilter<"Participation"> | $Enums.LeaveType
   createdBy?: Prisma.StringNullableFilter<"Participation"> | string | null
   isAlreadyHere?: Prisma.BoolFilter<"Participation"> | boolean
+  entryFlight?: Prisma.StringNullableFilter<"Participation"> | string | null
+  exitFlight?: Prisma.StringNullableFilter<"Participation"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Participation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Participation"> | Date | string
 }
@@ -659,6 +709,8 @@ export type ParticipationCreateWithoutEventInput = {
   leaveType: $Enums.LeaveType
   createdBy?: string | null
   isAlreadyHere?: boolean
+  entryFlight?: string | null
+  exitFlight?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutParticipationsInput
@@ -674,6 +726,8 @@ export type ParticipationUncheckedCreateWithoutEventInput = {
   leaveType: $Enums.LeaveType
   createdBy?: string | null
   isAlreadyHere?: boolean
+  entryFlight?: string | null
+  exitFlight?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -711,6 +765,8 @@ export type ParticipationCreateWithoutGroupInput = {
   leaveType: $Enums.LeaveType
   createdBy?: string | null
   isAlreadyHere?: boolean
+  entryFlight?: string | null
+  exitFlight?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutParticipationsInput
@@ -726,6 +782,8 @@ export type ParticipationUncheckedCreateWithoutGroupInput = {
   leaveType: $Enums.LeaveType
   createdBy?: string | null
   isAlreadyHere?: boolean
+  entryFlight?: string | null
+  exitFlight?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -765,6 +823,8 @@ export type ParticipationCreateManyUserInput = {
   leaveType: $Enums.LeaveType
   createdBy?: string | null
   isAlreadyHere?: boolean
+  entryFlight?: string | null
+  exitFlight?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -776,6 +836,8 @@ export type ParticipationUpdateWithoutUserInput = {
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  entryFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exitFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   event?: Prisma.EventUpdateOneWithoutParticipationsNestedInput
@@ -791,6 +853,8 @@ export type ParticipationUncheckedUpdateWithoutUserInput = {
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  entryFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exitFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -804,6 +868,8 @@ export type ParticipationUncheckedUpdateManyWithoutUserInput = {
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  entryFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exitFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -817,6 +883,8 @@ export type ParticipationCreateManyEventInput = {
   leaveType: $Enums.LeaveType
   createdBy?: string | null
   isAlreadyHere?: boolean
+  entryFlight?: string | null
+  exitFlight?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -828,6 +896,8 @@ export type ParticipationUpdateWithoutEventInput = {
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  entryFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exitFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutParticipationsNestedInput
@@ -843,6 +913,8 @@ export type ParticipationUncheckedUpdateWithoutEventInput = {
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  entryFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exitFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -856,6 +928,8 @@ export type ParticipationUncheckedUpdateManyWithoutEventInput = {
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  entryFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exitFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -869,6 +943,8 @@ export type ParticipationCreateManyGroupInput = {
   leaveType: $Enums.LeaveType
   createdBy?: string | null
   isAlreadyHere?: boolean
+  entryFlight?: string | null
+  exitFlight?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -880,6 +956,8 @@ export type ParticipationUpdateWithoutGroupInput = {
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  entryFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exitFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutParticipationsNestedInput
@@ -895,6 +973,8 @@ export type ParticipationUncheckedUpdateWithoutGroupInput = {
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  entryFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exitFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -908,6 +988,8 @@ export type ParticipationUncheckedUpdateManyWithoutGroupInput = {
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  entryFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  exitFlight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -924,6 +1006,8 @@ export type ParticipationSelect<ExtArgs extends runtime.Types.Extensions.Interna
   leaveType?: boolean
   createdBy?: boolean
   isAlreadyHere?: boolean
+  entryFlight?: boolean
+  exitFlight?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -941,6 +1025,8 @@ export type ParticipationSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   leaveType?: boolean
   createdBy?: boolean
   isAlreadyHere?: boolean
+  entryFlight?: boolean
+  exitFlight?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -958,6 +1044,8 @@ export type ParticipationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   leaveType?: boolean
   createdBy?: boolean
   isAlreadyHere?: boolean
+  entryFlight?: boolean
+  exitFlight?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -975,11 +1063,13 @@ export type ParticipationSelectScalar = {
   leaveType?: boolean
   createdBy?: boolean
   isAlreadyHere?: boolean
+  entryFlight?: boolean
+  exitFlight?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ParticipationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "eventId" | "groupId" | "from" | "to" | "leaveType" | "createdBy" | "isAlreadyHere" | "createdAt" | "updatedAt", ExtArgs["result"]["participation"]>
+export type ParticipationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "eventId" | "groupId" | "from" | "to" | "leaveType" | "createdBy" | "isAlreadyHere" | "entryFlight" | "exitFlight" | "createdAt" | "updatedAt", ExtArgs["result"]["participation"]>
 export type ParticipationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   event?: boolean | Prisma.Participation$eventArgs<ExtArgs>
@@ -1013,6 +1103,8 @@ export type $ParticipationPayload<ExtArgs extends runtime.Types.Extensions.Inter
     leaveType: $Enums.LeaveType
     createdBy: string | null
     isAlreadyHere: boolean
+    entryFlight: string | null
+    exitFlight: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["participation"]>
@@ -1450,6 +1542,8 @@ export interface ParticipationFieldRefs {
   readonly leaveType: Prisma.FieldRef<"Participation", 'LeaveType'>
   readonly createdBy: Prisma.FieldRef<"Participation", 'String'>
   readonly isAlreadyHere: Prisma.FieldRef<"Participation", 'Boolean'>
+  readonly entryFlight: Prisma.FieldRef<"Participation", 'String'>
+  readonly exitFlight: Prisma.FieldRef<"Participation", 'String'>
   readonly createdAt: Prisma.FieldRef<"Participation", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Participation", 'DateTime'>
 }

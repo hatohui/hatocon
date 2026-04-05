@@ -16,6 +16,8 @@ export const participationBaseSchema = zod.object({
     message: messages.participation.validation.leaveTypeInvalid,
   }),
   coTravelerIds: zod.array(zod.uuid()).optional(),
+  entryFlight: zod.string().max(20).optional().nullable(),
+  exitFlight: zod.string().max(20).optional().nullable(),
 });
 
 export const participationSchema = participationBaseSchema.refine(

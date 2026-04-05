@@ -7,9 +7,12 @@ import {
   Unauthorized,
 } from "@/common/response";
 import { db } from "@/config/prisma";
+import { r2 } from "@/config/r2";
 import { cacheDelPattern } from "@/config/redis";
 import eventRepository from "@/repositories/event_repository";
+import notificationRepository from "@/repositories/notification_repository";
 import { eventBaseSchema } from "@/validations/eventSchema";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import type { NextRequest } from "next/server";
 
 type Context = { params: Promise<{ id: string }> };
@@ -99,7 +102,47 @@ const DELETE = async (_req: NextRequest, ctx: Context) => {
   const isAdmin = session.user.isAdmin;
   if (!isOwner && !isAdmin) return Forbidden();
 
-  await eventRepository.softDelete(id);
+  // Collect all R2 image URLs before deleting records
+  const imageUrls = await eventRepository.getImageUrls(id);
+
+  // Gather all unique user IDs who had a participation in this event (exclude the deleter)
+  const participantUserIds = await db.participation
+    .findMany({
+      where: { eventId: id, userId: { not: session.user.id } },
+      select: { userId: true },
+      distinct: ["userId"],
+    })
+    .then((rows) => rows.map((r) => r.userId));
+
+  // Hard delete the event and all child records
+  await eventRepository.hardDelete(id);
+
+  // Delete R2 objects after DB cleanup (best-effort, fire-and-forget errors won't roll back)
+  if (imageUrls.length > 0) {
+    const r2Base = process.env.R2_PUBLIC_URL ?? "";
+    await Promise.allSettled(
+      imageUrls.map((url) => {
+        const key = url.startsWith(r2Base) ? url.slice(r2Base.length + 1) : url;
+        return r2.send(
+          new DeleteObjectCommand({
+            Bucket: process.env.R2_BUCKET_NAME!,
+            Key: key,
+          }),
+        );
+      }),
+    );
+  }
+
+  // Notify all participants that the event was deleted
+  if (participantUserIds.length > 0) {
+    await notificationRepository.createMany(
+      participantUserIds,
+      "EVENT_DELETED",
+      { eventId: id, eventTitle: event.title },
+      session.user.id,
+    );
+  }
+
   await cacheDelPattern("events:*");
   return OK({ id });
 };

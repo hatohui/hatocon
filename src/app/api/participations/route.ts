@@ -61,7 +61,16 @@ const POST = async (req: NextRequest) => {
     return BadRequest(result.error.issues.map((i) => i.message).join(", "));
   }
 
-  const { from, to, eventId, leaveType, coTravelerIds, planName } = result.data;
+  const {
+    from,
+    to,
+    eventId,
+    leaveType,
+    coTravelerIds,
+    planName,
+    entryFlight,
+    exitFlight,
+  } = result.data;
   const groupName = planName ?? "My Plan";
 
   // Always check for overlapping participations first
@@ -111,13 +120,19 @@ const POST = async (req: NextRequest) => {
     name: groupName,
   });
 
-  const participation = await participationRepository.create(session.user.id, {
-    eventId: resolvedEventId,
-    groupId: group.id,
-    from,
-    to,
-    leaveType,
-  });
+  const participation = await participationRepository.create(
+    session.user.id,
+    {
+      eventId: resolvedEventId,
+      groupId: group.id,
+      from,
+      to,
+      leaveType,
+      entryFlight: entryFlight || null,
+      exitFlight: exitFlight || null,
+    },
+    session.user.id,
+  );
 
   // Bust the creator's events cache (new private event or newly visible event)
   await cacheDel(`events:list:${session.user.id}`);

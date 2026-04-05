@@ -180,7 +180,14 @@ const EventCalendar = ({
                         {dayEvents.slice(0, 2).map((ev) => (
                           <div
                             key={ev.id}
-                            className="flex items-center gap-1 rounded px-1 py-0.5 bg-primary/10 w-full min-w-0"
+                            className={cn(
+                              "flex items-center gap-1 rounded px-1 py-0.5 w-full min-w-0",
+                              !ev.isApproved
+                                ? "bg-amber-500/15"
+                                : ev.visibility === "PRIVATE"
+                                  ? "bg-purple-500/15"
+                                  : "bg-primary/10",
+                            )}
                           >
                             {ev.image && (
                               // eslint-disable-next-line @next/next/no-img-element
@@ -190,7 +197,16 @@ const EventCalendar = ({
                                 className="h-3 w-3 rounded-sm object-cover shrink-0"
                               />
                             )}
-                            <span className="text-[10px] font-medium text-primary truncate leading-tight">
+                            <span
+                              className={cn(
+                                "text-[10px] font-medium truncate leading-tight",
+                                !ev.isApproved
+                                  ? "text-amber-700 dark:text-amber-400"
+                                  : ev.visibility === "PRIVATE"
+                                    ? "text-purple-700 dark:text-purple-400"
+                                    : "text-primary",
+                              )}
+                            >
                               {ev.title}
                             </span>
                           </div>

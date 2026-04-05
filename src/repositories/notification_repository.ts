@@ -78,6 +78,10 @@ const notificationRepository = {
       data: { type, isRead: true },
     });
   },
+
+  deleteById: async (id: string, userId: string) => {
+    return db.notification.deleteMany({ where: { id, userId } });
+  },
 };
 
 export default notificationRepository;

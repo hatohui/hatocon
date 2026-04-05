@@ -1822,6 +1822,8 @@ export const ParticipationScalarFieldEnum = {
   leaveType: 'leaveType',
   createdBy: 'createdBy',
   isAlreadyHere: 'isAlreadyHere',
+  entryFlight: 'entryFlight',
+  exitFlight: 'exitFlight',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1834,6 +1836,7 @@ export const ParticipationImageScalarFieldEnum = {
   groupId: 'groupId',
   url: 'url',
   caption: 'caption',
+  uploadedBy: 'uploadedBy',
   createdAt: 'createdAt'
 } as const
 

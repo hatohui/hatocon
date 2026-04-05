@@ -34,7 +34,11 @@ export const NotificationType = {
   USER_KICKED: 'USER_KICKED',
   INVITED_TO_JOIN: 'INVITED_TO_JOIN',
   INVITE_ACCEPTED: 'INVITE_ACCEPTED',
-  INVITE_DECLINED: 'INVITE_DECLINED'
+  INVITE_DECLINED: 'INVITE_DECLINED',
+  EVENT_DELETED: 'EVENT_DELETED',
+  PLAN_DELETED: 'PLAN_DELETED',
+  GROUP_PROMOTION: 'GROUP_PROMOTION',
+  USER_LEFT: 'USER_LEFT'
 } as const
 
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]

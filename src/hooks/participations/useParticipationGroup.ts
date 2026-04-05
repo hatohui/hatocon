@@ -106,6 +106,30 @@ const useRequestToJoin = () => {
   });
 };
 
+const useDeleteGroup = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (participationId: string) =>
+      participationService.deleteGroup(participationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["participations"] });
+      queryClient.invalidateQueries({ queryKey: ["participation"] });
+    },
+  });
+};
+
+const useLeaveGroup = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (participationId: string) =>
+      participationService.leaveGroup(participationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["participations"] });
+      queryClient.invalidateQueries({ queryKey: ["participation"] });
+    },
+  });
+};
+
 const useApproveJoinRequest = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -147,4 +171,6 @@ export {
   useRequestToJoin,
   useApproveJoinRequest,
   useRejectJoinRequest,
+  useDeleteGroup,
+  useLeaveGroup,
 };

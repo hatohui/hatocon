@@ -29,6 +29,8 @@ const POST = async (req: NextRequest, ctx: RouteContext) => {
   const notificationId: string | undefined = body?.notificationId;
   const fromBody: string | undefined = body?.from;
   const toBody: string | undefined = body?.to;
+  const entryFlightBody: string | undefined = body?.entryFlight;
+  const exitFlightBody: string | undefined = body?.exitFlight;
 
   const template = await participationRepository.getById(id);
   if (!template) return NotFound(messages.participation.notFound);
@@ -77,6 +79,8 @@ const POST = async (req: NextRequest, ctx: RouteContext) => {
       from: resolvedFrom,
       to: resolvedTo,
       leaveType: template.leaveType,
+      entryFlight: entryFlightBody || null,
+      exitFlight: exitFlightBody || null,
     },
     session.user.id,
   );

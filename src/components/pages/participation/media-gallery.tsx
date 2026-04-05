@@ -32,10 +32,14 @@ import {
 export default function MediaGallery({
   participationId,
   isOwner,
+  isMember,
+  isAdmin,
   userId,
 }: {
   participationId: string;
   isOwner: boolean;
+  isMember?: boolean;
+  isAdmin?: boolean;
   userId: string;
 }) {
   const [filterActivity, setFilterActivity] = useState<string>("all");
@@ -76,6 +80,7 @@ export default function MediaGallery({
         caption: img.caption,
         createdAt: img.createdAt,
         source: "participation",
+        uploadedBy: img.uploadedBy ?? undefined,
       });
     });
   }
@@ -144,8 +149,8 @@ export default function MediaGallery({
   };
 
   const canDelete = (item: MediaItem) => {
-    if (isOwner) return true;
-    if (item.source === "activity" && item.uploadedBy === userId) return true;
+    if (isOwner || isAdmin) return true;
+    if (item.uploadedBy === userId) return true;
     return false;
   };
 
@@ -192,7 +197,7 @@ export default function MediaGallery({
           </div>
 
           {/* Upload button */}
-          {isOwner && (
+          {(isOwner || isMember) && (
             <Button size="sm" variant="outline" asChild>
               <label className="cursor-pointer">
                 <Camera className="h-4 w-4 mr-1.5" />

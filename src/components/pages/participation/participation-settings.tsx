@@ -1,8 +1,9 @@
 "use client";
 
+import React from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Trash2 } from "lucide-react";
+import { LogOut, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,32 +22,52 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Separator } from "@/components/ui/separator";
 
-import { useDeleteParticipation } from "@/hooks/participations/useParticipations";
-import { useUpdateGroupSettings } from "@/hooks/participations/useParticipationGroup";
+import {
+  useDeleteGroup,
+  useLeaveGroup,
+  useUpdateGroupSettings,
+} from "@/hooks/participations/useParticipationGroup";
 import type { ParticipationDetail } from "@/types/participation.d";
 import TransferOwnershipDialog from "./transfer-ownership-dialog";
 
 export default function ParticipationSettings({
   participation,
   isOwner,
+  myParticipationId,
 }: {
   participation: ParticipationDetail;
   isOwner: boolean;
+  myParticipationId?: string;
 }) {
   const router = useRouter();
-  const deleteMutation = useDeleteParticipation();
+  const deleteGroupMutation = useDeleteGroup();
+  const leaveGroupMutation = useLeaveGroup();
   const updateSettings = useUpdateGroupSettings();
 
   const group = participation.group;
   const isGroupOwner = group?.ownerId === participation.userId && isOwner;
+  // The participation ID to act on — owner uses their own record; members use theirs
+  const actionParticipationId = myParticipationId ?? participation.id;
+  // Show Danger Zone to the plan owner or any group member with their own record
+  const showDangerZone = isOwner || !!myParticipationId;
 
-  const handleDelete = () => {
-    deleteMutation.mutate(participation.id, {
+  const handleDeleteGroup = () => {
+    deleteGroupMutation.mutate(participation.id, {
       onSuccess: () => {
-        toast.success("Plan deleted");
+        toast.success("Group deleted");
         router.push("/participations");
       },
-      onError: () => toast.error("Failed to delete plan"),
+      onError: () => toast.error("Failed to delete group"),
+    });
+  };
+
+  const handleLeaveGroup = () => {
+    leaveGroupMutation.mutate(actionParticipationId, {
+      onSuccess: () => {
+        toast.success("You have left the group");
+        router.push("/participations");
+      },
+      onError: () => toast.error("Failed to leave group"),
     });
   };
 
@@ -170,7 +191,7 @@ export default function ParticipationSettings({
       )}
 
       {/* Danger zone */}
-      {isOwner && (
+      {showDangerZone && (
         <Card className="border-destructive/50">
           <CardHeader>
             <CardTitle className="text-sm text-destructive">
@@ -178,47 +199,97 @@ export default function ParticipationSettings({
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-sm font-medium">Delete this plan</p>
-                <p className="text-xs text-muted-foreground">
-                  This action cannot be undone. Your leave record, activities,
-                  and all associated photos will be permanently removed.
-                </p>
-              </div>
+            {/* Leave Plan — shown for everyone */}
+            <DangerRow
+              title="Leave Plan"
+              description={
+                isGroupOwner
+                  ? "Leave this plan. Ownership will be transferred to the next member, or the plan will be disbanded if you are the only member."
+                  : "Remove yourself from this plan. Your activities and photos will be permanently deleted."
+              }
+              dialogTitle="Leave this plan?"
+              dialogDescription={
+                isGroupOwner
+                  ? "Your activities and data will be removed. If another member exists, they will become the new owner. Otherwise the plan will be disbanded."
+                  : "This cannot be undone. Your activities and photos in this plan will be permanently removed."
+              }
+              buttonLabel="Leave Plan"
+              icon={<LogOut className="h-4 w-4 mr-1.5" />}
+              isPending={leaveGroupMutation.isPending}
+              onConfirm={handleLeaveGroup}
+            />
 
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="destructive" size="sm">
-                    <Trash2 className="h-4 w-4 mr-1.5" />
-                    Delete
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Delete this plan?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. Your leave record, all
-                      activities, and any associated photos will be permanently
-                      removed.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleDelete}
-                      disabled={deleteMutation.isPending}
-                      className="bg-destructive text-white hover:bg-destructive/90"
-                    >
-                      Delete
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
+            {/* Delete Plan — group owner only, wipes the entire plan for everyone */}
+            {isGroupOwner && (
+              <>
+                <Separator />
+                <DangerRow
+                  title="Delete Plan"
+                  description="Permanently removes the plan and all members' data. Everyone in the group will lose their plans."
+                  dialogTitle="Delete the entire plan?"
+                  dialogDescription="This cannot be undone. All members' plans, activities, and photos will be permanently deleted and they will be notified."
+                  buttonLabel="Delete Plan"
+                  isPending={deleteGroupMutation.isPending}
+                  onConfirm={handleDeleteGroup}
+                />
+              </>
+            )}
           </CardContent>
         </Card>
       )}
+    </div>
+  );
+}
+
+function DangerRow({
+  title,
+  description,
+  dialogTitle,
+  dialogDescription,
+  buttonLabel,
+  icon,
+  isPending,
+  onConfirm,
+}: {
+  title: string;
+  description: string;
+  dialogTitle: string;
+  dialogDescription: string;
+  buttonLabel: string;
+  icon?: React.ReactNode;
+  isPending: boolean;
+  onConfirm: () => void;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <div>
+        <p className="text-sm font-medium">{title}</p>
+        <p className="text-xs text-muted-foreground">{description}</p>
+      </div>
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button variant="destructive" size="sm" disabled={isPending}>
+            {icon ?? <Trash2 className="h-4 w-4 mr-1.5" />}
+            {buttonLabel}
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{dialogTitle}</AlertDialogTitle>
+            <AlertDialogDescription>{dialogDescription}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={onConfirm}
+              disabled={isPending}
+              className="bg-destructive text-white hover:bg-destructive/90"
+            >
+              {buttonLabel}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

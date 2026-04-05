@@ -29,6 +29,7 @@ export type ParticipationImageMinAggregateOutputType = {
   groupId: string | null
   url: string | null
   caption: string | null
+  uploadedBy: string | null
   createdAt: Date | null
 }
 
@@ -37,6 +38,7 @@ export type ParticipationImageMaxAggregateOutputType = {
   groupId: string | null
   url: string | null
   caption: string | null
+  uploadedBy: string | null
   createdAt: Date | null
 }
 
@@ -45,6 +47,7 @@ export type ParticipationImageCountAggregateOutputType = {
   groupId: number
   url: number
   caption: number
+  uploadedBy: number
   createdAt: number
   _all: number
 }
@@ -55,6 +58,7 @@ export type ParticipationImageMinAggregateInputType = {
   groupId?: true
   url?: true
   caption?: true
+  uploadedBy?: true
   createdAt?: true
 }
 
@@ -63,6 +67,7 @@ export type ParticipationImageMaxAggregateInputType = {
   groupId?: true
   url?: true
   caption?: true
+  uploadedBy?: true
   createdAt?: true
 }
 
@@ -71,6 +76,7 @@ export type ParticipationImageCountAggregateInputType = {
   groupId?: true
   url?: true
   caption?: true
+  uploadedBy?: true
   createdAt?: true
   _all?: true
 }
@@ -152,6 +158,7 @@ export type ParticipationImageGroupByOutputType = {
   groupId: string
   url: string
   caption: string | null
+  uploadedBy: string | null
   createdAt: Date
   _count: ParticipationImageCountAggregateOutputType | null
   _min: ParticipationImageMinAggregateOutputType | null
@@ -181,6 +188,7 @@ export type ParticipationImageWhereInput = {
   groupId?: Prisma.StringFilter<"ParticipationImage"> | string
   url?: Prisma.StringFilter<"ParticipationImage"> | string
   caption?: Prisma.StringNullableFilter<"ParticipationImage"> | string | null
+  uploadedBy?: Prisma.StringNullableFilter<"ParticipationImage"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ParticipationImage"> | Date | string
   group?: Prisma.XOR<Prisma.ParticipationGroupScalarRelationFilter, Prisma.ParticipationGroupWhereInput>
 }
@@ -190,6 +198,7 @@ export type ParticipationImageOrderByWithRelationInput = {
   groupId?: Prisma.SortOrder
   url?: Prisma.SortOrder
   caption?: Prisma.SortOrderInput | Prisma.SortOrder
+  uploadedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   group?: Prisma.ParticipationGroupOrderByWithRelationInput
 }
@@ -202,6 +211,7 @@ export type ParticipationImageWhereUniqueInput = Prisma.AtLeast<{
   groupId?: Prisma.StringFilter<"ParticipationImage"> | string
   url?: Prisma.StringFilter<"ParticipationImage"> | string
   caption?: Prisma.StringNullableFilter<"ParticipationImage"> | string | null
+  uploadedBy?: Prisma.StringNullableFilter<"ParticipationImage"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ParticipationImage"> | Date | string
   group?: Prisma.XOR<Prisma.ParticipationGroupScalarRelationFilter, Prisma.ParticipationGroupWhereInput>
 }, "id">
@@ -211,6 +221,7 @@ export type ParticipationImageOrderByWithAggregationInput = {
   groupId?: Prisma.SortOrder
   url?: Prisma.SortOrder
   caption?: Prisma.SortOrderInput | Prisma.SortOrder
+  uploadedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.ParticipationImageCountOrderByAggregateInput
   _max?: Prisma.ParticipationImageMaxOrderByAggregateInput
@@ -225,6 +236,7 @@ export type ParticipationImageScalarWhereWithAggregatesInput = {
   groupId?: Prisma.StringWithAggregatesFilter<"ParticipationImage"> | string
   url?: Prisma.StringWithAggregatesFilter<"ParticipationImage"> | string
   caption?: Prisma.StringNullableWithAggregatesFilter<"ParticipationImage"> | string | null
+  uploadedBy?: Prisma.StringNullableWithAggregatesFilter<"ParticipationImage"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ParticipationImage"> | Date | string
 }
 
@@ -232,6 +244,7 @@ export type ParticipationImageCreateInput = {
   id?: string
   url: string
   caption?: string | null
+  uploadedBy?: string | null
   createdAt?: Date | string
   group: Prisma.ParticipationGroupCreateNestedOneWithoutImagesInput
 }
@@ -241,6 +254,7 @@ export type ParticipationImageUncheckedCreateInput = {
   groupId: string
   url: string
   caption?: string | null
+  uploadedBy?: string | null
   createdAt?: Date | string
 }
 
@@ -248,6 +262,7 @@ export type ParticipationImageUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uploadedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   group?: Prisma.ParticipationGroupUpdateOneRequiredWithoutImagesNestedInput
 }
@@ -257,6 +272,7 @@ export type ParticipationImageUncheckedUpdateInput = {
   groupId?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uploadedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -265,6 +281,7 @@ export type ParticipationImageCreateManyInput = {
   groupId: string
   url: string
   caption?: string | null
+  uploadedBy?: string | null
   createdAt?: Date | string
 }
 
@@ -272,6 +289,7 @@ export type ParticipationImageUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uploadedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -280,6 +298,7 @@ export type ParticipationImageUncheckedUpdateManyInput = {
   groupId?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uploadedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -288,6 +307,7 @@ export type ParticipationImageCountOrderByAggregateInput = {
   groupId?: Prisma.SortOrder
   url?: Prisma.SortOrder
   caption?: Prisma.SortOrder
+  uploadedBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -296,6 +316,7 @@ export type ParticipationImageMaxOrderByAggregateInput = {
   groupId?: Prisma.SortOrder
   url?: Prisma.SortOrder
   caption?: Prisma.SortOrder
+  uploadedBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -304,6 +325,7 @@ export type ParticipationImageMinOrderByAggregateInput = {
   groupId?: Prisma.SortOrder
   url?: Prisma.SortOrder
   caption?: Prisma.SortOrder
+  uploadedBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -363,6 +385,7 @@ export type ParticipationImageCreateWithoutGroupInput = {
   id?: string
   url: string
   caption?: string | null
+  uploadedBy?: string | null
   createdAt?: Date | string
 }
 
@@ -370,6 +393,7 @@ export type ParticipationImageUncheckedCreateWithoutGroupInput = {
   id?: string
   url: string
   caption?: string | null
+  uploadedBy?: string | null
   createdAt?: Date | string
 }
 
@@ -407,6 +431,7 @@ export type ParticipationImageScalarWhereInput = {
   groupId?: Prisma.StringFilter<"ParticipationImage"> | string
   url?: Prisma.StringFilter<"ParticipationImage"> | string
   caption?: Prisma.StringNullableFilter<"ParticipationImage"> | string | null
+  uploadedBy?: Prisma.StringNullableFilter<"ParticipationImage"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ParticipationImage"> | Date | string
 }
 
@@ -414,6 +439,7 @@ export type ParticipationImageCreateManyGroupInput = {
   id?: string
   url: string
   caption?: string | null
+  uploadedBy?: string | null
   createdAt?: Date | string
 }
 
@@ -421,6 +447,7 @@ export type ParticipationImageUpdateWithoutGroupInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uploadedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -428,6 +455,7 @@ export type ParticipationImageUncheckedUpdateWithoutGroupInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uploadedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -435,6 +463,7 @@ export type ParticipationImageUncheckedUpdateManyWithoutGroupInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
   caption?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uploadedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -445,6 +474,7 @@ export type ParticipationImageSelect<ExtArgs extends runtime.Types.Extensions.In
   groupId?: boolean
   url?: boolean
   caption?: boolean
+  uploadedBy?: boolean
   createdAt?: boolean
   group?: boolean | Prisma.ParticipationGroupDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["participationImage"]>
@@ -454,6 +484,7 @@ export type ParticipationImageSelectCreateManyAndReturn<ExtArgs extends runtime.
   groupId?: boolean
   url?: boolean
   caption?: boolean
+  uploadedBy?: boolean
   createdAt?: boolean
   group?: boolean | Prisma.ParticipationGroupDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["participationImage"]>
@@ -463,6 +494,7 @@ export type ParticipationImageSelectUpdateManyAndReturn<ExtArgs extends runtime.
   groupId?: boolean
   url?: boolean
   caption?: boolean
+  uploadedBy?: boolean
   createdAt?: boolean
   group?: boolean | Prisma.ParticipationGroupDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["participationImage"]>
@@ -472,10 +504,11 @@ export type ParticipationImageSelectScalar = {
   groupId?: boolean
   url?: boolean
   caption?: boolean
+  uploadedBy?: boolean
   createdAt?: boolean
 }
 
-export type ParticipationImageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "groupId" | "url" | "caption" | "createdAt", ExtArgs["result"]["participationImage"]>
+export type ParticipationImageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "groupId" | "url" | "caption" | "uploadedBy" | "createdAt", ExtArgs["result"]["participationImage"]>
 export type ParticipationImageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   group?: boolean | Prisma.ParticipationGroupDefaultArgs<ExtArgs>
 }
@@ -496,6 +529,7 @@ export type $ParticipationImagePayload<ExtArgs extends runtime.Types.Extensions.
     groupId: string
     url: string
     caption: string | null
+    uploadedBy: string | null
     createdAt: Date
   }, ExtArgs["result"]["participationImage"]>
   composites: {}
@@ -925,6 +959,7 @@ export interface ParticipationImageFieldRefs {
   readonly groupId: Prisma.FieldRef<"ParticipationImage", 'String'>
   readonly url: Prisma.FieldRef<"ParticipationImage", 'String'>
   readonly caption: Prisma.FieldRef<"ParticipationImage", 'String'>
+  readonly uploadedBy: Prisma.FieldRef<"ParticipationImage", 'String'>
   readonly createdAt: Prisma.FieldRef<"ParticipationImage", 'DateTime'>
 }
     

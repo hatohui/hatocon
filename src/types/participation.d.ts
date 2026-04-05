@@ -10,6 +10,8 @@ export type ParticipationCreateDTO = {
   to: Date | string;
   leaveType: LeaveType;
   coTravelerIds?: string[];
+  entryFlight?: string | null;
+  exitFlight?: string | null;
 };
 
 export type ParticipationImageDTO = {
@@ -41,6 +43,9 @@ export type ParticipationParticipant = {
   from: Date | string;
   to: Date | string;
   isAlreadyHere: boolean;
+  entryFlight: string | null;
+  exitFlight: string | null;
+  createdBy: string | null;
   user: { id: string; name: string; image: string | null; email: string };
 };
 

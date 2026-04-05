@@ -97,6 +97,7 @@ const POST = async (req: NextRequest, ctx: RouteContext) => {
   const image = await participationRepository.addImage(
     group.id,
     publicUrl,
+    session.user.id,
     caption,
   );
 

@@ -237,15 +237,20 @@ function DatePickerField({
   value,
   onChange,
   fromDate,
+  required,
 }: {
   label: string;
   value: Date | undefined;
   onChange: (d: Date | undefined) => void;
   fromDate?: Date;
+  required?: boolean;
 }) {
   return (
     <div className="space-y-1.5">
-      <Label>{label}</Label>
+      <Label>
+        {label}
+        {required && <span className="text-destructive ml-0.5">*</span>}
+      </Label>
       <Popover>
         <PopoverTrigger asChild>
           <Button
@@ -393,6 +398,56 @@ function CreatePlanPageInner() {
   const [coTravelers, setCoTravelers] = React.useState<
     Omit<User, "password">[]
   >([]);
+  const [entryFlight, setEntryFlight] = React.useState("");
+  const [exitFlight, setExitFlight] = React.useState("");
+
+  // Restore draft from sessionStorage on mount
+  React.useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem("hatocon:leave/new:draft");
+      if (!raw) return;
+      const draft = JSON.parse(raw);
+      if (draft.planName) setPlanName(draft.planName);
+      if (draft.from) setFrom(new Date(draft.from));
+      if (draft.to) setTo(new Date(draft.to));
+      if (draft.leaveType) setLeaveType(draft.leaveType);
+      if (Array.isArray(draft.coTravelers)) setCoTravelers(draft.coTravelers);
+      if (draft.entryFlight) setEntryFlight(draft.entryFlight);
+      if (draft.exitFlight) setExitFlight(draft.exitFlight);
+      // Only restore selected event if no eventId in the URL
+      if (!eventIdParam && draft.selectedEvent)
+        setSelectedEvent(draft.selectedEvent);
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Save draft to sessionStorage on any state change
+  React.useEffect(() => {
+    try {
+      sessionStorage.setItem(
+        "hatocon:leave/new:draft",
+        JSON.stringify({
+          planName,
+          from: from?.toISOString(),
+          to: to?.toISOString(),
+          leaveType,
+          coTravelers,
+          entryFlight,
+          exitFlight,
+          selectedEvent,
+        }),
+      );
+    } catch {}
+  }, [
+    planName,
+    from,
+    to,
+    leaveType,
+    coTravelers,
+    entryFlight,
+    exitFlight,
+    selectedEvent,
+  ]);
 
   // Pre-populate from query param
   const { data: prefillEvent } = useEventById(eventIdParam);
@@ -431,7 +486,10 @@ function CreatePlanPageInner() {
         to,
         leaveType: leaveType as (typeof LeaveType)[keyof typeof LeaveType],
         coTravelerIds: coTravelers.map((u) => u.id),
+        entryFlight: entryFlight.trim() || undefined,
+        exitFlight: exitFlight.trim() || undefined,
       });
+      sessionStorage.removeItem("hatocon:leave/new:draft");
       toast.success("Plan created successfully!");
       router.push("/");
     } catch (err: unknown) {
@@ -527,7 +585,9 @@ function CreatePlanPageInner() {
           <CardContent className="space-y-5">
             {/* Plan name */}
             <div className="space-y-1.5">
-              <Label htmlFor="plan-name">Plan Name</Label>
+              <Label htmlFor="plan-name">
+                Plan Name <span className="text-destructive">*</span>
+              </Label>
               <Input
                 id="plan-name"
                 placeholder="e.g. Tokyo Trip 2026"
@@ -542,13 +602,45 @@ function CreatePlanPageInner() {
                 value={from}
                 onChange={setFrom}
                 fromDate={new Date()}
+                required
               />
               <DatePickerField
                 label="To"
                 value={to}
                 onChange={setTo}
                 fromDate={from ?? new Date()}
+                required
               />
+            </div>
+
+            {/* Flight numbers */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label className="flex items-center gap-1">
+                  <Plane className="h-3.5 w-3.5" />
+                  Arrival flight
+                </Label>
+                <Input
+                  placeholder="e.g. TGW517"
+                  value={entryFlight}
+                  onChange={(e) => setEntryFlight(e.target.value.toUpperCase())}
+                  maxLength={20}
+                  className="uppercase"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="flex items-center gap-1">
+                  <Plane className="h-3.5 w-3.5 rotate-180" />
+                  Departure flight
+                </Label>
+                <Input
+                  placeholder="e.g. TGW518"
+                  value={exitFlight}
+                  onChange={(e) => setExitFlight(e.target.value.toUpperCase())}
+                  maxLength={20}
+                  className="uppercase"
+                />
+              </div>
             </div>
 
             {from && to && to < from && (

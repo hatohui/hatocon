@@ -1,13 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import ReactCrop, {
-  type Crop,
-  type PixelCrop,
-  centerCrop,
-  makeAspectCrop,
-} from "react-image-crop";
-import "react-image-crop/dist/ReactCrop.css";
+import { useCallback, useEffect, useState } from "react";
+import Cropper, { type Area } from "react-easy-crop";
 import {
   Dialog,
   DialogContent,
@@ -17,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Lock } from "lucide-react";
+import { Loader2, Lock, ZoomIn, ZoomOut } from "lucide-react";
 
 type ImageCropDialogProps = {
   /** The file the user just selected */
@@ -26,39 +20,27 @@ type ImageCropDialogProps = {
   aspect: number;
   /** Max output resolution in px (width). Height derived from aspect. */
   maxWidth?: number;
-  /** WebP quality 0–1 */
+  /** WebP quality 0-1 */
   quality?: number;
   /** Called with the cropped blob, or null on cancel */
   onComplete: (result: File | null) => void;
 };
 
-function centerAspectCrop(
-  mediaWidth: number,
-  mediaHeight: number,
-  aspect: number,
-): Crop {
-  return centerCrop(
-    makeAspectCrop({ unit: "%", width: 90 }, aspect, mediaWidth, mediaHeight),
-    mediaWidth,
-    mediaHeight,
-  );
-}
-
-function getCroppedCanvas(
-  image: HTMLImageElement,
-  crop: PixelCrop,
+async function getCroppedBlob(
+  imageSrc: string,
+  pixelCrop: Area,
   maxWidth: number,
   aspect: number,
-): HTMLCanvasElement {
-  const scaleX = image.naturalWidth / image.width;
-  const scaleY = image.naturalHeight / image.height;
+  quality: number,
+): Promise<Blob | null> {
+  const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const img = new Image();
+    img.addEventListener("load", () => resolve(img));
+    img.addEventListener("error", reject);
+    img.src = imageSrc;
+  });
 
-  const sourceX = crop.x * scaleX;
-  const sourceY = crop.y * scaleY;
-  const sourceW = crop.width * scaleX;
-  const sourceH = crop.height * scaleY;
-
-  const outW = Math.min(sourceW, maxWidth);
+  const outW = Math.min(pixelCrop.width, maxWidth);
   const outH = Math.round(outW / aspect);
 
   const canvas = document.createElement("canvas");
@@ -66,8 +48,19 @@ function getCroppedCanvas(
   canvas.height = outH;
   const ctx = canvas.getContext("2d")!;
   ctx.imageSmoothingQuality = "high";
-  ctx.drawImage(image, sourceX, sourceY, sourceW, sourceH, 0, 0, outW, outH);
-  return canvas;
+  ctx.drawImage(
+    image,
+    pixelCrop.x,
+    pixelCrop.y,
+    pixelCrop.width,
+    pixelCrop.height,
+    0,
+    0,
+    outW,
+    outH,
+  );
+
+  return new Promise((resolve) => canvas.toBlob(resolve, "image/webp", quality));
 }
 
 export default function ImageCropDialog({
@@ -83,44 +76,48 @@ export default function ImageCropDialog({
       : aspect === 16 / 9
         ? "16:9"
         : `${aspect.toFixed(2)}:1`;
-  const [crop, setCrop] = useState<Crop>();
-  const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
-  const [saving, setSaving] = useState(false);
-  const imgRef = useRef<HTMLImageElement>(null);
 
-  const previewUrl = useMemo(() => {
-    if (!file) return null;
-    const url = URL.createObjectURL(file);
-    return url;
-  }, [file]);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  // Delay mounting the Cropper until after the dialog zoom-in-95 animation (100ms)
+  // so react-easy-crop computes the correct initial container dimensions.
+  const [cropperReady, setCropperReady] = useState(false);
 
   useEffect(() => {
+    if (!file) {
+      setPreviewUrl(null);
+      setCropperReady(false);
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
+    setCroppedAreaPixels(null);
+    const timer = setTimeout(() => setCropperReady(true), 150);
     return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      clearTimeout(timer);
+      URL.revokeObjectURL(url);
     };
-  }, [previewUrl]);
+  }, [file]);
 
-  const onImageLoad = useCallback(
-    (e: React.SyntheticEvent<HTMLImageElement>) => {
-      const { width, height } = e.currentTarget;
-      const c = centerAspectCrop(width, height, aspect);
-      setCrop(c);
-    },
-    [aspect],
-  );
+  const onCropComplete = useCallback((_: Area, pixels: Area) => {
+    setCroppedAreaPixels(pixels);
+  }, []);
 
   const handleSave = async () => {
-    if (!imgRef.current || !completedCrop) return;
+    if (!previewUrl || !croppedAreaPixels) return;
     setSaving(true);
     try {
-      const canvas = getCroppedCanvas(
-        imgRef.current,
-        completedCrop,
+      const blob = await getCroppedBlob(
+        previewUrl,
+        croppedAreaPixels,
         maxWidth,
         aspect,
-      );
-      const blob = await new Promise<Blob | null>((res) =>
-        canvas.toBlob(res, "image/webp", quality),
+        quality,
       );
       if (!blob) {
         onComplete(null);
@@ -151,37 +148,66 @@ export default function ImageCropDialog({
           </div>
         </DialogHeader>
 
-        {previewUrl && (
-          <div className="flex justify-center overflow-hidden">
-            <ReactCrop
+        {/* Fixed-height crop canvas - react-easy-crop needs position:relative parent */}
+        <div className="relative h-64 w-full rounded-md overflow-hidden bg-muted">
+          {previewUrl && cropperReady ? (
+            <Cropper
+              image={previewUrl}
               crop={crop}
-              onChange={(c) => setCrop(c)}
-              onComplete={(c) => setCompletedCrop(c)}
+              zoom={zoom}
               aspect={aspect}
-              circularCrop={aspect === 1}
-              style={{ maxHeight: "60vh", maxWidth: "100%" }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                ref={imgRef}
-                src={previewUrl}
-                alt="Crop preview"
-                onLoad={onImageLoad}
-                style={{
-                  maxHeight: "60vh",
-                  maxWidth: "100%",
-                  display: "block",
-                }}
-              />
-            </ReactCrop>
-          </div>
-        )}
+              cropShape={aspect === 1 ? "round" : "rect"}
+              showGrid
+              onCropChange={setCrop}
+              onZoomChange={setZoom}
+              onCropComplete={onCropComplete}
+              zoomWithScroll
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          )}
+        </div>
+
+        {/* Zoom controls */}
+        <div className="flex items-center gap-2 px-1">
+          <button
+            type="button"
+            onClick={() => setZoom((z) => Math.max(1, +(z - 0.1).toFixed(1)))}
+            className="p-1 rounded hover:bg-muted transition-colors"
+            aria-label="Zoom out"
+          >
+            <ZoomOut className="h-4 w-4 text-muted-foreground" />
+          </button>
+          <input
+            type="range"
+            min="1"
+            max="3"
+            step="0.05"
+            value={zoom}
+            onChange={(e) => setZoom(Number(e.target.value))}
+            className="flex-1 accent-primary"
+            aria-label="Zoom level"
+          />
+          <button
+            type="button"
+            onClick={() => setZoom((z) => Math.min(3, +(z + 0.1).toFixed(1)))}
+            className="p-1 rounded hover:bg-muted transition-colors"
+            aria-label="Zoom in"
+          >
+            <ZoomIn className="h-4 w-4 text-muted-foreground" />
+          </button>
+          <span className="text-xs text-muted-foreground w-10 text-right tabular-nums">
+            {Math.round(zoom * 100)}%
+          </span>
+        </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onComplete(null)}>
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={saving || !completedCrop}>
+          <Button onClick={handleSave} disabled={saving || !croppedAreaPixels}>
             {saving && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
             Apply
           </Button>

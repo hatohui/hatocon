@@ -24,6 +24,7 @@ import {
   ExternalLink,
   ImageIcon,
   Link2,
+  Lock,
   LogIn,
   Mail,
   MapPin,
@@ -75,7 +76,10 @@ import {
   useDeclineInvite,
 } from "@/hooks/participations/useParticipations";
 import { useNotifications } from "@/hooks/notifications/useNotifications";
-import { useActivities, useDeleteActivity } from "@/hooks/activities/useActivities";
+import {
+  useActivities,
+  useDeleteActivity,
+} from "@/hooks/activities/useActivities";
 import { useUpdateGroupSettings } from "@/hooks/participations/useParticipationGroup";
 import { cn } from "@/lib/utils";
 import ActivityTimeline from "@/components/pages/participation/activity-timeline";
@@ -84,18 +88,6 @@ import MediaGallery from "@/components/pages/participation/media-gallery";
 import ParticipationSettings from "@/components/pages/participation/participation-settings";
 import MembersList from "@/components/pages/participation/members-list";
 import JoinRequestsPanel from "@/components/pages/participation/join-requests-panel";
-
-const LEAVE_COLOURS: Record<string, string> = {
-  ANNUAL: "bg-blue-100 text-blue-800",
-  SICK: "bg-amber-100 text-amber-800",
-  UNPAID: "bg-gray-100 text-gray-800",
-};
-
-const LEAVE_DOT_COLOURS: Record<string, string> = {
-  ANNUAL: "bg-blue-500",
-  SICK: "bg-amber-500",
-  UNPAID: "bg-gray-500",
-};
 
 // ─── Edit Group Name Dialog ──────────────────────────────────────────────────
 
@@ -171,12 +163,16 @@ function EditOwnDatesDialog({
   participationId,
   defaultFrom,
   defaultTo,
+  defaultEntryFlight,
+  defaultExitFlight,
   open,
   onOpenChange,
 }: {
   participationId: string;
   defaultFrom: Date | string;
   defaultTo: Date | string;
+  defaultEntryFlight?: string | null;
+  defaultExitFlight?: string | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
@@ -186,6 +182,8 @@ function EditOwnDatesDialog({
   const [toVal, setToVal] = useState(
     format(new Date(defaultTo), "yyyy-MM-dd'T'HH:mm"),
   );
+  const [entryFlight, setEntryFlight] = useState(defaultEntryFlight ?? "");
+  const [exitFlight, setExitFlight] = useState(defaultExitFlight ?? "");
   const updateDates = useUpdateParticipationDates();
 
   const handleSave = () => {
@@ -196,6 +194,8 @@ function EditOwnDatesDialog({
         data: {
           from: new Date(fromVal).toISOString(),
           to: new Date(toVal).toISOString(),
+          entryFlight: entryFlight.trim() || null,
+          exitFlight: exitFlight.trim() || null,
         },
       },
       {
@@ -225,6 +225,12 @@ function EditOwnDatesDialog({
               value={fromVal}
               onChange={(e) => setFromVal(e.target.value)}
             />
+            <Input
+              placeholder="Arrival flight (e.g. TGW517)"
+              value={entryFlight}
+              onChange={(e) => setEntryFlight(e.target.value.toUpperCase())}
+              className="uppercase"
+            />
           </div>
           <div className="space-y-1.5">
             <label className="text-xs font-medium">Your departure</label>
@@ -232,6 +238,12 @@ function EditOwnDatesDialog({
               type="datetime-local"
               value={toVal}
               onChange={(e) => setToVal(e.target.value)}
+            />
+            <Input
+              placeholder="Departure flight (e.g. TGW518)"
+              value={exitFlight}
+              onChange={(e) => setExitFlight(e.target.value.toUpperCase())}
+              className="uppercase"
             />
           </div>
           <div className="flex justify-end gap-2">
@@ -577,6 +589,8 @@ function UpcomingActivities({
   participationId,
   participationFrom,
   participationTo,
+  participationEntryFlight,
+  participationExitFlight,
   participantUser,
   currentUserId,
   isOwner,
@@ -589,6 +603,8 @@ function UpcomingActivities({
   participationId: string;
   participationFrom: Date | string;
   participationTo: Date | string;
+  participationEntryFlight?: string | null;
+  participationExitFlight?: string | null;
   participantUser?: { id: string; name: string };
   currentUserId?: string;
   isOwner: boolean;
@@ -600,6 +616,8 @@ function UpcomingActivities({
     from: Date | string;
     to: Date | string;
     isAlreadyHere: boolean;
+    entryFlight?: string | null;
+    exitFlight?: string | null;
     user: { id: string; name: string };
   }>;
   event?: {
@@ -613,42 +631,41 @@ function UpcomingActivities({
   const { data: activities, isLoading } = useActivities(
     showActivityDetails ? participationId : null,
   );
-  const updateDates = useUpdateParticipationDates();
   const deleteActivity = useDeleteActivity();
-  // which date field is being edited: "from" (arrival) | "to" (departure) | null
-  const [editingField, setEditingField] = useState<"from" | "to" | null>(null);
-  const [editingParticipationId, setEditingParticipationId] = useState<string | null>(null);
-  const [editValue, setEditValue] = useState("");
-  const [editingActivityId, setEditingActivityId] = useState<string | null>(null);
+  const [editingActivityId, setEditingActivityId] = useState<string | null>(
+    null,
+  );
+  const [editDialogTarget, setEditDialogTarget] = useState<{
+    id: string;
+    from: Date | string;
+    to: Date | string;
+    entryFlight?: string | null;
+    exitFlight?: string | null;
+  } | null>(null);
   const now = new Date();
 
-  const openEdit = (participationId: string, field: "from" | "to", currentValue: Date | string) => {
-    setEditValue(format(new Date(currentValue), "yyyy-MM-dd'T'HH:mm"));
-    setEditingField(field);
-    setEditingParticipationId(participationId);
-  };
-
-  const handleSave = () => {
-    if (!editingField || !editValue || !editingParticipationId) return;
-    const newDate = new Date(editValue).toISOString();
-    updateDates.mutate(
-      {
-        id: editingParticipationId,
-        data: { [editingField]: newDate },
-      },
-      {
-        onSuccess: () => {
-          toast.success(
-            editingField === "from"
-              ? "Arrival time updated"
-              : "Departure time updated",
-          );
-          setEditingField(null);
-          setEditingParticipationId(null);
-        },
-        onError: () => toast.error("Failed to update"),
-      },
+  const handleEditClick = (entry: UpcomingEntry) => {
+    if (!entry.editParticipationId) return;
+    const participant = participants?.find(
+      (p) => p.id === entry.editParticipationId,
     );
+    if (participant) {
+      setEditDialogTarget({
+        id: participant.id,
+        from: participant.from,
+        to: participant.to,
+        entryFlight: participant.entryFlight,
+        exitFlight: participant.exitFlight,
+      });
+    } else {
+      setEditDialogTarget({
+        id: entry.editParticipationId,
+        from: participationFrom,
+        to: participationTo,
+        entryFlight: participationEntryFlight,
+        exitFlight: participationExitFlight,
+      });
+    }
   };
 
   const perParticipantEntries: UpcomingEntry[] =
@@ -657,8 +674,7 @@ function UpcomingActivities({
           .filter((p) => !p.isAlreadyHere)
           .flatMap((p) => {
             const isMe = p.userId === currentUserId;
-            const isViewed = p.userId === participantUser?.id;
-            const canEdit = isOwner || isViewed;
+            const canEdit = isOwner || isMe;
             return [
               {
                 id: `__arriving_${p.userId}`,
@@ -773,7 +789,7 @@ function UpcomingActivities({
               No upcoming activities
             </p>
           )}
-              {!isLoading &&
+          {!isLoading &&
             upcoming.map((a) => (
               <div
                 key={a.id}
@@ -807,9 +823,7 @@ function UpcomingActivities({
                     variant="ghost"
                     size="icon"
                     className="shrink-0 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground"
-                    onClick={() =>
-                      openEdit(a.editParticipationId!, a.dateField!, a.from)
-                    }
+                    onClick={() => handleEditClick(a)}
                   >
                     <Pencil className="h-3 w-3" />
                   </Button>
@@ -832,7 +846,9 @@ function UpcomingActivities({
                       onClick={() =>
                         deleteActivity.mutate(
                           { participationId, activityId: a.activityId! },
-                          { onSuccess: () => toast.success("Activity deleted") },
+                          {
+                            onSuccess: () => toast.success("Activity deleted"),
+                          },
                         )
                       }
                     >
@@ -854,53 +870,19 @@ function UpcomingActivities({
         </CardContent>
       </Card>
 
-      {/* Edit arrival / departure dialog */}
-      <Dialog
-        open={editingField !== null}
-        onOpenChange={(open) => {
-          if (!open) {
-            setEditingField(null);
-            setEditingParticipationId(null);
-          }
-        }}
-      >
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>
-              {editingField === "from"
-                ? "Edit arrival time"
-                : "Edit departure time"}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 pt-2">
-            <Input
-              type="datetime-local"
-              value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
-              autoFocus
-            />
-            <div className="flex justify-end gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setEditingField(null);
-                  setEditingParticipationId(null);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                size="sm"
-                onClick={handleSave}
-                disabled={!editValue || updateDates.isPending}
-              >
-                Save
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {editDialogTarget && (
+        <EditOwnDatesDialog
+          participationId={editDialogTarget.id}
+          defaultFrom={editDialogTarget.from}
+          defaultTo={editDialogTarget.to}
+          defaultEntryFlight={editDialogTarget.entryFlight}
+          defaultExitFlight={editDialogTarget.exitFlight}
+          open={editDialogTarget !== null}
+          onOpenChange={(open) => {
+            if (!open) setEditDialogTarget(null);
+          }}
+        />
+      )}
 
       {/* Activity inline edit dialog */}
       <Dialog
@@ -940,7 +922,11 @@ export default function ParticipationDetailPage() {
   const [acceptDatesOpen, setAcceptDatesOpen] = useState(false);
   const [acceptFromInput, setAcceptFromInput] = useState("");
   const [acceptToInput, setAcceptToInput] = useState("");
+  const [acceptEntryFlight, setAcceptEntryFlight] = useState("");
+  const [acceptExitFlight, setAcceptExitFlight] = useState("");
   const [editOwnDatesOpen, setEditOwnDatesOpen] = useState(false);
+  const [adminDatesPromptDismissed, setAdminDatesPromptDismissed] =
+    useState(false);
 
   // All hooks must be declared before any early returns (rules of hooks)
   const { data: notifications } = useNotifications();
@@ -1016,13 +1002,24 @@ export default function ParticipationDetailPage() {
   const showInviteBanner =
     !!pendingInviteNotification && !isMemberOfGroup && !!currentUserId;
 
-  const handleBannerAccept = (from?: string, to?: string) => {
+  // User was added directly by an admin (not via invite flow) — prompt them to set their own dates
+  const wasAddedByAdmin =
+    isMemberOfGroup &&
+    !!myParticipationRecord &&
+    !!myParticipationRecord.createdBy &&
+    myParticipationRecord.createdBy !== currentUserId;
+
+  const handleBannerAccept = () => {
     acceptInvite.mutate(
       {
         participationId: params.id,
         notificationId: pendingInviteNotification?.id,
-        from,
-        to,
+        from: acceptFromInput
+          ? new Date(acceptFromInput).toISOString()
+          : undefined,
+        to: acceptToInput ? new Date(acceptToInput).toISOString() : undefined,
+        entryFlight: acceptEntryFlight.trim() || undefined,
+        exitFlight: acceptExitFlight.trim() || undefined,
       },
       {
         onSuccess: () => {
@@ -1060,7 +1057,9 @@ export default function ParticipationDetailPage() {
       {/* Login prompt for unauthenticated visitors (e.g. from shared link) */}
       <Dialog
         open={session.status === "unauthenticated" && !loginPromptDismissed}
-        onOpenChange={(open) => { if (!open) setLoginPromptDismissed(true); }}
+        onOpenChange={(open) => {
+          if (!open) setLoginPromptDismissed(true);
+        }}
       >
         <DialogContent className="max-w-sm">
           <DialogHeader>
@@ -1082,7 +1081,9 @@ export default function ParticipationDetailPage() {
               Continue as guest
             </Button>
             <Button asChild className="flex-1">
-              <Link href={`/login?callbackUrl=${encodeURIComponent(`/participations/${params.id}`)}`}>
+              <Link
+                href={`/login?callbackUrl=${encodeURIComponent(`/participations/${params.id}`)}`}
+              >
                 <LogIn className="h-4 w-4 mr-1.5" />
                 Sign in
               </Link>
@@ -1097,11 +1098,14 @@ export default function ParticipationDetailPage() {
           <div className="flex items-center gap-3 min-w-0">
             <LogIn className="h-4 w-4 text-muted-foreground shrink-0" />
             <p className="text-sm text-muted-foreground">
-              You&apos;re viewing as a guest. Sign in to join, upload photos, and interact.
+              You&apos;re viewing as a guest. Sign in to join, upload photos,
+              and interact.
             </p>
           </div>
           <Button size="sm" asChild>
-            <Link href={`/login?callbackUrl=${encodeURIComponent(`/participations/${params.id}`)}`}>
+            <Link
+              href={`/login?callbackUrl=${encodeURIComponent(`/participations/${params.id}`)}`}
+            >
               <LogIn className="h-3.5 w-3.5 mr-1.5" />
               Sign in
             </Link>
@@ -1144,6 +1148,8 @@ export default function ParticipationDetailPage() {
                 setAcceptToInput(
                   format(new Date(participation.to), "yyyy-MM-dd'T'HH:mm"),
                 );
+                setAcceptEntryFlight("");
+                setAcceptExitFlight("");
                 setAcceptDatesOpen(true);
               }}
               disabled={acceptInvite.isPending || declineInvite.isPending}
@@ -1160,6 +1166,42 @@ export default function ParticipationDetailPage() {
             >
               <UserX className="h-3.5 w-3.5" />
               Decline
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Admin-added banner — shown when the user was added directly by an admin */}
+      {wasAddedByAdmin && !adminDatesPromptDismissed && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-300/50 bg-amber-50/60 dark:bg-amber-950/20 px-4 py-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <Calendar className="h-4 w-4 text-amber-600 shrink-0" />
+            <div className="min-w-0">
+              <p className="text-sm font-medium leading-snug">
+                You&apos;ve been added to this plan
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Confirm or update your personal arrival &amp; departure times.
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2 shrink-0">
+            <Button
+              size="sm"
+              variant="default"
+              className="h-7 gap-1.5 text-xs"
+              onClick={() => setEditOwnDatesOpen(true)}
+            >
+              <Pencil className="h-3.5 w-3.5" />
+              Set my times
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-7 text-xs"
+              onClick={() => setAdminDatesPromptDismissed(true)}
+            >
+              Dismiss
             </Button>
           </div>
         </div>
@@ -1195,13 +1237,6 @@ export default function ParticipationDetailPage() {
               )}
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <Badge
-                variant="secondary"
-                className={LEAVE_COLOURS[participation.leaveType] ?? ""}
-              >
-                {participation.leaveType.charAt(0) +
-                  participation.leaveType.slice(1).toLowerCase()}
-              </Badge>
               <span className="text-sm text-muted-foreground flex items-center gap-1">
                 <Clock className="h-3.5 w-3.5" />
                 {days} {days === 1 ? "day" : "days"}
@@ -1215,11 +1250,15 @@ export default function ParticipationDetailPage() {
                         {format(new Date(participation.to), "MMM d, yyyy")}
                       </span>
                     </TooltipTrigger>
-                    <TooltipContent side="bottom" className="max-w-56 text-center">
+                    <TooltipContent
+                      side="bottom"
+                      className="max-w-56 text-center"
+                    >
                       <p className="font-medium">Group plan dates</p>
                       {isMemberOfGroup && (
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          Your arrival &amp; departure may differ — use the pencil to edit.
+                          Your arrival &amp; departure may differ — use the
+                          pencil to edit.
                         </p>
                       )}
                     </TooltipContent>
@@ -1290,6 +1329,14 @@ export default function ParticipationDetailPage() {
                   value={acceptFromInput}
                   onChange={(e) => setAcceptFromInput(e.target.value)}
                 />
+                <Input
+                  placeholder="Arrival flight (e.g. TGW517)"
+                  value={acceptEntryFlight}
+                  onChange={(e) =>
+                    setAcceptEntryFlight(e.target.value.toUpperCase())
+                  }
+                  className="uppercase"
+                />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-medium">Your departure</label>
@@ -1297,6 +1344,14 @@ export default function ParticipationDetailPage() {
                   type="datetime-local"
                   value={acceptToInput}
                   onChange={(e) => setAcceptToInput(e.target.value)}
+                />
+                <Input
+                  placeholder="Departure flight (e.g. TGW518)"
+                  value={acceptExitFlight}
+                  onChange={(e) =>
+                    setAcceptExitFlight(e.target.value.toUpperCase())
+                  }
+                  className="uppercase"
                 />
               </div>
               <div className="flex justify-end gap-2">
@@ -1309,16 +1364,9 @@ export default function ParticipationDetailPage() {
                 </Button>
                 <Button
                   size="sm"
-                  onClick={() =>
-                    handleBannerAccept(
-                      new Date(acceptFromInput).toISOString(),
-                      new Date(acceptToInput).toISOString(),
-                    )
-                  }
+                  onClick={handleBannerAccept}
                   disabled={
-                    !acceptFromInput ||
-                    !acceptToInput ||
-                    acceptInvite.isPending
+                    !acceptFromInput || !acceptToInput || acceptInvite.isPending
                   }
                 >
                   Join
@@ -1335,6 +1383,8 @@ export default function ParticipationDetailPage() {
           participationId={myParticipationRecord.id}
           defaultFrom={myParticipationRecord.from}
           defaultTo={myParticipationRecord.to}
+          defaultEntryFlight={myParticipationRecord.entryFlight}
+          defaultExitFlight={myParticipationRecord.exitFlight}
           open={editOwnDatesOpen}
           onOpenChange={setEditOwnDatesOpen}
         />
@@ -1355,13 +1405,19 @@ export default function ParticipationDetailPage() {
                   />
                 </div>
               )}
-              <div className="flex-1 min-w-0 space-y-1">
+              <div className="flex-1 min-w-0 space-y-1 space-x-3">
                 <Link
                   href={`/events?selected=${participation.event.id}`}
                   className="font-semibold hover:underline"
                 >
                   {participation.event.title}
                 </Link>
+                {participation.event.visibility === "PRIVATE" && (
+                  <Badge className="mt-1 text-[10px] h-4 px-1.5 gap-0.5 bg-violet-500/15 text-violet-700 border border-violet-300 hover:bg-violet-500/15 dark:text-violet-400 dark:border-violet-700">
+                    <Lock className="h-2.5 w-2.5" />
+                    Private
+                  </Badge>
+                )}
                 {participation.event.description && (
                   <p className="text-sm text-muted-foreground line-clamp-2">
                     {participation.event.description}
@@ -1433,6 +1489,12 @@ export default function ParticipationDetailPage() {
                 participationId={participation.id}
                 participationFrom={participation.from}
                 participationTo={participation.to}
+                participationEntryFlight={
+                  myParticipationRecord?.entryFlight ?? null
+                }
+                participationExitFlight={
+                  myParticipationRecord?.exitFlight ?? null
+                }
                 participantUser={participation.user}
                 currentUserId={currentUserId}
                 isOwner={isOwner}
@@ -1491,6 +1553,8 @@ export default function ParticipationDetailPage() {
           <MediaGallery
             participationId={participation.id}
             isOwner={isOwner}
+            isMember={isMemberOfGroup}
+            isAdmin={isAdmin}
             userId={currentUserId}
           />
         </TabsContent>
@@ -1500,6 +1564,7 @@ export default function ParticipationDetailPage() {
           <ParticipationSettings
             participation={participation}
             isOwner={isOwner}
+            myParticipationId={isOwner ? undefined : myParticipationRecord?.id}
           />
         </TabsContent>
       </Tabs>

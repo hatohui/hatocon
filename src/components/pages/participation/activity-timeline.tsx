@@ -55,6 +55,8 @@ const ActivityTimeline = ({
   participationId,
   participationFrom,
   participationTo,
+  participationEntryFlight,
+  participationExitFlight,
   participantUser,
   currentUserId,
   isOwner,
@@ -65,6 +67,8 @@ const ActivityTimeline = ({
   participationId: string;
   participationFrom: Date | string | null;
   participationTo: Date | string | null;
+  participationEntryFlight?: string | null;
+  participationExitFlight?: string | null;
   participantUser?: MemberUser | null;
   currentUserId?: string | null;
   isOwner: boolean;
@@ -73,6 +77,9 @@ const ActivityTimeline = ({
   event?: EventProp;
 }) => {
   const { data: activities, isLoading } = useActivities(participationId);
+  const isGroupMember =
+    !!currentUserId && participants.some((p) => p.userId === currentUserId);
+  const canAdd = isOwner || isGroupMember;
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingDateField, setEditingDateField] = useState<
@@ -88,6 +95,7 @@ const ActivityTimeline = ({
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [editDateValue, setEditDateValue] = useState("");
+  const [editFlightValue, setEditFlightValue] = useState("");
   const updateDates = useUpdateParticipationDates();
 
   const openDateEdit = (
@@ -100,14 +108,24 @@ const ActivityTimeline = ({
     setEditingDateField(field);
     setEditingParticipationId(pid);
     setEditingPersonName(personName ?? null);
+    // Pre-fill flight number from matching participant
+    const match = participants.find((p) => p.id === pid);
+    setEditFlightValue(
+      field === "from" ? (match?.entryFlight ?? "") : (match?.exitFlight ?? ""),
+    );
   };
 
   const saveDateEdit = () => {
     if (!editingDateField || !editDateValue || !editingParticipationId) return;
+    const flightKey =
+      editingDateField === "from" ? "entryFlight" : "exitFlight";
     updateDates.mutate(
       {
         id: editingParticipationId,
-        data: { [editingDateField]: new Date(editDateValue).toISOString() },
+        data: {
+          [editingDateField]: new Date(editDateValue).toISOString(),
+          [flightKey]: editFlightValue.trim() || null,
+        },
       },
       {
         onSuccess: () => {
@@ -119,6 +137,7 @@ const ActivityTimeline = ({
           setEditingDateField(null);
           setEditingParticipationId(null);
           setEditingPersonName(null);
+          setEditFlightValue("");
         },
         onError: () => toast.error("Failed to update"),
       },
@@ -134,6 +153,8 @@ const ActivityTimeline = ({
     participationId,
     participationFrom,
     participationTo,
+    participationEntryFlight,
+    participationExitFlight,
     isOwner,
   });
 
@@ -239,7 +260,7 @@ const ActivityTimeline = ({
           <p className="text-sm text-muted-foreground mt-1 mb-4">
             Plan your trip by adding activities to the timeline.
           </p>
-          {isOwner && !showAddForm && (
+          {canAdd && !showAddForm && (
             <Button size="sm" onClick={() => setShowAddForm(true)}>
               <Plus className="h-4 w-4 mr-1.5" />
               Add First Activity
@@ -360,7 +381,7 @@ const ActivityTimeline = ({
             {sortOrder === "asc" ? "Oldest first" : "Newest first"}
           </Button>
 
-          {isOwner && !showAddForm && (
+          {canAdd && !showAddForm && (
             <Button
               size="sm"
               className="h-8 ml-auto shrink-0"
@@ -464,8 +485,8 @@ const ActivityTimeline = ({
                       "isSynthetic" in activity && activity.isSynthetic;
                     const isTravel =
                       isSynth &&
-                      "editableDateField" in activity &&
-                      !!activity.editableDateField;
+                      "isTravelItem" in activity &&
+                      !!activity.isTravelItem;
                     const dotClass = isTravel
                       ? "h-3 w-3 shrink-0 rounded-full border-2 border-amber-500 bg-amber-500 z-10"
                       : isSynth
@@ -525,6 +546,7 @@ const ActivityTimeline = ({
             setEditingDateField(null);
             setEditingParticipationId(null);
             setEditingPersonName(null);
+            setEditFlightValue("");
           }
         }}
       >
@@ -549,6 +571,19 @@ const ActivityTimeline = ({
               onChange={(e) => setEditDateValue(e.target.value)}
               autoFocus
             />
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">
+                Flight number (optional)
+              </label>
+              <Input
+                placeholder="e.g. TGW517"
+                value={editFlightValue}
+                onChange={(e) =>
+                  setEditFlightValue(e.target.value.toUpperCase())
+                }
+                className="uppercase"
+              />
+            </div>
             <div className="flex justify-end gap-2">
               <Button
                 variant="outline"

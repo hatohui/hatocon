@@ -209,6 +209,12 @@ export default function CreateEventPage() {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = React.useState(false);
   const [cropFile, setCropFile] = React.useState<File | null>(null);
+  const [pendingImageFile, setPendingImageFile] = React.useState<File | null>(
+    null,
+  );
+  const [pendingImageUrl, setPendingImageUrl] = React.useState<string | null>(
+    null,
+  );
   const [invitees, setInvitees] = React.useState<Omit<User, "password">[]>([]);
 
   const form = useForm<FormValues>({
@@ -226,15 +232,72 @@ export default function CreateEventPage() {
     },
   });
 
+  // Restore draft from sessionStorage on mount
+  React.useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem("hatocon:events/new:draft");
+      if (!raw) return;
+      const draft = JSON.parse(raw);
+      if (draft?.form) form.reset(draft.form);
+      if (Array.isArray(draft?.invitees)) setInvitees(draft.invitees);
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const watched = useWatch({ control: form.control });
   const isPrivate = watched.visibility === "PRIVATE";
 
-  const onSubmit = (values: FormValues) => {
+  // Save draft to sessionStorage whenever form or invitees change
+  React.useEffect(() => {
+    try {
+      sessionStorage.setItem(
+        "hatocon:events/new:draft",
+        JSON.stringify({ form: watched, invitees }),
+      );
+    } catch {}
+  }, [watched, invitees]);
+
+  // Create/revoke object URL for pending image preview
+  React.useEffect(() => {
+    if (!pendingImageFile) {
+      setPendingImageUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(pendingImageFile);
+    setPendingImageUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [pendingImageFile]);
+
+  const onSubmit = async (values: FormValues) => {
+    let imageUrl = values.image || "";
+
+    // Upload the pending image at submit time (not immediately after crop)
+    if (pendingImageFile) {
+      setUploading(true);
+      try {
+        const { data } = await axios.post<{
+          data: { uploadUrl: string; publicUrl: string };
+        }>("/api/upload/event-image", {
+          contentType: pendingImageFile.type,
+          contentLength: pendingImageFile.size,
+        });
+        await axios.put(data.data.uploadUrl, pendingImageFile, {
+          headers: { "Content-Type": pendingImageFile.type },
+        });
+        imageUrl = data.data.publicUrl;
+      } catch {
+        toast.error("Failed to upload image");
+        setUploading(false);
+        return;
+      }
+      setUploading(false);
+    }
+
     createEvent.mutate(
       {
         title: values.title,
         description: values.description || undefined,
-        image: values.image || undefined,
+        image: imageUrl || undefined,
         startAt: new Date(values.startAt),
         endAt: new Date(values.endAt),
         location: values.location || undefined,
@@ -248,6 +311,7 @@ export default function CreateEventPage() {
       },
       {
         onSuccess: () => {
+          sessionStorage.removeItem("hatocon:events/new:draft");
           toast.success("Event submitted", {
             description: "It will appear once approved by an admin.",
           });
@@ -263,31 +327,16 @@ export default function CreateEventPage() {
     );
   };
 
-  const handleImageUpload = async (file: File) => {
-    setUploading(true);
-    try {
-      const { data } = await axios.post<{
-        data: { uploadUrl: string; publicUrl: string };
-      }>("/api/upload/event-image", {
-        contentType: file.type,
-        contentLength: file.size,
-      });
-      await axios.put(data.data.uploadUrl, file, {
-        headers: { "Content-Type": file.type },
-      });
-      form.setValue("image", data.data.publicUrl, { shouldValidate: true });
-      toast.success("Image uploaded");
-    } catch {
-      toast.error("Failed to upload image");
-    } finally {
-      setUploading(false);
+  const handleCropComplete = (cropped: File | null) => {
+    setCropFile(null);
+    if (cropped) {
+      setPendingImageFile(cropped);
+      // Clear any previously uploaded URL so the pending file takes precedence
+      form.setValue("image", "", { shouldValidate: true });
     }
   };
 
-  const handleCropComplete = (cropped: File | null) => {
-    setCropFile(null);
-    if (cropped) handleImageUpload(cropped);
-  };
+  const displayImageUrl = pendingImageUrl || watched.image;
 
   const dateRange = formatDateRange(watched.startAt ?? "", watched.endAt ?? "");
 
@@ -315,7 +364,9 @@ export default function CreateEventPage() {
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Title *</FormLabel>
+                      <FormLabel>
+                        Title <span className="text-destructive">*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Team offsite, Company hackathon…"
@@ -354,10 +405,10 @@ export default function CreateEventPage() {
                       <FormLabel>Banner Image</FormLabel>
                       <FormControl>
                         <div className="space-y-2">
-                          {field.value ? (
+                          {displayImageUrl ? (
                             <div className="relative aspect-video w-full overflow-hidden rounded-md border">
                               <Image
-                                src={field.value}
+                                src={displayImageUrl!}
                                 alt="Event banner"
                                 fill
                                 className="object-cover"
@@ -367,11 +418,12 @@ export default function CreateEventPage() {
                                 variant="destructive"
                                 size="icon"
                                 className="absolute right-2 top-2 h-7 w-7"
-                                onClick={() =>
+                                onClick={() => {
+                                  setPendingImageFile(null);
                                   form.setValue("image", "", {
                                     shouldValidate: true,
-                                  })
-                                }
+                                  });
+                                }}
                               >
                                 <X className="h-4 w-4" />
                               </Button>
@@ -416,7 +468,9 @@ export default function CreateEventPage() {
                     name="startAt"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Start Date *</FormLabel>
+                        <FormLabel>
+                          Start Date <span className="text-destructive">*</span>
+                        </FormLabel>
                         <FormControl>
                           <Input type="date" {...field} />
                         </FormControl>
@@ -429,7 +483,9 @@ export default function CreateEventPage() {
                     name="endAt"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>End Date *</FormLabel>
+                        <FormLabel>
+                          End Date <span className="text-destructive">*</span>
+                        </FormLabel>
                         <FormControl>
                           <Input type="date" {...field} />
                         </FormControl>
@@ -566,7 +622,9 @@ export default function CreateEventPage() {
                 type="submit"
                 disabled={createEvent.isPending || uploading}
               >
-                {createEvent.isPending ? "Submitting…" : "Submit for Review"}
+                {createEvent.isPending || uploading
+                  ? "Submitting…"
+                  : "Submit for Review"}
               </Button>
             </div>
           </form>
@@ -578,10 +636,10 @@ export default function CreateEventPage() {
             Preview
           </p>
           <Card className="overflow-hidden">
-            {watched.image && (
+            {displayImageUrl && (
               <div className="relative aspect-video w-full overflow-hidden">
                 <Image
-                  src={watched.image}
+                  src={displayImageUrl}
                   alt="Event banner preview"
                   fill
                   className="object-cover"

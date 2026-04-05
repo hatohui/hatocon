@@ -134,6 +134,9 @@ const participationRepository = {
         from: true,
         to: true,
         isAlreadyHere: true,
+        entryFlight: true,
+        exitFlight: true,
+        createdBy: true,
         user: { select: { id: true, name: true, image: true, email: true } },
       },
       orderBy: { createdAt: "asc" },
@@ -149,6 +152,9 @@ const participationRepository = {
         from: true,
         to: true,
         isAlreadyHere: true,
+        entryFlight: true,
+        exitFlight: true,
+        createdBy: true,
         user: { select: { id: true, name: true, image: true, email: true } },
       },
       orderBy: { createdAt: "asc" },
@@ -255,6 +261,8 @@ const participationRepository = {
         to: new Date(data.to),
         leaveType: data.leaveType,
         createdBy: createdBy ?? null,
+        ...(data.entryFlight ? { entryFlight: data.entryFlight } : {}),
+        ...(data.exitFlight ? { exitFlight: data.exitFlight } : {}),
       },
     });
   },
@@ -383,13 +391,30 @@ const participationRepository = {
     return { total, groups };
   },
 
-  updateDates: async (id: string, data: { from: Date; to: Date; isAlreadyHere?: boolean }) => {
+  updateDates: async (
+    id: string,
+    data: {
+      from: Date;
+      to: Date;
+      isAlreadyHere?: boolean;
+      entryFlight?: string | null;
+      exitFlight?: string | null;
+    },
+  ) => {
     return db.participation.update({
       where: { id },
       data: {
         from: data.from,
         to: data.to,
-        ...(data.isAlreadyHere !== undefined && { isAlreadyHere: data.isAlreadyHere }),
+        ...(data.isAlreadyHere !== undefined && {
+          isAlreadyHere: data.isAlreadyHere,
+        }),
+        ...(data.entryFlight !== undefined && {
+          entryFlight: data.entryFlight || null,
+        }),
+        ...(data.exitFlight !== undefined && {
+          exitFlight: data.exitFlight || null,
+        }),
       },
     });
   },
@@ -407,9 +432,14 @@ const participationRepository = {
     });
   },
 
-  addImage: async (groupId: string, url: string, caption?: string) => {
+  addImage: async (
+    groupId: string,
+    url: string,
+    uploadedBy: string,
+    caption?: string,
+  ) => {
     return db.participationImage.create({
-      data: { groupId, url, caption },
+      data: { groupId, url, uploadedBy, caption },
     });
   },
 
@@ -644,6 +674,85 @@ const participationRepository = {
           },
         },
       },
+    });
+  },
+
+  /**
+   * Collect all R2 image URLs that belong to a specific user inside a group:
+   * - Activities created by them (imageUrl)
+   * - ActivityMedia uploaded by them in any activity of the group
+   */
+  getUserMediaUrlsInGroup: async (
+    groupId: string,
+    userId: string,
+  ): Promise<string[]> => {
+    const [activities, media] = await Promise.all([
+      db.activity.findMany({
+        where: { participationGroupId: groupId, createdBy: userId },
+        select: { imageUrl: true },
+      }),
+      db.activityMedia.findMany({
+        where: {
+          uploadedBy: userId,
+          activity: { participationGroupId: groupId },
+        },
+        select: { url: true },
+      }),
+    ]);
+    const urls: string[] = [];
+    for (const a of activities) if (a.imageUrl) urls.push(a.imageUrl);
+    for (const m of media) urls.push(m.url);
+    return urls;
+  },
+
+  /**
+   * Collect ALL R2 image URLs for an entire group:
+   * - ParticipationImage rows
+   * - Activities' imageUrl
+   * - ActivityMedia rows
+   */
+  getGroupAllMediaUrls: async (groupId: string): Promise<string[]> => {
+    const group = await db.participationGroup.findUnique({
+      where: { id: groupId },
+      select: {
+        images: { select: { url: true } },
+        activities: {
+          select: {
+            imageUrl: true,
+            media: { select: { url: true } },
+          },
+        },
+      },
+    });
+    if (!group) return [];
+    const urls: string[] = [];
+    for (const img of group.images) urls.push(img.url);
+    for (const act of group.activities) {
+      if (act.imageUrl) urls.push(act.imageUrl);
+      for (const m of act.media) urls.push(m.url);
+    }
+    return urls;
+  },
+
+  /**
+   * Hard-delete an entire participation group and all its members' data.
+   * Participations don't cascade from the group FK, so we delete them first.
+   * DB cascades handle: activities → media, images, join requests.
+   */
+  deleteEntireGroup: async (groupId: string) => {
+    await db.participation.deleteMany({ where: { groupId } });
+    return db.participationGroup.delete({ where: { id: groupId } });
+  },
+
+  /**
+   * Find the second-oldest member of a group (by participation.createdAt),
+   * excluding the current owner. Used for auto-promotion when owner leaves.
+   */
+  getSecondOldestMember: async (groupId: string, excludeUserId: string) => {
+    return db.participation.findFirst({
+      where: { groupId, userId: { not: excludeUserId } },
+      orderBy: { createdAt: "asc" },
+      select: { id: true, userId: true },
     });
   },
 };

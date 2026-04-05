@@ -88,6 +88,8 @@ const datesUpdateSchema = zod.object({
   from: zod.coerce.date().optional(),
   to: zod.coerce.date().optional(),
   isAlreadyHere: zod.boolean().optional(),
+  entryFlight: zod.string().max(20).optional().nullable(),
+  exitFlight: zod.string().max(20).optional().nullable(),
 });
 
 /** PATCH /api/participations/[id] — update arrival / departure dates */
@@ -124,6 +126,12 @@ const PATCH = async (req: NextRequest, ctx: RouteContext) => {
     from,
     to,
     isAlreadyHere,
+    ...(parsed.data.entryFlight !== undefined && {
+      entryFlight: parsed.data.entryFlight,
+    }),
+    ...(parsed.data.exitFlight !== undefined && {
+      exitFlight: parsed.data.exitFlight,
+    }),
   });
   return OK(updated);
 };

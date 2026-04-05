@@ -2,7 +2,7 @@
 
 import { signIn, useSession } from "next-auth/react";
 import { useActionState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 type FormState = { error?: string } | undefined;
 
@@ -25,10 +25,12 @@ async function loginAction(
 
 export default function LoginPage() {
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") ?? "/";
 
   useEffect(() => {
     if (session) {
-      router.push("/");
+      router.push(callbackUrl);
     }
   });
 
@@ -36,7 +38,7 @@ export default function LoginPage() {
   const [state, action, pending] = useActionState(
     async (prev: FormState, formData: FormData) => {
       const result = await loginAction(prev, formData);
-      if (!result?.error) router.push("/");
+      if (!result?.error) router.push(callbackUrl);
       return result;
     },
     undefined,
@@ -99,7 +101,7 @@ export default function LoginPage() {
         </div>
 
         <button
-          onClick={() => signIn("google", { callbackUrl: "/" })}
+          onClick={() => signIn("google", { callbackUrl })}
           className="flex w-full items-center justify-center gap-2 rounded border py-2 text-sm hover:bg-gray-50"
         >
           <GoogleIcon />

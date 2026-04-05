@@ -134,6 +134,8 @@ model Participation {
   leaveType     LeaveType
   createdBy     String?   // null = self, otherwise the admin/user who added them
   isAlreadyHere Boolean   @default(false) // user is already at the location from the start
+  entryFlight   String?   // flight number for arrival, e.g. "TGW517"
+  exitFlight    String?   // flight number for departure
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -148,10 +150,11 @@ model Participation {
 }
 
 model ParticipationImage {
-  id      String @id @default(uuid())
-  groupId String
-  url     String
-  caption String?
+  id         String  @id @default(uuid())
+  groupId    String
+  url        String
+  caption    String?
+  uploadedBy String?
 
   createdAt DateTime @default(now())
 
@@ -231,6 +234,10 @@ enum NotificationType {
   INVITED_TO_JOIN
   INVITE_ACCEPTED
   INVITE_DECLINED
+  EVENT_DELETED
+  PLAN_DELETED
+  GROUP_PROMOTION
+  USER_LEFT
 }
 
 enum JoinRequestStatus {

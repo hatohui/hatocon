@@ -41,11 +41,10 @@ export async function generateMetadata({
   const days =
     differenceInCalendarDays(new Date(data.to), new Date(data.from)) + 1;
 
-  const title = eventTitle
-    ? `${data.user.name} is going to ${eventTitle}`
-    : `${data.user.name}'s trip — ${groupName}`;
+  const title = eventTitle ? `${groupName} - ${eventTitle}` : `${groupName}`;
 
   const descParts = [
+    `${eventTitle ? `${eventTitle}` : `Travel plan by ${data.user.name}`}`,
     `📅 ${format(new Date(data.from), "MMM d")} – ${format(new Date(data.to), "MMM d, yyyy")} (${days} ${days === 1 ? "day" : "days"})`,
     data.event?.location && `📍 ${data.event.location}`,
     memberCount > 1 && `👥 ${memberCount} travellers`,

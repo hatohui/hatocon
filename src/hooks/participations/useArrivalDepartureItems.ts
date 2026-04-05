@@ -11,6 +11,8 @@ export function useArrivalDepartureItems({
   participationId,
   participationFrom,
   participationTo,
+  participationEntryFlight,
+  participationExitFlight,
   isOwner,
 }: {
   participants: ParticipationParticipant[];
@@ -20,6 +22,8 @@ export function useArrivalDepartureItems({
   participationId: string;
   participationFrom: Date | string | null;
   participationTo: Date | string | null;
+  participationEntryFlight?: string | null;
+  participationExitFlight?: string | null;
   isOwner: boolean;
 }): EventActivity[] {
   return useMemo(() => {
@@ -33,7 +37,7 @@ export function useArrivalDepartureItems({
         const memberName = p.user.name;
         const arrivalLabel = isMe ? "You arrive" : `${memberName} arrives`;
         const departureLabel = isMe ? "You depart" : `${memberName} departs`;
-        const isEditable = isOwner || p.userId === participantUser?.id;
+        const isEditable = isOwner || isMe;
 
         if (p.from) {
           items.push({
@@ -48,6 +52,8 @@ export function useArrivalDepartureItems({
             note: null,
             media: [],
             isSynthetic: true,
+            isTravelItem: true,
+            flightNumber: p.entryFlight ?? null,
             ...(isEditable
               ? { editableDateField: "from" as const, participationId: p.id }
               : {}),
@@ -67,6 +73,8 @@ export function useArrivalDepartureItems({
             note: null,
             media: [],
             isSynthetic: true,
+            isTravelItem: true,
+            flightNumber: p.exitFlight ?? null,
             ...(isEditable
               ? { editableDateField: "to" as const, participationId: p.id }
               : {}),
@@ -89,9 +97,7 @@ export function useArrivalDepartureItems({
           if (bucket.length === 1) return bucket[0];
           const allUserIds = bucket.flatMap((b) => b.involvedPeople);
           const hasMe = allUserIds.includes(currentUserId ?? "");
-          const otherCount = hasMe
-            ? allUserIds.length - 1
-            : allUserIds.length;
+          const otherCount = hasMe ? allUserIds.length - 1 : allUserIds.length;
           let name: string;
           if (kind === "arriving") {
             name =
@@ -128,6 +134,7 @@ export function useArrivalDepartureItems({
             id: `__${kind}_group_${new Date(bucket[0].from).getTime()}`,
             name,
             involvedPeople: allUserIds,
+            isTravelItem: true as const,
             editableDateField:
               editableBucket.length === 1
                 ? editableBucket[0].editableDateField
@@ -183,6 +190,8 @@ export function useArrivalDepartureItems({
               note: null as null,
               media: [],
               isSynthetic: true as const,
+              isTravelItem: true as const,
+              flightNumber: participationEntryFlight ?? null,
               editableDateField: "from" as const,
               participationId,
             },
@@ -202,6 +211,8 @@ export function useArrivalDepartureItems({
               note: null as null,
               media: [],
               isSynthetic: true as const,
+              isTravelItem: true as const,
+              flightNumber: participationExitFlight ?? null,
               editableDateField: "to" as const,
               participationId,
             },
@@ -216,6 +227,8 @@ export function useArrivalDepartureItems({
     participationId,
     participationFrom,
     participationTo,
+    participationEntryFlight,
+    participationExitFlight,
     isOwner,
   ]);
 }

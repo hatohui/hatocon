@@ -36,13 +36,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
@@ -64,15 +57,6 @@ function initials(name: string) {
     .join("")
     .toUpperCase();
 }
-
-/** 30-minute interval options for the time selects */
-const TIME_OPTIONS = Array.from({ length: 48 }, (_, i) => {
-  const h = Math.floor(i / 2)
-    .toString()
-    .padStart(2, "0");
-  const m = i % 2 === 0 ? "00" : "30";
-  return `${h}:${m}`;
-});
 
 function formatDuration(minutes: number): string {
   if (minutes <= 0) return "";
@@ -186,19 +170,16 @@ function TimePickerField({
       <Label htmlFor={id} className="text-xs text-muted-foreground">
         {label}
       </Label>
-      <Select value={value} onValueChange={onChange}>
-        <SelectTrigger id={id} size="sm" className="w-full h-8 text-sm">
-          <Clock className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-          <SelectValue placeholder="Time" />
-        </SelectTrigger>
-        <SelectContent className="max-h-52">
-          {TIME_OPTIONS.map((t) => (
-            <SelectItem key={t} value={t} className="text-sm">
-              {t}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className="relative">
+        <Clock className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+        <Input
+          id={id}
+          type="time"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-8 text-sm pl-7"
+        />
+      </div>
     </div>
   );
 }
@@ -256,6 +237,12 @@ const ActivityInlineForm = ({
   const [fromTime, setFromTime] = useState(initFrom.time || "09:00");
   const [toDate, setToDate] = useState<Date | undefined>(initTo.date);
   const [toTime, setToTime] = useState(initTo.time || "10:00");
+  const [hasEndTime, setHasEndTime] = useState(() => {
+    if (!activity?.from || !activity?.to) return true;
+    return (
+      new Date(activity.from).getTime() !== new Date(activity.to).getTime()
+    );
+  });
 
   const [peopleOpen, setPeopleOpen] = useState(false);
   const [peopleSearch, setPeopleSearch] = useState("");
@@ -385,7 +372,7 @@ const ActivityInlineForm = ({
     const payload = {
       name: name.trim(),
       from: fromDatetime.toISOString(),
-      to: (toDatetime && toDatetime > fromDatetime
+      to: (hasEndTime && toDatetime && toDatetime > fromDatetime
         ? toDatetime
         : fromDatetime
       ).toISOString(),
@@ -502,41 +489,67 @@ const ActivityInlineForm = ({
 
         {/* End */}
         <div className="space-y-2">
-          <p className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
-            <Clock className="h-3.5 w-3.5" />
-            End
-            {durationText && !durationNegative && (
-              <Badge
-                variant="secondary"
-                className="text-[10px] h-4 px-1.5 font-normal"
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+              <Clock className="h-3.5 w-3.5" />
+              End
+              {hasEndTime && durationText && !durationNegative && (
+                <Badge
+                  variant="secondary"
+                  className="text-[10px] h-4 px-1.5 font-normal"
+                >
+                  {durationText}
+                </Badge>
+              )}
+              {hasEndTime && durationNegative && (
+                <Badge
+                  variant="destructive"
+                  className="text-[10px] h-4 px-1.5 font-normal"
+                >
+                  Before start
+                </Badge>
+              )}
+            </p>
+            {hasEndTime ? (
+              <button
+                type="button"
+                onClick={() => setHasEndTime(false)}
+                className="text-xs text-muted-foreground hover:text-destructive flex items-center gap-1"
               >
-                {durationText}
-              </Badge>
-            )}
-            {durationNegative && (
-              <Badge
-                variant="destructive"
-                className="text-[10px] h-4 px-1.5 font-normal"
+                <X className="h-3 w-3" />
+                Remove
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setHasEndTime(true)}
+                className="text-xs text-primary hover:underline"
               >
-                Before start
-              </Badge>
+                + Add end time
+              </button>
             )}
-          </p>
-          <div className="grid grid-cols-[1fr_auto] gap-2">
-            <DatePickerField
-              id="act-to-date"
-              label="Date"
-              date={toDate}
-              fromDate={fromDate}
-              onChange={setToDate}
-            />
-            <TimePickerField
-              id="act-to-time"
-              label="Time"
-              value={toTime}
-              onChange={setToTime}
-            />
           </div>
+          {hasEndTime ? (
+            <div className="grid grid-cols-[1fr_auto] gap-2">
+              <DatePickerField
+                id="act-to-date"
+                label="Date"
+                date={toDate}
+                fromDate={fromDate}
+                onChange={setToDate}
+              />
+              <TimePickerField
+                id="act-to-time"
+                label="Time"
+                value={toTime}
+                onChange={setToTime}
+              />
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground italic px-0.5">
+              No end time — activity has no fixed duration.
+            </p>
+          )}
         </div>
 
         <Separator />
@@ -803,7 +816,9 @@ const ActivityInlineForm = ({
                           <div className="flex items-center gap-1.5 text-xs">
                             <Clock className="h-3 w-3 text-muted-foreground" />
                             <span className="font-medium tabular-nums">
-                              {toDatetime && toDatetime > fromDatetime
+                              {hasEndTime &&
+                              toDatetime &&
+                              toDatetime > fromDatetime
                                 ? isSameDay(fromDatetime, toDatetime)
                                   ? `${format(fromDatetime, "h:mm a")} – ${format(toDatetime, "h:mm a")}`
                                   : `${format(fromDatetime, "h:mm a, MMM d")} – ${format(toDatetime, "h:mm a, MMM d")}`

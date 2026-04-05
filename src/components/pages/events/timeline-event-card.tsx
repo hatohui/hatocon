@@ -4,7 +4,7 @@ import { differenceInDays, format, startOfDay } from "date-fns";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, CalendarCheck } from "lucide-react";
+import { MapPin, CalendarCheck, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -54,12 +54,25 @@ const TimelineEventCard = ({
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
               <p className="font-semibold text-sm">{event.title}</p>
-              <Badge variant="secondary" className="shrink-0 text-[10px]">
-                in{" "}
-                {differenceInDays(start, startOfDay(new Date())) === 1
-                  ? "1 day"
-                  : `${differenceInDays(start, startOfDay(new Date()))} days`}
-              </Badge>
+              <div className="flex items-center gap-1 shrink-0 flex-wrap justify-end">
+                {!event.isApproved && (
+                  <Badge className="text-[10px] h-4 px-1.5 bg-amber-500/15 text-amber-700 border-amber-300 hover:bg-amber-500/15 dark:text-amber-400 dark:border-amber-700">
+                    Pending
+                  </Badge>
+                )}
+                {event.visibility === "PRIVATE" && (
+                  <Badge className="text-[10px] h-4 px-1.5 gap-0.5 bg-violet-500/15 text-violet-700 border border-violet-300 hover:bg-violet-500/15 dark:text-violet-400 dark:border-violet-700">
+                    <Lock className="h-2.5 w-2.5" />
+                    Private
+                  </Badge>
+                )}
+                <Badge variant="secondary" className="text-[10px]">
+                  in{" "}
+                  {differenceInDays(start, startOfDay(new Date())) === 1
+                    ? "1 day"
+                    : `${differenceInDays(start, startOfDay(new Date()))} days`}
+                </Badge>
+              </div>
             </div>
             {event.description && (
               <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">

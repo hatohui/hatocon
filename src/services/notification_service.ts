@@ -12,6 +12,8 @@ const notificationService = {
   markAsRead: (id: string) => axios.patch(`/api/notifications/${id}/read`),
 
   markAllAsRead: () => axios.post("/api/notifications/mark-all-read"),
+
+  deleteNotification: (id: string) => axios.delete(`/api/notifications/${id}`),
 };
 
 export { notificationService };

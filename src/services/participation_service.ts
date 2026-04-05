@@ -35,8 +35,16 @@ const participationService = {
 
   delete: (id: string) => axios.delete(`/api/participations/${id}`),
 
-  update: (id: string, data: { from?: Date | string; to?: Date | string; isAlreadyHere?: boolean }) =>
-    axios.patch(`/api/participations/${id}`, data),
+  update: (
+    id: string,
+    data: {
+      from?: Date | string;
+      to?: Date | string;
+      isAlreadyHere?: boolean;
+      entryFlight?: string | null;
+      exitFlight?: string | null;
+    },
+  ) => axios.patch(`/api/participations/${id}`, data),
 
   getImages: (participationId: string) =>
     axios.get<ApiOk<ParticipationImageDTO[]>>(
@@ -83,7 +91,12 @@ const participationService = {
   acceptInvite: (
     participationId: string,
     notificationId?: string,
-    dates?: { from: string; to: string },
+    dates?: {
+      from: string;
+      to: string;
+      entryFlight?: string;
+      exitFlight?: string;
+    },
   ) =>
     axios.post<ApiOk<Participation>>(
       `/api/participations/${participationId}/invite/accept`,
@@ -115,6 +128,12 @@ const participationService = {
 
   transferOwnership: (participationId: string, userId: string) =>
     axios.post(`/api/participations/${participationId}/transfer`, { userId }),
+
+  deleteGroup: (participationId: string) =>
+    axios.delete(`/api/participations/${participationId}/group`),
+
+  leaveGroup: (participationId: string) =>
+    axios.post(`/api/participations/${participationId}/leave`),
 
   // ─── Join Requests ───────────────────────────────────────────────
 

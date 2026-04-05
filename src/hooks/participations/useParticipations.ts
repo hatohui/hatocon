@@ -158,16 +158,20 @@ const useAcceptInvite = () => {
       notificationId,
       from,
       to,
+      entryFlight,
+      exitFlight,
     }: {
       participationId: string;
       notificationId?: string;
       from?: string;
       to?: string;
+      entryFlight?: string;
+      exitFlight?: string;
     }) =>
       participationService.acceptInvite(
         participationId,
         notificationId,
-        from && to ? { from, to } : undefined,
+        from && to ? { from, to, entryFlight, exitFlight } : undefined,
       ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["participations"] });
@@ -202,7 +206,13 @@ const useUpdateParticipationDates = () => {
       data,
     }: {
       id: string;
-      data: { from?: string; to?: string; isAlreadyHere?: boolean };
+      data: {
+        from?: string;
+        to?: string;
+        isAlreadyHere?: boolean;
+        entryFlight?: string | null;
+        exitFlight?: string | null;
+      };
     }) => participationService.update(id, data),
     onSuccess: () => {
       // Invalidate all participation queries (prefix match) so the page's

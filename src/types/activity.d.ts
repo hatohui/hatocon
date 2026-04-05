@@ -67,6 +67,10 @@ export type EventActivity = {
   note: null;
   media: ActivityMediaDTO[];
   isSynthetic: true;
+  /** Flight number for this arrival/departure entry, e.g. "TGW517" */
+  flightNumber?: string | null;
+  /** True for all arrival/departure items regardless of editability (used for dot color) */
+  isTravelItem?: true;
   /** "from" or "to" if this is an editable arrival/departure item (single person) */
   editableDateField?: "from" | "to";
   /** Which participation record to PATCH when editing this item */

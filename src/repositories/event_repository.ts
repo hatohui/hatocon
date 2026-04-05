@@ -39,17 +39,22 @@ const eventRepository = {
   }) => {
     return db.event.findMany({
       where: {
-        isApproved: true,
         isDeleted: false,
         ...(opts.q ? { title: { contains: opts.q, mode: "insensitive" } } : {}),
         ...(opts.from ? { endAt: { gte: opts.from } } : {}),
         ...(opts.to ? { startAt: { lte: opts.to } } : {}),
         OR: [
-          { visibility: "PUBLIC" },
+          // 1. All approved public events
+          { isApproved: true, visibility: "PUBLIC" },
+          // 2. Private events the user has a participation in
           ...(opts.userId
             ? [
-                { createdBy: opts.userId },
-                { invitees: { some: { userId: opts.userId } } },
+                {
+                  visibility: "PRIVATE" as const,
+                  participations: { some: { userId: opts.userId } },
+                },
+                // 3. Pending (unapproved) events created by the user
+                { isApproved: false, createdBy: opts.userId },
               ]
             : []),
         ],
@@ -164,6 +169,47 @@ const eventRepository = {
       where: { id },
       data: { isDeleted: true, deletedAt: new Date() },
     });
+  },
+
+  /** Collect all R2 image URLs associated with an event (for pre-deletion cleanup). */
+  getImageUrls: async (id: string): Promise<string[]> => {
+    const event = await db.event.findUnique({
+      where: { id },
+      select: {
+        image: true,
+        participationGroups: {
+          select: {
+            images: { select: { url: true } },
+            activities: {
+              select: {
+                imageUrl: true,
+                media: { select: { url: true } },
+              },
+            },
+          },
+        },
+      },
+    });
+    if (!event) return [];
+
+    const urls: string[] = [];
+    if (event.image) urls.push(event.image);
+    for (const group of event.participationGroups) {
+      for (const img of group.images) urls.push(img.url);
+      for (const act of group.activities) {
+        if (act.imageUrl) urls.push(act.imageUrl);
+        for (const m of act.media) urls.push(m.url);
+      }
+    }
+    return urls;
+  },
+
+  /** Hard-delete an event and all child records (participations, groups, activities, media). */
+  hardDelete: async (id: string) => {
+    // Participations have no DB cascade from Event, delete them first.
+    await db.participation.deleteMany({ where: { eventId: id } });
+    // Event hard-delete; DB cascades remove groups → activities → media, images, join requests, invitees.
+    return db.event.delete({ where: { id } });
   },
 
   getInvitees: async (eventId: string) => {

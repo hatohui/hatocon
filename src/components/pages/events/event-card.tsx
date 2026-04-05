@@ -69,8 +69,13 @@ const EventCard = ({
           <Badge variant="secondary" className="text-[10px] h-4 px-1.5">
             {durationLabel(start, end)}
           </Badge>
+          {!event.isApproved && (
+            <Badge className="text-[10px] h-4 px-1.5 bg-amber-500/15 text-amber-700 border-amber-300 hover:bg-amber-500/15 dark:text-amber-400 dark:border-amber-700">
+              Pending
+            </Badge>
+          )}
           {event.visibility === "PRIVATE" && (
-            <Badge variant="outline" className="text-[10px] h-4 px-1.5 gap-0.5">
+            <Badge className="text-[10px] h-4 px-1.5 gap-0.5 bg-violet-500/15 text-violet-700 border border-violet-300 hover:bg-violet-500/15 dark:text-violet-400 dark:border-violet-700">
               <Lock className="h-2.5 w-2.5" />
               Private
             </Badge>

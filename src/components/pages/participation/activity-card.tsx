@@ -8,6 +8,7 @@ import {
   MapPin,
   MoreHorizontal,
   Pencil,
+  Plane,
   Trash2,
   Users,
 } from "lucide-react";
@@ -82,7 +83,7 @@ export function ActivityCard({
         <div className="flex gap-2.5">
           {/* Image thumbnail */}
           {activity.imageUrl && (
-            <div className="relative w-24 shrink-0 self-stretch min-h-[54px] rounded-md overflow-hidden">
+            <div className="relative w-24 shrink-0 self-stretch min-h-13.5 rounded-md overflow-hidden">
               <Image
                 src={activity.imageUrl}
                 alt={activity.name}
@@ -94,9 +95,9 @@ export function ActivityCard({
 
           {/* Content */}
           <div className="flex-1 min-w-0 space-y-1.5">
-            <div className="flex items-start justify-between gap-2">
+            <div className="flex items-start justify-between">
               <div className="space-y-0.5">
-                <h4 className="font-semibold text-sm leading-tight">
+                <h4 className="font-semibold pb-0.5 font-sans leading-tight">
                   {activity.name}
                 </h4>
                 <div className="flex items-center gap-1.5 text-xs">
@@ -232,6 +233,22 @@ export function ActivityCard({
                     <ExternalLink className="h-3 w-3" />
                   </a>
                 )}
+              </div>
+            )}
+
+            {/* Flight number (for arrival/departure synthetic cards) */}
+            {"flightNumber" in activity && activity.flightNumber && (
+              <div className="flex items-center gap-1.5 text-xs">
+                <Plane className="h-3 w-3 shrink-0 text-muted-foreground" />
+                <a
+                  href={`https://www.flightaware.com/live/flight/${activity.flightNumber}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline font-medium"
+                >
+                  {activity.flightNumber}
+                  <ExternalLink className="h-2.5 w-2.5 inline ml-0.5 opacity-70" />
+                </a>
               </div>
             )}
 
