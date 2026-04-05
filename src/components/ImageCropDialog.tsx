@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ReactCrop, {
   type Crop,
   type PixelCrop,
@@ -81,7 +81,17 @@ export default function ImageCropDialog({
   const [saving, setSaving] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
 
-  const previewUrl = file ? URL.createObjectURL(file) : null;
+  const previewUrl = useMemo(() => {
+    if (!file) return null;
+    const url = URL.createObjectURL(file);
+    return url;
+  }, [file]);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
   const onImageLoad = useCallback(
     (e: React.SyntheticEvent<HTMLImageElement>) => {

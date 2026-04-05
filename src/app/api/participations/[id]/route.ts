@@ -100,7 +100,13 @@ const PATCH = async (req: NextRequest, ctx: RouteContext) => {
   if (!participation) return NotFound("Participation not found");
 
   if (participation.userId !== session.user.id && !session.user.isAdmin) {
-    return Forbidden("You can only edit your own participation");
+    const isGroupOwner = participation.groupId
+      ? (await participationRepository.getGroupById(participation.groupId))
+          ?.ownerId === session.user.id
+      : false;
+    if (!isGroupOwner) {
+      return Forbidden("You can only edit your own participation");
+    }
   }
 
   const body = await req.json();

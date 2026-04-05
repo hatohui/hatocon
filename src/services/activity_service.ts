@@ -40,11 +40,6 @@ const activityService = {
       `/api/participations/${participationId}/activities/${activityId}`,
     ),
 
-  reorder: (participationId: string, orderedIds: string[]) =>
-    axios.put(`/api/participations/${participationId}/activities/reorder`, {
-      orderedIds,
-    }),
-
   // Activity media
   getMedia: (
     participationId: string,

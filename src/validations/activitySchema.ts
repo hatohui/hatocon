@@ -18,7 +18,6 @@ export const activitySchema = zod.object({
   isExcludeMode: zod.boolean().default(false),
   note: zod.string().optional(),
   imageUrl: zod.string().url().optional().or(zod.literal("")),
-  sortOrder: zod.number().int().optional(),
 });
 
 export const activityUpdateSchema = activitySchema.partial();

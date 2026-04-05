@@ -71,10 +71,11 @@ import {
   useDeclineInvite,
 } from "@/hooks/participations/useParticipations";
 import { useNotifications } from "@/hooks/notifications/useNotifications";
-import { useActivities } from "@/hooks/activities/useActivities";
+import { useActivities, useDeleteActivity } from "@/hooks/activities/useActivities";
 import { useUpdateGroupSettings } from "@/hooks/participations/useParticipationGroup";
 import { cn } from "@/lib/utils";
 import ActivityTimeline from "@/components/pages/participation/activity-timeline";
+import ActivityInlineForm from "@/components/pages/participation/activity-inline-form";
 import MediaGallery from "@/components/pages/participation/media-gallery";
 import ParticipationSettings from "@/components/pages/participation/participation-settings";
 import MembersList from "@/components/pages/participation/members-list";
@@ -555,8 +556,14 @@ type UpcomingEntry = {
   name: string;
   from: Date | string;
   location?: string | null;
-  /** "__arriving" | "__departing" | "__event_start" | "__event_end" | falsy */
+  /** Synthetic kind identifier, or false for real activities */
   syntheticKind: string | false;
+  /** For real activities: their ID (used for edit/delete) */
+  activityId?: string;
+  /** For editable arrival/departure items: which participation to PATCH */
+  editParticipationId?: string;
+  /** "from" | "to" – which date field to PATCH */
+  dateField?: "from" | "to";
 };
 
 function UpcomingActivities({
@@ -579,6 +586,7 @@ function UpcomingActivities({
   isOwner: boolean;
   showActivityDetails: boolean;
   participants?: Array<{
+    id: string;
     userId: string;
     from: Date | string;
     to: Date | string;
@@ -597,23 +605,26 @@ function UpcomingActivities({
     showActivityDetails ? participationId : null,
   );
   const updateDates = useUpdateParticipationDates();
+  const deleteActivity = useDeleteActivity();
   // which date field is being edited: "from" (arrival) | "to" (departure) | null
   const [editingField, setEditingField] = useState<"from" | "to" | null>(null);
+  const [editingParticipationId, setEditingParticipationId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
+  const [editingActivityId, setEditingActivityId] = useState<string | null>(null);
   const now = new Date();
 
-  const openEdit = (field: "from" | "to") => {
-    const current = field === "from" ? participationFrom : participationTo;
-    setEditValue(format(new Date(current), "yyyy-MM-dd'T'HH:mm"));
+  const openEdit = (participationId: string, field: "from" | "to", currentValue: Date | string) => {
+    setEditValue(format(new Date(currentValue), "yyyy-MM-dd'T'HH:mm"));
     setEditingField(field);
+    setEditingParticipationId(participationId);
   };
 
   const handleSave = () => {
-    if (!editingField || !editValue) return;
+    if (!editingField || !editValue || !editingParticipationId) return;
     const newDate = new Date(editValue).toISOString();
     updateDates.mutate(
       {
-        id: participationId,
+        id: editingParticipationId,
         data: { [editingField]: newDate },
       },
       {
@@ -624,6 +635,7 @@ function UpcomingActivities({
               : "Departure time updated",
           );
           setEditingField(null);
+          setEditingParticipationId(null);
         },
         onError: () => toast.error("Failed to update"),
       },
@@ -637,18 +649,23 @@ function UpcomingActivities({
           .flatMap((p) => {
             const isMe = p.userId === currentUserId;
             const isViewed = p.userId === participantUser?.id;
+            const canEdit = isOwner || isViewed;
             return [
               {
                 id: `__arriving_${p.userId}`,
                 name: isMe ? "You arrive" : `${p.user.name} arrives`,
                 from: p.from,
-                syntheticKind: isViewed ? "__arriving" : "__member",
+                syntheticKind: "__arrival_departure",
+                editParticipationId: canEdit ? p.id : undefined,
+                dateField: "from" as const,
               },
               {
                 id: `__departing_${p.userId}`,
                 name: isMe ? "You depart" : `${p.user.name} departs`,
                 from: p.to,
-                syntheticKind: isViewed ? "__departing" : "__member",
+                syntheticKind: "__arrival_departure",
+                editParticipationId: canEdit ? p.id : undefined,
+                dateField: "to" as const,
               },
             ];
           })
@@ -661,7 +678,9 @@ function UpcomingActivities({
                   ? "You arrive"
                   : `${participantUser.name} arrives`,
               from: participationFrom,
-              syntheticKind: "__arriving",
+              syntheticKind: "__arrival_departure",
+              editParticipationId: isOwner ? participationId : undefined,
+              dateField: "from" as const,
             },
             {
               id: "__departing",
@@ -670,7 +689,9 @@ function UpcomingActivities({
                   ? "You depart"
                   : `${participantUser.name} departs`,
               from: participationTo,
-              syntheticKind: "__departing",
+              syntheticKind: "__arrival_departure",
+              editParticipationId: isOwner ? participationId : undefined,
+              dateField: "to" as const,
             },
           ]
         : [];
@@ -703,6 +724,7 @@ function UpcomingActivities({
     from: a.from,
     location: a.location,
     syntheticKind: false,
+    activityId: a.id,
   }));
 
   const upcoming = [...syntheticEntries, ...activityEntries]
@@ -710,8 +732,8 @@ function UpcomingActivities({
     .sort((a, b) => new Date(a.from).getTime() - new Date(b.from).getTime())
     .slice(0, 5);
 
-  const isEditable = (kind: string | false) =>
-    isOwner && (kind === "__arriving" || kind === "__departing");
+  const isEditable = (entry: UpcomingEntry) =>
+    !!entry.editParticipationId && !!entry.dateField;
 
   return (
     <>
@@ -742,7 +764,7 @@ function UpcomingActivities({
               No upcoming activities
             </p>
           )}
-          {!isLoading &&
+              {!isLoading &&
             upcoming.map((a) => (
               <div
                 key={a.id}
@@ -770,25 +792,53 @@ function UpcomingActivities({
                     </div>
                   )}
                 </div>
-                {a.syntheticKind && !isEditable(a.syntheticKind) && (
+                {/* Arrival/departure edit */}
+                {isEditable(a) && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="shrink-0 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground"
+                    onClick={() =>
+                      openEdit(a.editParticipationId!, a.dateField!, a.from)
+                    }
+                  >
+                    <Pencil className="h-3 w-3" />
+                  </Button>
+                )}
+                {/* Activity edit + delete */}
+                {!a.syntheticKind && a.activityId && isOwner && (
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="shrink-0 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground"
+                      onClick={() => setEditingActivityId(a.activityId!)}
+                    >
+                      <Pencil className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="shrink-0 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-destructive/70 hover:text-destructive"
+                      onClick={() =>
+                        deleteActivity.mutate(
+                          { participationId, activityId: a.activityId! },
+                          { onSuccess: () => toast.success("Activity deleted") },
+                        )
+                      }
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </>
+                )}
+                {/* Milestone badge for non-editable synthetic items */}
+                {a.syntheticKind && !isEditable(a) && (
                   <Badge
                     variant="secondary"
                     className="shrink-0 text-[10px] px-1.5 py-0 h-4 font-normal"
                   >
                     milestone
                   </Badge>
-                )}
-                {isEditable(a.syntheticKind) && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="shrink-0 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground"
-                    onClick={() =>
-                      openEdit(a.syntheticKind === "__arriving" ? "from" : "to")
-                    }
-                  >
-                    <Pencil className="h-3 w-3" />
-                  </Button>
                 )}
               </div>
             ))}
@@ -798,7 +848,12 @@ function UpcomingActivities({
       {/* Edit arrival / departure dialog */}
       <Dialog
         open={editingField !== null}
-        onOpenChange={(open) => !open && setEditingField(null)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditingField(null);
+            setEditingParticipationId(null);
+          }
+        }}
       >
         <DialogContent className="max-w-sm">
           <DialogHeader>
@@ -819,7 +874,10 @@ function UpcomingActivities({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setEditingField(null)}
+                onClick={() => {
+                  setEditingField(null);
+                  setEditingParticipationId(null);
+                }}
               >
                 Cancel
               </Button>
@@ -831,6 +889,25 @@ function UpcomingActivities({
                 Save
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Activity inline edit dialog */}
+      <Dialog
+        open={editingActivityId !== null}
+        onOpenChange={(open) => !open && setEditingActivityId(null)}
+      >
+        <DialogContent className="max-w-xl p-0 gap-0 overflow-y-auto max-h-[90vh]">
+          <div className="p-4">
+            {editingActivityId && (
+              <ActivityInlineForm
+                participationId={participationId}
+                activity={activities?.find((a) => a.id === editingActivityId)}
+                allUsers={[]}
+                onDone={() => setEditingActivityId(null)}
+              />
+            )}
           </div>
         </DialogContent>
       </Dialog>

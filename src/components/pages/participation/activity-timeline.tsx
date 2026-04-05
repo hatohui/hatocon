@@ -1,36 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { format, isSameDay } from "date-fns";
+import { format } from "date-fns";
 import {
   ArrowUpDown,
   ChevronDown,
   Clock,
-  ExternalLink,
-  MapPin,
   MapPinCheck,
-  MoreHorizontal,
   Pencil,
   Plus,
   Search,
-  Trash2,
   Users,
   X,
-  Image as ImageIcon,
 } from "lucide-react";
-import Image from "next/image";
 import { toast } from "sonner";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
@@ -45,300 +31,26 @@ import {
 } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import {
-  useActivities,
-  useDeleteActivity,
-} from "@/hooks/activities/useActivities";
+import { useActivities } from "@/hooks/activities/useActivities";
 import { useUpdateParticipationDates } from "@/hooks/participations/useParticipations";
-import { ActivityMediaDTO, ActivityWithMedia } from "@/types/activity.d";
 import type { ParticipationParticipant } from "@/types/participation.d";
 import { cn } from "@/lib/utils";
 import ActivityInlineForm from "@/components/pages/participation/activity-inline-form";
 
-// ─── Local types ─────────────────────────────────────────────────────────────
+import {
+  initials,
+  type DisplayActivity,
+  type EventActivity,
+  type EventProp,
+  type MemberUser,
+} from "./activity-timeline.types";
+import { ActivityCard } from "./activity-card";
 
-type MemberUser = {
-  id: string;
-  name: string;
-  image: string | null;
-  email: string;
-};
-
-type EventProp = {
-  id: string;
-  title: string;
-  startAt: Date | string;
-  endAt: Date | string;
-  location: string | null;
-  locationUrl: string | null;
-  image: string | null;
-} | null;
-
-type EventActivity = {
-  id: string;
-  name: string;
-  from: Date | string;
-  to: Date | string;
-  location: string | null;
-  locationUrl: string | null;
-  imageUrl: string | null;
-  involvedPeople: string[];
-  isExcludeMode?: boolean;
-  note: null;
-  media: ActivityMediaDTO[];
-  isSynthetic: true;
-  /** "from" or "to" if this is an editable arrival/departure item */
-  editableDateField?: "from" | "to";
-};
-
-type DisplayActivity = ActivityWithMedia | EventActivity;
-
-function initials(name: string) {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase();
-}
-
-// ─── User Popover ────────────────────────────────────────────────────────────
-
-function UserPopover({
-  userId,
-  allUsers,
-}: {
-  userId: string;
-  allUsers: { id: string; name: string; image: string | null; email: string }[];
-}) {
-  const user = allUsers.find((u) => u.id === userId);
-  if (!user) return <Badge variant="secondary">Unknown</Badge>;
-
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <button
-          type="button"
-          className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-2 py-0.5 text-xs font-medium hover:bg-secondary/80 transition-colors"
-        >
-          <Avatar className="h-4 w-4">
-            <AvatarImage src={user.image ?? undefined} />
-            <AvatarFallback className="text-[8px]">
-              {initials(user.name)}
-            </AvatarFallback>
-          </Avatar>
-          {user.name}
-        </button>
-      </PopoverTrigger>
-      <PopoverContent className="w-64 p-3" align="start">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-10 w-10">
-            <AvatarImage src={user.image ?? undefined} />
-            <AvatarFallback>{initials(user.name)}</AvatarFallback>
-          </Avatar>
-          <div className="min-w-0 flex-1">
-            <p className="font-medium truncate">{user.name}</p>
-            <p className="text-xs text-muted-foreground truncate">
-              {user.email}
-            </p>
-          </div>
-        </div>
-      </PopoverContent>
-    </Popover>
-  );
-}
-
-// ─── Activity Card ───────────────────────────────────────────────────────────
-
-function ActivityCard({
-  activity,
-  participationId,
-  isOwner,
-  allUsers,
-  onEdit,
-  onEditDates,
-}: {
-  activity: DisplayActivity;
-  participationId: string;
-  isOwner: boolean;
-  allUsers: MemberUser[];
-  onEdit?: () => void;
-  onEditDates?: (field: "from" | "to", current: Date | string) => void;
-}) {
-  const deleteMutation = useDeleteActivity();
-  const isSynthetic = "isSynthetic" in activity && activity.isSynthetic;
-  const editableDateField =
-    "editableDateField" in activity ? activity.editableDateField : undefined;
-  const from = new Date(activity.from);
-  const to = new Date(activity.to);
-  const sameTime = from.getTime() === to.getTime();
-
-  const handleDelete = () => {
-    deleteMutation.mutate(
-      { participationId, activityId: activity.id },
-      {
-        onSuccess: () => toast.success("Activity deleted"),
-        onError: () => toast.error("Failed to delete activity"),
-      },
-    );
-  };
-
-  return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardContent className="p-4">
-        <div className="flex gap-3">
-          {/* Image thumbnail */}
-          {activity.imageUrl && (
-            <div className="relative h-16 w-16 rounded-lg overflow-hidden shrink-0">
-              <Image
-                src={activity.imageUrl}
-                alt={activity.name}
-                fill
-                className="object-cover"
-              />
-            </div>
-          )}
-
-          {/* Content */}
-          <div className="flex-1 min-w-0 space-y-2">
-            <div className="flex items-start justify-between gap-2">
-              <div className="space-y-0.5">
-                <h4 className="font-semibold text-sm leading-tight">
-                  {activity.name}
-                </h4>
-                <div className="flex items-center gap-1.5 text-xs">
-                  <Clock className="h-3 w-3 text-muted-foreground" />
-                  {sameTime ? (
-                    <span className="font-medium tabular-nums">
-                      {format(from, "h:mm a")}
-                    </span>
-                  ) : (
-                    <span className="font-medium tabular-nums">
-                      {isSameDay(from, to)
-                        ? `${format(from, "h:mm a")} – ${format(to, "h:mm a")}`
-                        : `${format(from, "h:mm a, MMM d")} – ${format(to, "h:mm a, MMM d")}`}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Actions */}
-              {isOwner && !isSynthetic && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 shrink-0"
-                    >
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => onEdit?.()}>
-                      <Pencil className="h-3.5 w-3.5 mr-2" />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="text-destructive"
-                      onClick={handleDelete}
-                    >
-                      <Trash2 className="h-3.5 w-3.5 mr-2" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-              {isOwner && isSynthetic && editableDateField && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7 shrink-0"
-                  onClick={() =>
-                    onEditDates?.(editableDateField, activity.from)
-                  }
-                >
-                  <Pencil className="h-3.5 w-3.5" />
-                </Button>
-              )}
-            </div>
-
-            {/* Location */}
-            {activity.location && (
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <MapPin className="h-3 w-3 shrink-0" />
-                <span className="truncate">{activity.location}</span>
-                {activity.locationUrl && (
-                  <a
-                    href={activity.locationUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:text-primary/80"
-                  >
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                )}
-              </div>
-            )}
-
-            {/* Involved people */}
-            {(() => {
-              const isExclude =
-                "isExcludeMode" in activity && activity.isExcludeMode;
-              const hasPeople = activity.involvedPeople.length > 0;
-              // Empty array = @Everyone
-              if (!hasPeople) {
-                return (
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <Users className="h-3 w-3 text-muted-foreground shrink-0" />
-                    <Badge
-                      variant="secondary"
-                      className="text-xs h-5 px-2 font-normal"
-                    >
-                      @Everyone
-                    </Badge>
-                  </div>
-                );
-              }
-              return (
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <Users className="h-3 w-3 text-muted-foreground shrink-0" />
-                  {isExclude && (
-                    <span className="text-[10px] text-muted-foreground font-medium">
-                      Everyone except
-                    </span>
-                  )}
-                  {activity.involvedPeople.map((uid) => (
-                    <UserPopover key={uid} userId={uid} allUsers={allUsers} />
-                  ))}
-                </div>
-              );
-            })()}
-
-            {/* Note */}
-            {activity.note && (
-              <p className="text-xs text-muted-foreground line-clamp-2">
-                {activity.note}
-              </p>
-            )}
-
-            {/* Media count */}
-            {activity.media.length > 0 && (
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <ImageIcon className="h-3 w-3" />
-                {activity.media.length}{" "}
-                {activity.media.length === 1 ? "photo" : "photos"}
-              </div>
-            )}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
+export { ActivityOverviewSection } from "./activity-overview-section";
 
 // ─── Activity Timeline ───────────────────────────────────────────────────────
 
-export default function ActivityTimeline({
+const ActivityTimeline = ({
   participationId,
   participationFrom,
   participationTo,
@@ -358,29 +70,42 @@ export default function ActivityTimeline({
   members?: MemberUser[];
   participants?: ParticipationParticipant[];
   event?: EventProp;
-}) {
+}) => {
   const { data: activities, isLoading } = useActivities(participationId);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingDateField, setEditingDateField] = useState<
     "from" | "to" | null
   >(null);
+  const [editingParticipationId, setEditingParticipationId] = useState<
+    string | null
+  >(null);
+  const [editingPersonName, setEditingPersonName] = useState<string | null>(
+    null,
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [editDateValue, setEditDateValue] = useState("");
   const updateDates = useUpdateParticipationDates();
 
-  const openDateEdit = (field: "from" | "to", current: Date | string) => {
+  const openDateEdit = (
+    pid: string,
+    field: "from" | "to",
+    current: Date | string,
+    personName?: string | null,
+  ) => {
     setEditDateValue(format(new Date(current), "yyyy-MM-dd'T'HH:mm"));
     setEditingDateField(field);
+    setEditingParticipationId(pid);
+    setEditingPersonName(personName ?? null);
   };
 
   const saveDateEdit = () => {
-    if (!editingDateField || !editDateValue) return;
+    if (!editingDateField || !editDateValue || !editingParticipationId) return;
     updateDates.mutate(
       {
-        id: participationId,
+        id: editingParticipationId,
         data: { [editingDateField]: new Date(editDateValue).toISOString() },
       },
       {
@@ -391,6 +116,8 @@ export default function ActivityTimeline({
               : "Departure updated",
           );
           setEditingDateField(null);
+          setEditingParticipationId(null);
+          setEditingPersonName(null);
         },
         onError: () => toast.error("Failed to update"),
       },
@@ -410,7 +137,7 @@ export default function ActivityTimeline({
         const memberName = p.user.name;
         const arrivalLabel = isMe ? "You arrive" : `${memberName} arrives`;
         const departureLabel = isMe ? "You depart" : `${memberName} departs`;
-        const isEditable = p.userId === participantUser?.id;
+        const isEditable = isOwner || p.userId === participantUser?.id;
 
         if (p.from) {
           items.push({
@@ -425,7 +152,9 @@ export default function ActivityTimeline({
             note: null,
             media: [],
             isSynthetic: true,
-            ...(isEditable ? { editableDateField: "from" as const } : {}),
+            ...(isEditable
+              ? { editableDateField: "from" as const, participationId: p.id }
+              : {}),
           });
         }
         if (p.to) {
@@ -441,7 +170,9 @@ export default function ActivityTimeline({
             note: null,
             media: [],
             isSynthetic: true,
-            ...(isEditable ? { editableDateField: "to" as const } : {}),
+            ...(isEditable
+              ? { editableDateField: "to" as const, participationId: p.id }
+              : {}),
           });
         }
       }
@@ -482,16 +213,34 @@ export default function ActivityTimeline({
                   ? `You & ${otherCount} others depart`
                   : `${allUserIds.length} members depart`;
           }
+          const editableBucket = bucket.filter((b) => b.editableDateField);
+          const mergedMembers =
+            editableBucket.length > 1
+              ? editableBucket.map((b) => ({
+                  userId: b.involvedPeople[0],
+                  participationId: b.participationId!,
+                  name:
+                    members.find((m) => m.id === b.involvedPeople[0])?.name ??
+                    b.involvedPeople[0],
+                  dateField: b.editableDateField as "from" | "to",
+                  datetime: b.from,
+                }))
+              : undefined;
           return {
             ...bucket[0],
             id: `__${kind}_group_${new Date(bucket[0].from).getTime()}`,
             name,
             involvedPeople: allUserIds,
-            // keep editableDateField only if exactly one member's participation is editable
+            // single editable: keep editableDateField + participationId
             editableDateField:
-              bucket.filter((b) => b.editableDateField).length === 1
-                ? bucket.find((b) => b.editableDateField)?.editableDateField
+              editableBucket.length === 1
+                ? editableBucket[0].editableDateField
                 : undefined,
+            participationId:
+              editableBucket.length === 1
+                ? editableBucket[0].participationId
+                : undefined,
+            mergedMembers,
           };
         });
       };
@@ -504,28 +253,6 @@ export default function ActivityTimeline({
         (i) =>
           !i.id.startsWith("__arriving_") && !i.id.startsWith("__departing_"),
       );
-
-      // Add "Already here" synthetic item for members already at the location
-      const alreadyHereMembers = participants.filter((p) => p.isAlreadyHere);
-      if (alreadyHereMembers.length > 0) {
-        const startTime = event?.startAt ?? participationFrom ?? new Date();
-        otherItems.push({
-          id: "__already_here",
-          name:
-            alreadyHereMembers.length === 1
-              ? `${alreadyHereMembers[0].userId === currentUserId ? "You're" : `${alreadyHereMembers[0].user.name} is`} already here`
-              : `${alreadyHereMembers.length} members already here`,
-          from: startTime,
-          to: startTime,
-          location: null,
-          locationUrl: null,
-          imageUrl: null,
-          involvedPeople: alreadyHereMembers.map((p) => p.userId),
-          note: null,
-          media: [],
-          isSynthetic: true,
-        });
-      }
 
       return [
         ...mergeByTime(arrivalItems, "arriving"),
@@ -561,6 +288,7 @@ export default function ActivityTimeline({
               media: [],
               isSynthetic: true as const,
               editableDateField: "from" as const,
+              participationId,
             },
           ]
         : []),
@@ -579,6 +307,7 @@ export default function ActivityTimeline({
               media: [],
               isSynthetic: true as const,
               editableDateField: "to" as const,
+              participationId,
             },
           ]
         : []),
@@ -945,10 +674,12 @@ export default function ActivityTimeline({
                                 : () => setEditingId(activity.id)
                             }
                             onEditDates={
-                              "editableDateField" in activity &&
-                              activity.editableDateField
-                                ? (field, current) =>
-                                    openDateEdit(field, current)
+                              "isSynthetic" in activity &&
+                              activity.isSynthetic &&
+                              (activity.editableDateField ||
+                                activity.mergedMembers?.length)
+                                ? (pid, field, current, name) =>
+                                    openDateEdit(pid, field, current, name)
                                 : undefined
                             }
                           />
@@ -966,7 +697,13 @@ export default function ActivityTimeline({
       {/* Edit arrival / departure dialog */}
       <Dialog
         open={editingDateField !== null}
-        onOpenChange={(open) => !open && setEditingDateField(null)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditingDateField(null);
+            setEditingParticipationId(null);
+            setEditingPersonName(null);
+          }
+        }}
       >
         <DialogContent className="max-w-sm">
           <DialogHeader>
@@ -975,6 +712,12 @@ export default function ActivityTimeline({
                 ? "Edit arrival time"
                 : "Edit departure time"}
             </DialogTitle>
+            {editingPersonName && (
+              <p className="text-sm text-muted-foreground">
+                Editing {editingPersonName}&apos;s{" "}
+                {editingDateField === "from" ? "arrival" : "departure"}
+              </p>
+            )}
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <Input
@@ -1004,144 +747,6 @@ export default function ActivityTimeline({
       </Dialog>
     </>
   );
-}
+};
 
-// ─── Activity Overview Section ───────────────────────────────────────────────
-
-export function ActivityOverviewSection({
-  participationId,
-  isOwner,
-  members = [],
-  event,
-}: {
-  participationId: string;
-  isOwner: boolean;
-  members?: MemberUser[];
-  event?: EventProp;
-}) {
-  const { data: activities, isLoading } = useActivities(participationId);
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-
-  // Synthetic event boundary items
-  const syntheticItems: EventActivity[] = event
-    ? [
-        {
-          id: "__event_start",
-          name: `${event.title} starts`,
-          from: event.startAt,
-          to: event.startAt,
-          location: event.location,
-          locationUrl: event.locationUrl,
-          imageUrl: event.image,
-          involvedPeople: [],
-          note: null,
-          media: [],
-          isSynthetic: true,
-        },
-        {
-          id: "__event_end",
-          name: `${event.title} ends`,
-          from: event.endAt,
-          to: event.endAt,
-          location: event.location,
-          locationUrl: event.locationUrl,
-          imageUrl: event.image,
-          involvedPeople: [],
-          note: null,
-          media: [],
-          isSynthetic: true,
-        },
-      ]
-    : [];
-
-  const allItems: DisplayActivity[] = [
-    ...syntheticItems,
-    ...(activities ?? []),
-  ].sort((a, b) => new Date(a.from).getTime() - new Date(b.from).getTime());
-
-  const totalReal = activities?.length ?? 0;
-
-  return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-sm">
-            Activities{totalReal > 0 ? ` (${totalReal})` : ""}
-          </CardTitle>
-          {isOwner && !showAddForm && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setShowAddForm(true)}
-            >
-              <Plus className="h-3.5 w-3.5 mr-1" />
-              Add
-            </Button>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent className="pt-0 space-y-2">
-        {isLoading && (
-          <div className="space-y-2 py-2">
-            {[1, 2].map((i) => (
-              <Skeleton key={i} className="h-24 rounded-xl" />
-            ))}
-          </div>
-        )}
-
-        {!isLoading &&
-          allItems.map((activity) => {
-            if (editingId === activity.id) {
-              return (
-                <ActivityInlineForm
-                  key={activity.id}
-                  participationId={participationId}
-                  activity={"isSynthetic" in activity ? undefined : activity}
-                  allUsers={members}
-                  onDone={() => setEditingId(null)}
-                />
-              );
-            }
-            return (
-              <ActivityCard
-                key={activity.id}
-                activity={activity}
-                participationId={participationId}
-                isOwner={isOwner}
-                allUsers={members}
-                onEdit={
-                  "isSynthetic" in activity
-                    ? undefined
-                    : () => setEditingId(activity.id)
-                }
-              />
-            );
-          })}
-
-        {!isLoading && allItems.length === 0 && !showAddForm && (
-          <p className="text-xs text-muted-foreground text-center py-6">
-            No activities yet.{" "}
-            {isOwner && (
-              <button
-                type="button"
-                onClick={() => setShowAddForm(true)}
-                className="underline underline-offset-2"
-              >
-                Add one?
-              </button>
-            )}
-          </p>
-        )}
-
-        {showAddForm && (
-          <ActivityInlineForm
-            participationId={participationId}
-            allUsers={members}
-            onDone={() => setShowAddForm(false)}
-          />
-        )}
-      </CardContent>
-    </Card>
-  );
-}
+export default ActivityTimeline;

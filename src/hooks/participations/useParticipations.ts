@@ -204,10 +204,11 @@ const useUpdateParticipationDates = () => {
       id: string;
       data: { from?: string; to?: string; isAlreadyHere?: boolean };
     }) => participationService.update(id, data),
-    onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ["participation", variables.id],
-      });
+    onSuccess: () => {
+      // Invalidate all participation queries (prefix match) so the page's
+      // nested participants array always refreshes, even when an owner edits
+      // a different member's dates.
+      queryClient.invalidateQueries({ queryKey: ["participation"] });
       queryClient.invalidateQueries({ queryKey: ["participations"] });
       queryClient.invalidateQueries({ queryKey: ["heatmap"] });
     },

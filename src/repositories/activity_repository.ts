@@ -13,7 +13,7 @@ const activityRepository = {
     return db.activity.findMany({
       where: { participationGroupId: groupId },
       include: { media: { orderBy: { createdAt: "desc" } } },
-      orderBy: [{ from: "asc" }, { sortOrder: "asc" }],
+      orderBy: { from: "asc" },
     });
   },
 
@@ -35,7 +35,6 @@ const activityRepository = {
         isExcludeMode: data.isExcludeMode ?? false,
         note: data.note || null,
         imageUrl: data.imageUrl || null,
-        sortOrder: data.sortOrder ?? 0,
       },
       include: { media: true },
     });
@@ -64,7 +63,6 @@ const activityRepository = {
         ...(data.imageUrl !== undefined && {
           imageUrl: data.imageUrl || null,
         }),
-        ...(data.sortOrder !== undefined && { sortOrder: data.sortOrder }),
       },
       include: { media: true },
     });
@@ -72,16 +70,6 @@ const activityRepository = {
 
   delete: async (id: string) => {
     return db.activity.delete({ where: { id } });
-  },
-
-  reorder: async (groupId: string, orderedIds: string[]) => {
-    const updates = orderedIds.map((id, index) =>
-      db.activity.update({
-        where: { id },
-        data: { sortOrder: index },
-      }),
-    );
-    return db.$transaction(updates);
   },
 
   // ─── Activity Media ──────────────────────────────────────────────

@@ -10,7 +10,6 @@ export type ActivityCreateDTO = {
   isExcludeMode?: boolean;
   note?: string;
   imageUrl?: string;
-  sortOrder?: number;
 };
 
 export type ActivityUpdateDTO = Partial<ActivityCreateDTO>;

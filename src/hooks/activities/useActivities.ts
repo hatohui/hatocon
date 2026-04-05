@@ -67,24 +67,6 @@ const useDeleteActivity = () => {
   });
 };
 
-const useReorderActivities = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({
-      participationId,
-      orderedIds,
-    }: {
-      participationId: string;
-      orderedIds: string[];
-    }) => activityService.reorder(participationId, orderedIds),
-    onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ["activities", variables.participationId],
-      });
-    },
-  });
-};
-
 const useActivityMedia = (
   participationId: string | null,
   filters?: { activityId?: string; uploadedBy?: string },
@@ -199,7 +181,6 @@ export {
   useCreateActivity,
   useUpdateActivity,
   useDeleteActivity,
-  useReorderActivities,
   useActivityMedia,
   useUploadActivityMedia,
   useDeleteActivityMedia,

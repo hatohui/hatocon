@@ -221,7 +221,6 @@ export const ActivityScalarFieldEnum = {
   isExcludeMode: 'isExcludeMode',
   note: 'note',
   imageUrl: 'imageUrl',
-  sortOrder: 'sortOrder',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   createdBy: 'createdBy'

@@ -1,14 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { addMinutes, differenceInMinutes, format } from "date-fns";
+import { addMinutes, differenceInMinutes, format, isSameDay } from "date-fns";
+import axios from "axios";
 import {
   CalendarIcon,
   Check,
   Clock,
   Image as ImageIcon,
+  Link,
   Loader2,
   MapPin,
+  Upload,
   Users,
   X,
 } from "lucide-react";
@@ -44,6 +47,7 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 
+import ImageCropDialog from "@/components/ImageCropDialog";
 import {
   useCreateActivity,
   useUpdateActivity,
@@ -203,25 +207,48 @@ function TimePickerField({
 // Main form
 // --------------------------------------------------------------------------
 
-export default function ActivityInlineForm({
-  participationId,
-  activity,
-  allUsers,
-  onDone,
-}: {
+type ActivityInlineFormProps = {
   participationId: string;
   activity?: ActivityWithMedia;
   allUsers?: UserLike[];
   onDone: () => void;
-}) {
+};
+
+const ActivityInlineForm = ({
+  participationId,
+  activity,
+  allUsers,
+  onDone,
+}: ActivityInlineFormProps) => {
   const isEditing = !!activity;
   const createMutation = useCreateActivity();
   const updateMutation = useUpdateActivity();
 
   const [name, setName] = useState(activity?.name ?? "");
   const [location, setLocation] = useState(activity?.location ?? "");
+  const [locationUrl, setLocationUrl] = useState(activity?.locationUrl ?? "");
   const [note, setNote] = useState(activity?.note ?? "");
-  const [imageUrl, setImageUrl] = useState(activity?.imageUrl ?? "");
+  // URL already committed to the server (only populated when editing an existing activity)
+  const [committedImageUrl, setCommittedImageUrl] = useState(
+    activity?.imageUrl ?? "",
+  );
+  // Cropped file waiting to be uploaded on save
+  const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
+  // Local blob URL for showing the pending image in the form
+  const [localPreviewUrl, setLocalPreviewUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [cropFile, setCropFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Revoke blob URL when it changes or component unmounts
+  useEffect(() => {
+    return () => {
+      if (localPreviewUrl) URL.revokeObjectURL(localPreviewUrl);
+    };
+  }, [localPreviewUrl]);
+
+  // The URL to display in preview — prefer local blob over committed remote URL
+  const displayImageUrl = localPreviewUrl ?? committedImageUrl;
 
   const initFrom = parseInit(activity?.from);
   const initTo = parseInit(activity?.to);
@@ -257,6 +284,15 @@ export default function ActivityInlineForm({
   useEffect(() => {
     nameRef.current?.focus();
   }, []);
+
+  const handleCropComplete = (cropped: File | null) => {
+    setCropFile(null);
+    if (cropped) {
+      if (localPreviewUrl) URL.revokeObjectURL(localPreviewUrl);
+      setPendingImageFile(cropped);
+      setLocalPreviewUrl(URL.createObjectURL(cropped));
+    }
+  };
 
   // Derived
   const fromDatetime = buildDatetime(fromDate, fromTime);
@@ -323,6 +359,29 @@ export default function ActivityInlineForm({
       return;
     }
 
+    // Upload pending image if any
+    let finalImageUrl = committedImageUrl;
+    if (pendingImageFile) {
+      setUploading(true);
+      try {
+        const { data } = await axios.post<{
+          data: { uploadUrl: string; publicUrl: string };
+        }>("/api/upload/activity-image", {
+          contentType: pendingImageFile.type,
+          contentLength: pendingImageFile.size,
+        });
+        await axios.put(data.data.uploadUrl, pendingImageFile, {
+          headers: { "Content-Type": pendingImageFile.type },
+        });
+        finalImageUrl = data.data.publicUrl;
+      } catch {
+        toast.error("Failed to upload image");
+        setUploading(false);
+        return;
+      }
+      setUploading(false);
+    }
+
     const payload = {
       name: name.trim(),
       from: fromDatetime.toISOString(),
@@ -331,10 +390,11 @@ export default function ActivityInlineForm({
         : fromDatetime
       ).toISOString(),
       location: location.trim() || undefined,
+      locationUrl: locationUrl.trim() || undefined,
       note: note.trim() || undefined,
       involvedPeople: selectedPeople.map((p) => p.id),
       isExcludeMode,
-      imageUrl: imageUrl.trim() || undefined,
+      imageUrl: finalImageUrl.trim() || undefined,
     };
 
     try {
@@ -357,7 +417,8 @@ export default function ActivityInlineForm({
     }
   };
 
-  const isPending = createMutation.isPending || updateMutation.isPending;
+  const isPending =
+    createMutation.isPending || updateMutation.isPending || uploading;
 
   return (
     <Card className="border-primary/40 shadow-md">
@@ -498,6 +559,24 @@ export default function ActivityInlineForm({
           />
         </div>
 
+        {/* Location URL */}
+        <div className="space-y-1.5">
+          <Label
+            htmlFor="act-location-url"
+            className="text-xs text-muted-foreground"
+          >
+            <Link className="h-3.5 w-3.5" />
+            Location URL
+          </Label>
+          <Input
+            id="act-location-url"
+            placeholder="https://maps.google.com/..."
+            value={locationUrl}
+            onChange={(e) => setLocationUrl(e.target.value)}
+            className="h-8 text-sm"
+          />
+        </div>
+
         {/* People */}
         {(allUsers ?? []).length > 0 && (
           <div className="space-y-1.5">
@@ -620,34 +699,176 @@ export default function ActivityInlineForm({
           />
         </div>
 
-        {/* Image URL */}
+        {/* Cover photo upload */}
         <div className="space-y-1.5">
-          <Label htmlFor="act-image" className="text-xs text-muted-foreground">
+          <Label className="text-xs text-muted-foreground">
             <ImageIcon className="h-3.5 w-3.5" />
-            Cover photo URL
+            Cover photo
           </Label>
-          <Input
-            id="act-image"
-            placeholder="https://..."
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            className="h-8 text-sm"
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              e.target.value = "";
+              if (file) setCropFile(file);
+            }}
           />
-          {imageUrl.trim() && (
-            <div className="relative mt-1 h-28 w-full overflow-hidden rounded-md border border-input">
+          {displayImageUrl ? (
+            <div className="flex items-center gap-2 rounded-md border border-input bg-muted/30 px-2 py-1.5">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={imageUrl.trim()}
-                alt="Cover preview"
-                className="h-full w-full object-cover"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).style.display = "none";
-                }}
+                src={displayImageUrl}
+                alt="Cover thumbnail"
+                className="h-9 w-16 rounded object-cover shrink-0"
               />
+              <span className="flex-1 truncate text-xs text-muted-foreground">
+                {pendingImageFile ? pendingImageFile.name : "Current cover"}
+              </span>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="text-xs text-muted-foreground hover:text-foreground px-1.5 py-0.5 rounded hover:bg-muted shrink-0"
+              >
+                Change
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setPendingImageFile(null);
+                  if (localPreviewUrl) URL.revokeObjectURL(localPreviewUrl);
+                  setLocalPreviewUrl(null);
+                  setCommittedImageUrl("");
+                }}
+                className="rounded-full p-0.5 hover:bg-muted shrink-0"
+              >
+                <X className="h-3.5 w-3.5 text-muted-foreground" />
+              </button>
             </div>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="w-full h-8 gap-2 text-sm"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+            >
+              <Upload className="h-3.5 w-3.5" />
+              Upload cover photo
+            </Button>
           )}
         </div>
+        <ImageCropDialog
+          file={cropFile}
+          aspect={16 / 9}
+          maxWidth={1200}
+          quality={0.85}
+          onComplete={handleCropComplete}
+        />
+
+        {/* Activity preview card — mirrors ActivityCard in activity-timeline.tsx */}
+        {(name.trim() || displayImageUrl) && (
+          <>
+            <Separator />
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium text-muted-foreground">
+                Preview
+              </p>
+              <Card className="pointer-events-none opacity-90">
+                <CardContent className="p-4">
+                  <div className="flex gap-3">
+                    {displayImageUrl && (
+                      <div className="relative h-16 w-16 rounded-lg overflow-hidden shrink-0">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={displayImageUrl}
+                          alt={name || "Cover"}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0 space-y-2">
+                      <div className="space-y-0.5">
+                        <h4 className="font-semibold text-sm leading-tight">
+                          {name.trim() || (
+                            <span className="text-muted-foreground italic">
+                              Activity name
+                            </span>
+                          )}
+                        </h4>
+                        {fromDatetime && (
+                          <div className="flex items-center gap-1.5 text-xs">
+                            <Clock className="h-3 w-3 text-muted-foreground" />
+                            <span className="font-medium tabular-nums">
+                              {toDatetime && toDatetime > fromDatetime
+                                ? isSameDay(fromDatetime, toDatetime)
+                                  ? `${format(fromDatetime, "h:mm a")} – ${format(toDatetime, "h:mm a")}`
+                                  : `${format(fromDatetime, "h:mm a, MMM d")} – ${format(toDatetime, "h:mm a, MMM d")}`
+                                : format(fromDatetime, "h:mm a")}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      {location.trim() && (
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <MapPin className="h-3 w-3 shrink-0" />
+                          <span className="truncate">{location.trim()}</span>
+                        </div>
+                      )}
+                      {selectedPeople.length === 0 ? (
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <Users className="h-3 w-3 text-muted-foreground shrink-0" />
+                          <Badge
+                            variant="secondary"
+                            className="text-xs h-5 px-2 font-normal"
+                          >
+                            @Everyone
+                          </Badge>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <Users className="h-3 w-3 text-muted-foreground shrink-0" />
+                          {isExcludeMode && (
+                            <span className="text-[10px] text-muted-foreground font-medium">
+                              Everyone except
+                            </span>
+                          )}
+                          {selectedPeople.map((p) => (
+                            <span
+                              key={p.id}
+                              className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-2 py-0.5 text-xs font-medium"
+                            >
+                              <Avatar className="h-4 w-4">
+                                <AvatarImage src={p.image ?? undefined} />
+                                <AvatarFallback className="text-[8px]">
+                                  {initials(p.name === p.id ? "?" : p.name)}
+                                </AvatarFallback>
+                              </Avatar>
+                              {p.name === p.id
+                                ? p.id.slice(0, 8) + "\u2026"
+                                : p.name}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      {note.trim() && (
+                        <p className="text-xs text-muted-foreground line-clamp-2">
+                          {note.trim()}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </>
+        )}
       </CardContent>
     </Card>
   );
-}
+};
+
+export default ActivityInlineForm;
