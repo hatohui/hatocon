@@ -75,7 +75,10 @@ import {
   useAcceptInvite,
   useDeclineInvite,
 } from "@/hooks/participations/useParticipations";
-import { useNotifications } from "@/hooks/notifications/useNotifications";
+import {
+  useNotifications,
+  useDeleteNotification,
+} from "@/hooks/notifications/useNotifications";
 import {
   useActivities,
   useDeleteActivity,
@@ -167,6 +170,7 @@ function EditOwnDatesDialog({
   defaultExitFlight,
   open,
   onOpenChange,
+  onSuccess,
 }: {
   participationId: string;
   defaultFrom: Date | string;
@@ -175,6 +179,7 @@ function EditOwnDatesDialog({
   defaultExitFlight?: string | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }) {
   const [fromVal, setFromVal] = useState(
     format(new Date(defaultFrom), "yyyy-MM-dd'T'HH:mm"),
@@ -202,6 +207,7 @@ function EditOwnDatesDialog({
         onSuccess: () => {
           toast.success("Your dates updated");
           onOpenChange(false);
+          onSuccess?.();
         },
         onError: () => toast.error("Failed to update dates"),
       },
@@ -274,10 +280,21 @@ function PhotoGallery({
   images,
   participationId,
   onViewAll,
+  isOwner,
+  isAdmin,
+  userId,
 }: {
-  images: { id: string; url: string; caption?: string | null }[];
+  images: {
+    id: string;
+    url: string;
+    caption?: string | null;
+    uploadedBy?: string | null;
+  }[];
   participationId: string;
   onViewAll: () => void;
+  isOwner?: boolean;
+  isAdmin?: boolean;
+  userId?: string;
 }) {
   const [lightbox, setLightbox] = useState<string | null>(null);
   const uploadMutation = useUploadParticipationImage();
@@ -379,19 +396,21 @@ function PhotoGallery({
                         className="aspect-square rounded-lg object-cover"
                       />
                     </button>
-                    <Button
-                      size="icon"
-                      variant="destructive"
-                      className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={() =>
-                        deleteMutation.mutate({
-                          participationId,
-                          imageId: img.id,
-                        })
-                      }
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
+                    {(isOwner || isAdmin || img.uploadedBy === userId) && (
+                      <Button
+                        size="icon"
+                        variant="destructive"
+                        className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() =>
+                          deleteMutation.mutate({
+                            participationId,
+                            imageId: img.id,
+                          })
+                        }
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    )}
                     {img.caption && (
                       <p className="text-xs text-muted-foreground mt-1 truncate">
                         {img.caption}
@@ -930,6 +949,7 @@ export default function ParticipationDetailPage() {
 
   // All hooks must be declared before any early returns (rules of hooks)
   const { data: notifications } = useNotifications();
+  const deleteNotification = useDeleteNotification();
   const acceptInvite = useAcceptInvite();
   const declineInvite = useDeclineInvite();
 
@@ -1387,6 +1407,16 @@ export default function ParticipationDetailPage() {
           defaultExitFlight={myParticipationRecord.exitFlight}
           open={editOwnDatesOpen}
           onOpenChange={setEditOwnDatesOpen}
+          onSuccess={
+            wasAddedByAdmin && !adminDatesPromptDismissed
+              ? () => {
+                  setAdminDatesPromptDismissed(true);
+                  if (pendingInviteNotification) {
+                    deleteNotification.mutate(pendingInviteNotification.id);
+                  }
+                }
+              : undefined
+          }
         />
       )}
 
@@ -1483,6 +1513,9 @@ export default function ParticipationDetailPage() {
                   images={participation.group?.images ?? []}
                   participationId={participation.id}
                   onViewAll={() => setActiveTab("media")}
+                  isOwner={isOwner}
+                  isAdmin={isAdmin}
+                  userId={currentUserId}
                 />
               )}
               <UpcomingActivities

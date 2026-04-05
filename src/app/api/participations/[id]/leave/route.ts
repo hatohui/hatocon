@@ -84,6 +84,12 @@ const POST = async (_req: NextRequest, ctx: RouteContext) => {
     // Remove leaving owner from activities (delete their created ones, remove from involvedPeople)
     await activityRepository.removeUserFromGroup(group.id, session.user.id);
 
+    // Delete participation images uploaded by the leaving owner
+    await participationRepository.deleteUserParticipationImages(
+      group.id,
+      session.user.id,
+    );
+
     // Delete the leaving owner's participation
     await participationRepository.delete(id);
 
@@ -124,6 +130,12 @@ const POST = async (_req: NextRequest, ctx: RouteContext) => {
 
   // Remove from activities (delete created, remove from involvedPeople)
   await activityRepository.removeUserFromGroup(group.id, session.user.id);
+
+  // Delete participation images uploaded by the leaving member
+  await participationRepository.deleteUserParticipationImages(
+    group.id,
+    session.user.id,
+  );
 
   // Delete their participation
   await participationRepository.delete(id);

@@ -686,7 +686,7 @@ const participationRepository = {
     groupId: string,
     userId: string,
   ): Promise<string[]> => {
-    const [activities, media] = await Promise.all([
+    const [activities, media, participationImages] = await Promise.all([
       db.activity.findMany({
         where: { participationGroupId: groupId, createdBy: userId },
         select: { imageUrl: true },
@@ -698,11 +698,25 @@ const participationRepository = {
         },
         select: { url: true },
       }),
+      db.participationImage.findMany({
+        where: { groupId, uploadedBy: userId },
+        select: { url: true },
+      }),
     ]);
     const urls: string[] = [];
     for (const a of activities) if (a.imageUrl) urls.push(a.imageUrl);
     for (const m of media) urls.push(m.url);
+    for (const img of participationImages) urls.push(img.url);
     return urls;
+  },
+
+  deleteUserParticipationImages: async (
+    groupId: string,
+    userId: string,
+  ): Promise<void> => {
+    await db.participationImage.deleteMany({
+      where: { groupId, uploadedBy: userId },
+    });
   },
 
   /**

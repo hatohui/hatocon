@@ -97,6 +97,14 @@ function NotificationMessage({
       </span>
     );
   }
+  if (type === "USER_LEFT") {
+    return (
+      <span>
+        <strong>{data.userName}</strong> {NOTIFICATION_LABELS[type]}{" "}
+        <strong>{data.eventTitle}</strong>
+      </span>
+    );
+  }
   return (
     <span>
       {NOTIFICATION_LABELS[type]} <strong>{data.eventTitle}</strong>
