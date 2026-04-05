@@ -1,6 +1,8 @@
 import { auth } from "@/auth";
 import { Forbidden, NotFound, Unauthorized } from "@/common/response";
+import { r2 } from "@/config/r2";
 import participationRepository from "@/repositories/participation_repository";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -20,6 +22,12 @@ const DELETE = async (_req: NextRequest, ctx: RouteContext) => {
   if (image.group.ownerId !== session.user.id && !session.user.isAdmin) {
     return Forbidden("You can only delete images in groups you own");
   }
+
+  // Delete from R2
+  const key = image.url.replace(`${process.env.R2_PUBLIC_URL}/`, "");
+  await r2.send(
+    new DeleteObjectCommand({ Bucket: process.env.R2_BUCKET_NAME!, Key: key }),
+  );
 
   await participationRepository.deleteImage(imageId);
   return new NextResponse(null, { status: 204 });
