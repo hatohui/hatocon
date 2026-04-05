@@ -76,7 +76,7 @@ function EventPicker({
     return (
       <div className="rounded-xl border bg-primary/5 border-primary/20 overflow-hidden">
         {value.image && (
-          <div className="relative aspect-[3/1] w-full">
+          <div className="relative aspect-3/1 w-full">
             <Image
               src={value.image}
               alt={value.title}
@@ -172,7 +172,7 @@ function EventPicker({
                     }}
                   >
                     {event.image && (
-                      <div className="relative aspect-[4/1] w-full">
+                      <div className="relative aspect-4/1 w-full">
                         <Image
                           src={event.image}
                           alt={event.title}
@@ -182,7 +182,7 @@ function EventPicker({
                       </div>
                     )}
                     <div className="flex items-start gap-3 px-4 py-3">
-                      <div className="shrink-0 text-center bg-primary/10 rounded-lg px-2 py-1 min-w-[40px]">
+                      <div className="shrink-0 text-center bg-primary/10 rounded-lg px-2 py-1 min-w-10">
                         <p className="text-[9px] font-bold text-primary uppercase">
                           {format(start, "MMM")}
                         </p>
