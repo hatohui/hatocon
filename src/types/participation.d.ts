@@ -5,6 +5,7 @@ import type { ParticipationGroupDTO } from "@/types/notification.d";
 export type ParticipationCreateDTO = {
   eventId?: string;
   groupId?: string;
+  planName?: string;
   from: Date | string;
   to: Date | string;
   leaveType: LeaveType;
@@ -37,6 +38,9 @@ export type ParticipationWithEvent = Participation & {
 export type ParticipationParticipant = {
   id: string;
   userId: string;
+  from: Date | string;
+  to: Date | string;
+  isAlreadyHere: boolean;
   user: { id: string; name: string; image: string | null; email: string };
 };
 

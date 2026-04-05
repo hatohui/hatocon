@@ -193,7 +193,7 @@ const useUpdateParticipationDates = () => {
       data,
     }: {
       id: string;
-      data: { from?: string; to?: string };
+      data: { from?: string; to?: string; isAlreadyHere?: boolean };
     }) => participationService.update(id, data),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({

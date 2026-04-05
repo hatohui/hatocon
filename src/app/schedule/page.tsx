@@ -28,11 +28,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useWorkSchedule, useHolidays } from "@/hooks/schedule/useSchedule";
 
-function countWorkingDays(
-  from: Date,
-  to: Date,
-  workDays?: boolean[],
-): number {
+function countWorkingDays(from: Date, to: Date, workDays?: boolean[]): number {
   const wd = workDays ?? [false, true, true, true, true, true, false];
   let count = 0;
   const cur = new Date(from);
@@ -86,7 +82,15 @@ function ScheduleCalendar({
 
   const { data: schedule } = useWorkSchedule();
   const workDays = schedule
-    ? [schedule.sunday, schedule.monday, schedule.tuesday, schedule.wednesday, schedule.thursday, schedule.friday, schedule.saturday]
+    ? [
+        schedule.sunday,
+        schedule.monday,
+        schedule.tuesday,
+        schedule.wednesday,
+        schedule.thursday,
+        schedule.friday,
+        schedule.saturday,
+      ]
     : [false, true, true, true, true, true, false];
 
   const monthFrom = startOfMonth(currentMonth).toISOString();
@@ -217,7 +221,15 @@ function UpcomingLeaveList({
 }) {
   const { data: schedule } = useWorkSchedule();
   const workDays = schedule
-    ? [schedule.sunday, schedule.monday, schedule.tuesday, schedule.wednesday, schedule.thursday, schedule.friday, schedule.saturday]
+    ? [
+        schedule.sunday,
+        schedule.monday,
+        schedule.tuesday,
+        schedule.wednesday,
+        schedule.thursday,
+        schedule.friday,
+        schedule.saturday,
+      ]
     : undefined;
 
   const upcoming = participations
@@ -238,7 +250,11 @@ function UpcomingLeaveList({
   return (
     <div className="space-y-3">
       {upcoming.map((p) => {
-        const days = countWorkingDays(new Date(p.from), new Date(p.to), workDays);
+        const days = countWorkingDays(
+          new Date(p.from),
+          new Date(p.to),
+          workDays,
+        );
         const daysUntil = differenceInCalendarDays(
           new Date(p.from),
           new Date(),
@@ -252,7 +268,7 @@ function UpcomingLeaveList({
               <p className="text-sm font-medium truncate">
                 {p.event ? (
                   <Link
-                    href={`/events?selected=${p.event.id}`}
+                    href={`/participations/${p.id}`}
                     className="hover:underline"
                   >
                     {p.event.title}
@@ -302,10 +318,19 @@ function LeaveStats({
   const { data: balance } = useLeaveBalance();
   const { data: schedule } = useWorkSchedule();
   const workDays = schedule
-    ? [schedule.sunday, schedule.monday, schedule.tuesday, schedule.wednesday, schedule.thursday, schedule.friday, schedule.saturday]
+    ? [
+        schedule.sunday,
+        schedule.monday,
+        schedule.tuesday,
+        schedule.wednesday,
+        schedule.thursday,
+        schedule.friday,
+        schedule.saturday,
+      ]
     : undefined;
   const totalDays = participations.reduce(
-    (sum, p) => sum + countWorkingDays(new Date(p.from), new Date(p.to), workDays),
+    (sum, p) =>
+      sum + countWorkingDays(new Date(p.from), new Date(p.to), workDays),
     0,
   );
   const totalTrips = participations.filter((p) => p.event).length;

@@ -41,6 +41,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 
 import {
@@ -240,6 +241,9 @@ export default function ActivityInlineForm({
         : { id, name: id, image: null };
     });
   });
+  const [isExcludeMode, setIsExcludeMode] = useState(
+    activity?.isExcludeMode ?? false,
+  );
 
   const { data: searchResults } = useSearchParticipationMembers(
     participationId,
@@ -329,6 +333,7 @@ export default function ActivityInlineForm({
       location: location.trim() || undefined,
       note: note.trim() || undefined,
       involvedPeople: selectedPeople.map((p) => p.id),
+      isExcludeMode,
       imageUrl: imageUrl.trim() || undefined,
     };
 
@@ -496,15 +501,42 @@ export default function ActivityInlineForm({
         {/* People */}
         {(allUsers ?? []).length > 0 && (
           <div className="space-y-1.5">
-            <Label className="text-xs text-muted-foreground">
-              <Users className="h-3.5 w-3.5" />
-              Involved people
-            </Label>
+            <div className="flex items-center justify-between">
+              <Label className="text-xs text-muted-foreground">
+                <Users className="h-3.5 w-3.5" />
+                {isExcludeMode ? "Exclude people" : "Involved people"}
+              </Label>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] text-muted-foreground">
+                  {isExcludeMode ? "Exclude mode" : "Include mode"}
+                </span>
+                <Switch
+                  checked={isExcludeMode}
+                  onCheckedChange={(checked) => {
+                    setIsExcludeMode(checked);
+                    setSelectedPeople([]);
+                  }}
+                  className="scale-75"
+                />
+              </div>
+            </div>
+
+            {selectedPeople.length === 0 && (
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted/50">
+                <Users className="h-3 w-3 text-muted-foreground" />
+                <span className="text-xs text-muted-foreground">
+                  {isExcludeMode
+                    ? "No one excluded — @Everyone is involved"
+                    : "@Everyone — all members are involved"}
+                </span>
+              </div>
+            )}
+
             <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-input bg-background px-2 py-1.5 min-h-8">
               {selectedPeople.map((p) => (
                 <Badge
                   key={p.id}
-                  variant="secondary"
+                  variant={isExcludeMode ? "destructive" : "secondary"}
                   className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 h-auto text-xs"
                 >
                   <Avatar className="h-4 w-4">
@@ -513,6 +545,9 @@ export default function ActivityInlineForm({
                       {initials(p.name === p.id ? "?" : p.name)}
                     </AvatarFallback>
                   </Avatar>
+                  {isExcludeMode && (
+                    <span className="text-[10px] opacity-70">NOT</span>
+                  )}
                   {p.name === p.id ? p.id.slice(0, 8) + "\u2026" : p.name}
                   <button
                     type="button"
@@ -529,7 +564,7 @@ export default function ActivityInlineForm({
                     type="button"
                     className="text-xs text-muted-foreground hover:text-foreground px-1 py-0.5 rounded hover:bg-muted"
                   >
-                    + Add
+                    + {isExcludeMode ? "Exclude" : "Add"}
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="p-0 w-56" align="start">

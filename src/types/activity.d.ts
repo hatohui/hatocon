@@ -7,6 +7,7 @@ export type ActivityCreateDTO = {
   location?: string;
   locationUrl?: string;
   involvedPeople: string[];
+  isExcludeMode?: boolean;
   note?: string;
   imageUrl?: string;
   sortOrder?: number;

@@ -200,8 +200,8 @@ function PhotoGallery({
           <div className="flex items-center justify-center gap-2">
             <Button size="sm" variant="outline" asChild>
               <label className="cursor-pointer">
-                <Camera className="h-4 w-4 mr-1.5" />
-                Upload First Photo
+                <Camera className="h-4 w-4 sm:mr-1.5" />
+                <span className="hidden sm:inline">Upload First Photo</span>
                 <input
                   type="file"
                   accept="image/*"
@@ -212,7 +212,8 @@ function PhotoGallery({
               </label>
             </Button>
             <Button size="sm" variant="ghost" onClick={onViewAll}>
-              Open Gallery
+              <span className="hidden sm:inline">Open Gallery</span>
+              <span className="sm:hidden">Gallery</span>
             </Button>
           </div>
         </CardContent>
@@ -235,9 +236,9 @@ function PhotoGallery({
             </button>
           </div>
           <Button size="sm" variant="outline" asChild>
-            <label className="cursor-pointer">
-              <Camera className="h-4 w-4 mr-1.5" />
-              Upload
+            <label className="cursor-pointer gap-0 sm:gap-1.5">
+              <Camera className="h-4 w-4" />
+              <span className="hidden sm:inline">Upload</span>
               <input
                 type="file"
                 accept="image/*"
@@ -475,6 +476,7 @@ function UpcomingActivities({
   currentUserId,
   isOwner,
   showActivityDetails,
+  participants = [],
   event,
   onViewAll,
 }: {
@@ -485,6 +487,13 @@ function UpcomingActivities({
   currentUserId?: string;
   isOwner: boolean;
   showActivityDetails: boolean;
+  participants?: Array<{
+    userId: string;
+    from: Date | string;
+    to: Date | string;
+    isAlreadyHere: boolean;
+    user: { id: string; name: string };
+  }>;
   event?: {
     title: string;
     startAt: Date | string;
@@ -501,15 +510,6 @@ function UpcomingActivities({
   const [editingField, setEditingField] = useState<"from" | "to" | null>(null);
   const [editValue, setEditValue] = useState("");
   const now = new Date();
-
-  const isOwnParticipation =
-    !participantUser || participantUser.id === currentUserId;
-  const arrivalName = isOwnParticipation
-    ? "You arrive"
-    : `${participantUser!.name} arrives`;
-  const departureName = isOwnParticipation
-    ? "You depart"
-    : `${participantUser!.name} departs`;
 
   const openEdit = (field: "from" | "to") => {
     const current = field === "from" ? participationFrom : participationTo;
@@ -539,23 +539,53 @@ function UpcomingActivities({
     );
   };
 
+  const perParticipantEntries: UpcomingEntry[] =
+    showActivityDetails && participants.length > 0
+      ? participants
+          .filter((p) => !p.isAlreadyHere)
+          .flatMap((p) => {
+            const isMe = p.userId === currentUserId;
+            const isViewed = p.userId === participantUser?.id;
+            return [
+              {
+                id: `__arriving_${p.userId}`,
+                name: isMe ? "You arrive" : `${p.user.name} arrives`,
+                from: p.from,
+                syntheticKind: isViewed ? "__arriving" : "__member",
+              },
+              {
+                id: `__departing_${p.userId}`,
+                name: isMe ? "You depart" : `${p.user.name} departs`,
+                from: p.to,
+                syntheticKind: isViewed ? "__departing" : "__member",
+              },
+            ];
+          })
+      : showActivityDetails
+        ? [
+            {
+              id: "__arriving",
+              name:
+                !participantUser || participantUser.id === currentUserId
+                  ? "You arrive"
+                  : `${participantUser.name} arrives`,
+              from: participationFrom,
+              syntheticKind: "__arriving",
+            },
+            {
+              id: "__departing",
+              name:
+                !participantUser || participantUser.id === currentUserId
+                  ? "You depart"
+                  : `${participantUser.name} departs`,
+              from: participationTo,
+              syntheticKind: "__departing",
+            },
+          ]
+        : [];
+
   const syntheticEntries: UpcomingEntry[] = [
-    ...(showActivityDetails
-      ? [
-          {
-            id: "__arriving",
-            name: arrivalName,
-            from: participationFrom,
-            syntheticKind: "__arriving",
-          },
-          {
-            id: "__departing",
-            name: departureName,
-            from: participationTo,
-            syntheticKind: "__departing",
-          },
-        ]
-      : []),
+    ...perParticipantEntries,
     ...(event
       ? [
           {
@@ -643,10 +673,10 @@ function UpcomingActivities({
                       : "Activity"}
                   </p>
                   {(a.syntheticKind || showActivityDetails) && a.location && (
-                    <p className="text-muted-foreground truncate flex items-center gap-1">
+                    <div className="flex items-center gap-1 min-w-0 text-muted-foreground">
                       <MapPin className="h-2.5 w-2.5 shrink-0" />
-                      {a.location}
-                    </p>
+                      <span className="truncate">{a.location}</span>
+                    </div>
                   )}
                 </div>
                 {a.syntheticKind && !isEditable(a.syntheticKind) && (
@@ -931,11 +961,11 @@ export default function ParticipationDetailPage() {
             <Button
               variant="outline"
               size="sm"
-              className="shrink-0 gap-1.5"
+              className="shrink-0 gap-0 sm:gap-1.5"
               onClick={handleShare}
             >
               <Link2 className="h-4 w-4" />
-              Share
+              <span className="hidden sm:inline">Share</span>
             </Button>
           )}
         </div>
@@ -1031,7 +1061,7 @@ export default function ParticipationDetailPage() {
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-6">
           <div className="grid gap-6 md:grid-cols-3">
-            <div className="md:col-span-2 space-y-6">
+            <div className="md:col-span-2 space-y-6 min-w-0">
               {(isMemberOfGroup || isMediaVisible) && (
                 <PhotoGallery
                   images={participation.group?.images ?? []}
@@ -1049,6 +1079,7 @@ export default function ParticipationDetailPage() {
                 showActivityDetails={
                   isMemberOfGroup || isAdmin || isActivityVisible
                 }
+                participants={participation.participants}
                 event={participation.event}
                 onViewAll={() => setActiveTab("timeline")}
               />
@@ -1088,6 +1119,7 @@ export default function ParticipationDetailPage() {
               participantUser={participation.user}
               currentUserId={currentUserId}
               members={members}
+              participants={participation.participants}
               event={participation.event}
             />
           </TabsContent>

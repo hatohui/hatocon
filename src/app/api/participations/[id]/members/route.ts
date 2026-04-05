@@ -11,6 +11,7 @@ import { messages } from "@/common/messages";
 import notificationRepository from "@/repositories/notification_repository";
 import participationRepository from "@/repositories/participation_repository";
 import eventRepository from "@/repositories/event_repository";
+import { cacheDel } from "@/config/redis";
 import type { NextRequest } from "next/server";
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -95,6 +96,9 @@ const POST = async (req: NextRequest, ctx: RouteContext) => {
     userId: session.user.id,
     userName: session.user.name ?? "Someone",
   });
+
+  // Bust the added user's events cache so the event becomes visible to them
+  await cacheDel(`events:list:${userId}`);
 
   return OK(newParticipation);
 };

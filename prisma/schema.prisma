@@ -125,14 +125,15 @@ model Event {
 }
 
 model Participation {
-  id        String    @id @default(uuid())
-  userId    String
-  eventId   String?
-  groupId   String?
-  from      DateTime
-  to        DateTime
-  leaveType LeaveType
-  createdBy String?   // null = self, otherwise the admin/user who added them
+  id            String    @id @default(uuid())
+  userId        String
+  eventId       String?
+  groupId       String?
+  from          DateTime
+  to            DateTime
+  leaveType     LeaveType
+  createdBy     String?   // null = self, otherwise the admin/user who added them
+  isAlreadyHere Boolean   @default(false) // user is already at the location from the start
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -168,6 +169,7 @@ model Activity {
   location             String?
   locationUrl          String?
   involvedPeople       String[] // array of user IDs
+  isExcludeMode        Boolean  @default(false) // true = involvedPeople lists excluded users
   note                 String?
   imageUrl             String?
   sortOrder            Int      @default(0)

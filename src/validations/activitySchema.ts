@@ -15,6 +15,7 @@ export const activitySchema = zod.object({
   location: zod.string().optional(),
   locationUrl: zod.string().url().optional().or(zod.literal("")),
   involvedPeople: zod.array(zod.string().uuid()).default([]),
+  isExcludeMode: zod.boolean().default(false),
   note: zod.string().optional(),
   imageUrl: zod.string().url().optional().or(zod.literal("")),
   sortOrder: zod.number().int().optional(),

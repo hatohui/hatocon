@@ -33,6 +33,7 @@ export type ParticipationMinAggregateOutputType = {
   to: Date | null
   leaveType: $Enums.LeaveType | null
   createdBy: string | null
+  isAlreadyHere: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -46,6 +47,7 @@ export type ParticipationMaxAggregateOutputType = {
   to: Date | null
   leaveType: $Enums.LeaveType | null
   createdBy: string | null
+  isAlreadyHere: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -59,6 +61,7 @@ export type ParticipationCountAggregateOutputType = {
   to: number
   leaveType: number
   createdBy: number
+  isAlreadyHere: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -74,6 +77,7 @@ export type ParticipationMinAggregateInputType = {
   to?: true
   leaveType?: true
   createdBy?: true
+  isAlreadyHere?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -87,6 +91,7 @@ export type ParticipationMaxAggregateInputType = {
   to?: true
   leaveType?: true
   createdBy?: true
+  isAlreadyHere?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -100,6 +105,7 @@ export type ParticipationCountAggregateInputType = {
   to?: true
   leaveType?: true
   createdBy?: true
+  isAlreadyHere?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -186,6 +192,7 @@ export type ParticipationGroupByOutputType = {
   to: Date
   leaveType: $Enums.LeaveType
   createdBy: string | null
+  isAlreadyHere: boolean
   createdAt: Date
   updatedAt: Date
   _count: ParticipationCountAggregateOutputType | null
@@ -220,6 +227,7 @@ export type ParticipationWhereInput = {
   to?: Prisma.DateTimeFilter<"Participation"> | Date | string
   leaveType?: Prisma.EnumLeaveTypeFilter<"Participation"> | $Enums.LeaveType
   createdBy?: Prisma.StringNullableFilter<"Participation"> | string | null
+  isAlreadyHere?: Prisma.BoolFilter<"Participation"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Participation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Participation"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -236,6 +244,7 @@ export type ParticipationOrderByWithRelationInput = {
   to?: Prisma.SortOrder
   leaveType?: Prisma.SortOrder
   createdBy?: Prisma.SortOrderInput | Prisma.SortOrder
+  isAlreadyHere?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -255,6 +264,7 @@ export type ParticipationWhereUniqueInput = Prisma.AtLeast<{
   to?: Prisma.DateTimeFilter<"Participation"> | Date | string
   leaveType?: Prisma.EnumLeaveTypeFilter<"Participation"> | $Enums.LeaveType
   createdBy?: Prisma.StringNullableFilter<"Participation"> | string | null
+  isAlreadyHere?: Prisma.BoolFilter<"Participation"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Participation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Participation"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -271,6 +281,7 @@ export type ParticipationOrderByWithAggregationInput = {
   to?: Prisma.SortOrder
   leaveType?: Prisma.SortOrder
   createdBy?: Prisma.SortOrderInput | Prisma.SortOrder
+  isAlreadyHere?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ParticipationCountOrderByAggregateInput
@@ -290,6 +301,7 @@ export type ParticipationScalarWhereWithAggregatesInput = {
   to?: Prisma.DateTimeWithAggregatesFilter<"Participation"> | Date | string
   leaveType?: Prisma.EnumLeaveTypeWithAggregatesFilter<"Participation"> | $Enums.LeaveType
   createdBy?: Prisma.StringNullableWithAggregatesFilter<"Participation"> | string | null
+  isAlreadyHere?: Prisma.BoolWithAggregatesFilter<"Participation"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Participation"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Participation"> | Date | string
 }
@@ -300,6 +312,7 @@ export type ParticipationCreateInput = {
   to: Date | string
   leaveType: $Enums.LeaveType
   createdBy?: string | null
+  isAlreadyHere?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutParticipationsInput
@@ -316,6 +329,7 @@ export type ParticipationUncheckedCreateInput = {
   to: Date | string
   leaveType: $Enums.LeaveType
   createdBy?: string | null
+  isAlreadyHere?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -326,6 +340,7 @@ export type ParticipationUpdateInput = {
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutParticipationsNestedInput
@@ -342,6 +357,7 @@ export type ParticipationUncheckedUpdateInput = {
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -355,6 +371,7 @@ export type ParticipationCreateManyInput = {
   to: Date | string
   leaveType: $Enums.LeaveType
   createdBy?: string | null
+  isAlreadyHere?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -365,6 +382,7 @@ export type ParticipationUpdateManyMutationInput = {
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -378,6 +396,7 @@ export type ParticipationUncheckedUpdateManyInput = {
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -401,6 +420,7 @@ export type ParticipationCountOrderByAggregateInput = {
   to?: Prisma.SortOrder
   leaveType?: Prisma.SortOrder
   createdBy?: Prisma.SortOrder
+  isAlreadyHere?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -414,6 +434,7 @@ export type ParticipationMaxOrderByAggregateInput = {
   to?: Prisma.SortOrder
   leaveType?: Prisma.SortOrder
   createdBy?: Prisma.SortOrder
+  isAlreadyHere?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -427,6 +448,7 @@ export type ParticipationMinOrderByAggregateInput = {
   to?: Prisma.SortOrder
   leaveType?: Prisma.SortOrder
   createdBy?: Prisma.SortOrder
+  isAlreadyHere?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -567,6 +589,7 @@ export type ParticipationCreateWithoutUserInput = {
   to: Date | string
   leaveType: $Enums.LeaveType
   createdBy?: string | null
+  isAlreadyHere?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   event?: Prisma.EventCreateNestedOneWithoutParticipationsInput
@@ -581,6 +604,7 @@ export type ParticipationUncheckedCreateWithoutUserInput = {
   to: Date | string
   leaveType: $Enums.LeaveType
   createdBy?: string | null
+  isAlreadyHere?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -623,6 +647,7 @@ export type ParticipationScalarWhereInput = {
   to?: Prisma.DateTimeFilter<"Participation"> | Date | string
   leaveType?: Prisma.EnumLeaveTypeFilter<"Participation"> | $Enums.LeaveType
   createdBy?: Prisma.StringNullableFilter<"Participation"> | string | null
+  isAlreadyHere?: Prisma.BoolFilter<"Participation"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Participation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Participation"> | Date | string
 }
@@ -633,6 +658,7 @@ export type ParticipationCreateWithoutEventInput = {
   to: Date | string
   leaveType: $Enums.LeaveType
   createdBy?: string | null
+  isAlreadyHere?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutParticipationsInput
@@ -647,6 +673,7 @@ export type ParticipationUncheckedCreateWithoutEventInput = {
   to: Date | string
   leaveType: $Enums.LeaveType
   createdBy?: string | null
+  isAlreadyHere?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -683,6 +710,7 @@ export type ParticipationCreateWithoutGroupInput = {
   to: Date | string
   leaveType: $Enums.LeaveType
   createdBy?: string | null
+  isAlreadyHere?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutParticipationsInput
@@ -697,6 +725,7 @@ export type ParticipationUncheckedCreateWithoutGroupInput = {
   to: Date | string
   leaveType: $Enums.LeaveType
   createdBy?: string | null
+  isAlreadyHere?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -735,6 +764,7 @@ export type ParticipationCreateManyUserInput = {
   to: Date | string
   leaveType: $Enums.LeaveType
   createdBy?: string | null
+  isAlreadyHere?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -745,6 +775,7 @@ export type ParticipationUpdateWithoutUserInput = {
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   event?: Prisma.EventUpdateOneWithoutParticipationsNestedInput
@@ -759,6 +790,7 @@ export type ParticipationUncheckedUpdateWithoutUserInput = {
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -771,6 +803,7 @@ export type ParticipationUncheckedUpdateManyWithoutUserInput = {
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -783,6 +816,7 @@ export type ParticipationCreateManyEventInput = {
   to: Date | string
   leaveType: $Enums.LeaveType
   createdBy?: string | null
+  isAlreadyHere?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -793,6 +827,7 @@ export type ParticipationUpdateWithoutEventInput = {
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutParticipationsNestedInput
@@ -807,6 +842,7 @@ export type ParticipationUncheckedUpdateWithoutEventInput = {
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -819,6 +855,7 @@ export type ParticipationUncheckedUpdateManyWithoutEventInput = {
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -831,6 +868,7 @@ export type ParticipationCreateManyGroupInput = {
   to: Date | string
   leaveType: $Enums.LeaveType
   createdBy?: string | null
+  isAlreadyHere?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -841,6 +879,7 @@ export type ParticipationUpdateWithoutGroupInput = {
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutParticipationsNestedInput
@@ -855,6 +894,7 @@ export type ParticipationUncheckedUpdateWithoutGroupInput = {
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -867,6 +907,7 @@ export type ParticipationUncheckedUpdateManyWithoutGroupInput = {
   to?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
   createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAlreadyHere?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -882,6 +923,7 @@ export type ParticipationSelect<ExtArgs extends runtime.Types.Extensions.Interna
   to?: boolean
   leaveType?: boolean
   createdBy?: boolean
+  isAlreadyHere?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -898,6 +940,7 @@ export type ParticipationSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   to?: boolean
   leaveType?: boolean
   createdBy?: boolean
+  isAlreadyHere?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -914,6 +957,7 @@ export type ParticipationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   to?: boolean
   leaveType?: boolean
   createdBy?: boolean
+  isAlreadyHere?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -930,11 +974,12 @@ export type ParticipationSelectScalar = {
   to?: boolean
   leaveType?: boolean
   createdBy?: boolean
+  isAlreadyHere?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ParticipationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "eventId" | "groupId" | "from" | "to" | "leaveType" | "createdBy" | "createdAt" | "updatedAt", ExtArgs["result"]["participation"]>
+export type ParticipationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "eventId" | "groupId" | "from" | "to" | "leaveType" | "createdBy" | "isAlreadyHere" | "createdAt" | "updatedAt", ExtArgs["result"]["participation"]>
 export type ParticipationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   event?: boolean | Prisma.Participation$eventArgs<ExtArgs>
@@ -967,6 +1012,7 @@ export type $ParticipationPayload<ExtArgs extends runtime.Types.Extensions.Inter
     to: Date
     leaveType: $Enums.LeaveType
     createdBy: string | null
+    isAlreadyHere: boolean
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["participation"]>
@@ -1403,6 +1449,7 @@ export interface ParticipationFieldRefs {
   readonly to: Prisma.FieldRef<"Participation", 'DateTime'>
   readonly leaveType: Prisma.FieldRef<"Participation", 'LeaveType'>
   readonly createdBy: Prisma.FieldRef<"Participation", 'String'>
+  readonly isAlreadyHere: Prisma.FieldRef<"Participation", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Participation", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Participation", 'DateTime'>
 }

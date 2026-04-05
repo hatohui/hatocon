@@ -32,6 +32,7 @@ const activityRepository = {
         location: data.location || null,
         locationUrl: data.locationUrl || null,
         involvedPeople: data.involvedPeople,
+        isExcludeMode: data.isExcludeMode ?? false,
         note: data.note || null,
         imageUrl: data.imageUrl || null,
         sortOrder: data.sortOrder ?? 0,
@@ -55,6 +56,9 @@ const activityRepository = {
         }),
         ...(data.involvedPeople !== undefined && {
           involvedPeople: data.involvedPeople,
+        }),
+        ...(data.isExcludeMode !== undefined && {
+          isExcludeMode: data.isExcludeMode,
         }),
         ...(data.note !== undefined && { note: data.note || null }),
         ...(data.imageUrl !== undefined && {

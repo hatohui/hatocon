@@ -42,6 +42,7 @@ export type ActivityMinAggregateOutputType = {
   to: Date | null
   location: string | null
   locationUrl: string | null
+  isExcludeMode: boolean | null
   note: string | null
   imageUrl: string | null
   sortOrder: number | null
@@ -58,6 +59,7 @@ export type ActivityMaxAggregateOutputType = {
   to: Date | null
   location: string | null
   locationUrl: string | null
+  isExcludeMode: boolean | null
   note: string | null
   imageUrl: string | null
   sortOrder: number | null
@@ -75,6 +77,7 @@ export type ActivityCountAggregateOutputType = {
   location: number
   locationUrl: number
   involvedPeople: number
+  isExcludeMode: number
   note: number
   imageUrl: number
   sortOrder: number
@@ -101,6 +104,7 @@ export type ActivityMinAggregateInputType = {
   to?: true
   location?: true
   locationUrl?: true
+  isExcludeMode?: true
   note?: true
   imageUrl?: true
   sortOrder?: true
@@ -117,6 +121,7 @@ export type ActivityMaxAggregateInputType = {
   to?: true
   location?: true
   locationUrl?: true
+  isExcludeMode?: true
   note?: true
   imageUrl?: true
   sortOrder?: true
@@ -134,6 +139,7 @@ export type ActivityCountAggregateInputType = {
   location?: true
   locationUrl?: true
   involvedPeople?: true
+  isExcludeMode?: true
   note?: true
   imageUrl?: true
   sortOrder?: true
@@ -238,6 +244,7 @@ export type ActivityGroupByOutputType = {
   location: string | null
   locationUrl: string | null
   involvedPeople: string[]
+  isExcludeMode: boolean
   note: string | null
   imageUrl: string | null
   sortOrder: number
@@ -278,6 +285,7 @@ export type ActivityWhereInput = {
   location?: Prisma.StringNullableFilter<"Activity"> | string | null
   locationUrl?: Prisma.StringNullableFilter<"Activity"> | string | null
   involvedPeople?: Prisma.StringNullableListFilter<"Activity">
+  isExcludeMode?: Prisma.BoolFilter<"Activity"> | boolean
   note?: Prisma.StringNullableFilter<"Activity"> | string | null
   imageUrl?: Prisma.StringNullableFilter<"Activity"> | string | null
   sortOrder?: Prisma.IntFilter<"Activity"> | number
@@ -297,6 +305,7 @@ export type ActivityOrderByWithRelationInput = {
   location?: Prisma.SortOrderInput | Prisma.SortOrder
   locationUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   involvedPeople?: Prisma.SortOrder
+  isExcludeMode?: Prisma.SortOrder
   note?: Prisma.SortOrderInput | Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
@@ -319,6 +328,7 @@ export type ActivityWhereUniqueInput = Prisma.AtLeast<{
   location?: Prisma.StringNullableFilter<"Activity"> | string | null
   locationUrl?: Prisma.StringNullableFilter<"Activity"> | string | null
   involvedPeople?: Prisma.StringNullableListFilter<"Activity">
+  isExcludeMode?: Prisma.BoolFilter<"Activity"> | boolean
   note?: Prisma.StringNullableFilter<"Activity"> | string | null
   imageUrl?: Prisma.StringNullableFilter<"Activity"> | string | null
   sortOrder?: Prisma.IntFilter<"Activity"> | number
@@ -338,6 +348,7 @@ export type ActivityOrderByWithAggregationInput = {
   location?: Prisma.SortOrderInput | Prisma.SortOrder
   locationUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   involvedPeople?: Prisma.SortOrder
+  isExcludeMode?: Prisma.SortOrder
   note?: Prisma.SortOrderInput | Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
@@ -363,6 +374,7 @@ export type ActivityScalarWhereWithAggregatesInput = {
   location?: Prisma.StringNullableWithAggregatesFilter<"Activity"> | string | null
   locationUrl?: Prisma.StringNullableWithAggregatesFilter<"Activity"> | string | null
   involvedPeople?: Prisma.StringNullableListFilter<"Activity">
+  isExcludeMode?: Prisma.BoolWithAggregatesFilter<"Activity"> | boolean
   note?: Prisma.StringNullableWithAggregatesFilter<"Activity"> | string | null
   imageUrl?: Prisma.StringNullableWithAggregatesFilter<"Activity"> | string | null
   sortOrder?: Prisma.IntWithAggregatesFilter<"Activity"> | number
@@ -379,6 +391,7 @@ export type ActivityCreateInput = {
   location?: string | null
   locationUrl?: string | null
   involvedPeople?: Prisma.ActivityCreateinvolvedPeopleInput | string[]
+  isExcludeMode?: boolean
   note?: string | null
   imageUrl?: string | null
   sortOrder?: number
@@ -398,6 +411,7 @@ export type ActivityUncheckedCreateInput = {
   location?: string | null
   locationUrl?: string | null
   involvedPeople?: Prisma.ActivityCreateinvolvedPeopleInput | string[]
+  isExcludeMode?: boolean
   note?: string | null
   imageUrl?: string | null
   sortOrder?: number
@@ -415,6 +429,7 @@ export type ActivityUpdateInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   involvedPeople?: Prisma.ActivityUpdateinvolvedPeopleInput | string[]
+  isExcludeMode?: Prisma.BoolFieldUpdateOperationsInput | boolean
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
@@ -434,6 +449,7 @@ export type ActivityUncheckedUpdateInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   involvedPeople?: Prisma.ActivityUpdateinvolvedPeopleInput | string[]
+  isExcludeMode?: Prisma.BoolFieldUpdateOperationsInput | boolean
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
@@ -452,6 +468,7 @@ export type ActivityCreateManyInput = {
   location?: string | null
   locationUrl?: string | null
   involvedPeople?: Prisma.ActivityCreateinvolvedPeopleInput | string[]
+  isExcludeMode?: boolean
   note?: string | null
   imageUrl?: string | null
   sortOrder?: number
@@ -468,6 +485,7 @@ export type ActivityUpdateManyMutationInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   involvedPeople?: Prisma.ActivityUpdateinvolvedPeopleInput | string[]
+  isExcludeMode?: Prisma.BoolFieldUpdateOperationsInput | boolean
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
@@ -485,6 +503,7 @@ export type ActivityUncheckedUpdateManyInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   involvedPeople?: Prisma.ActivityUpdateinvolvedPeopleInput | string[]
+  isExcludeMode?: Prisma.BoolFieldUpdateOperationsInput | boolean
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
@@ -510,6 +529,7 @@ export type ActivityCountOrderByAggregateInput = {
   location?: Prisma.SortOrder
   locationUrl?: Prisma.SortOrder
   involvedPeople?: Prisma.SortOrder
+  isExcludeMode?: Prisma.SortOrder
   note?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
@@ -530,6 +550,7 @@ export type ActivityMaxOrderByAggregateInput = {
   to?: Prisma.SortOrder
   location?: Prisma.SortOrder
   locationUrl?: Prisma.SortOrder
+  isExcludeMode?: Prisma.SortOrder
   note?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
@@ -546,6 +567,7 @@ export type ActivityMinOrderByAggregateInput = {
   to?: Prisma.SortOrder
   location?: Prisma.SortOrder
   locationUrl?: Prisma.SortOrder
+  isExcludeMode?: Prisma.SortOrder
   note?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
@@ -646,6 +668,7 @@ export type ActivityCreateWithoutMediaInput = {
   location?: string | null
   locationUrl?: string | null
   involvedPeople?: Prisma.ActivityCreateinvolvedPeopleInput | string[]
+  isExcludeMode?: boolean
   note?: string | null
   imageUrl?: string | null
   sortOrder?: number
@@ -664,6 +687,7 @@ export type ActivityUncheckedCreateWithoutMediaInput = {
   location?: string | null
   locationUrl?: string | null
   involvedPeople?: Prisma.ActivityCreateinvolvedPeopleInput | string[]
+  isExcludeMode?: boolean
   note?: string | null
   imageUrl?: string | null
   sortOrder?: number
@@ -696,6 +720,7 @@ export type ActivityUpdateWithoutMediaInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   involvedPeople?: Prisma.ActivityUpdateinvolvedPeopleInput | string[]
+  isExcludeMode?: Prisma.BoolFieldUpdateOperationsInput | boolean
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
@@ -714,6 +739,7 @@ export type ActivityUncheckedUpdateWithoutMediaInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   involvedPeople?: Prisma.ActivityUpdateinvolvedPeopleInput | string[]
+  isExcludeMode?: Prisma.BoolFieldUpdateOperationsInput | boolean
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
@@ -730,6 +756,7 @@ export type ActivityCreateWithoutGroupInput = {
   location?: string | null
   locationUrl?: string | null
   involvedPeople?: Prisma.ActivityCreateinvolvedPeopleInput | string[]
+  isExcludeMode?: boolean
   note?: string | null
   imageUrl?: string | null
   sortOrder?: number
@@ -747,6 +774,7 @@ export type ActivityUncheckedCreateWithoutGroupInput = {
   location?: string | null
   locationUrl?: string | null
   involvedPeople?: Prisma.ActivityCreateinvolvedPeopleInput | string[]
+  isExcludeMode?: boolean
   note?: string | null
   imageUrl?: string | null
   sortOrder?: number
@@ -794,6 +822,7 @@ export type ActivityScalarWhereInput = {
   location?: Prisma.StringNullableFilter<"Activity"> | string | null
   locationUrl?: Prisma.StringNullableFilter<"Activity"> | string | null
   involvedPeople?: Prisma.StringNullableListFilter<"Activity">
+  isExcludeMode?: Prisma.BoolFilter<"Activity"> | boolean
   note?: Prisma.StringNullableFilter<"Activity"> | string | null
   imageUrl?: Prisma.StringNullableFilter<"Activity"> | string | null
   sortOrder?: Prisma.IntFilter<"Activity"> | number
@@ -810,6 +839,7 @@ export type ActivityCreateManyGroupInput = {
   location?: string | null
   locationUrl?: string | null
   involvedPeople?: Prisma.ActivityCreateinvolvedPeopleInput | string[]
+  isExcludeMode?: boolean
   note?: string | null
   imageUrl?: string | null
   sortOrder?: number
@@ -826,6 +856,7 @@ export type ActivityUpdateWithoutGroupInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   involvedPeople?: Prisma.ActivityUpdateinvolvedPeopleInput | string[]
+  isExcludeMode?: Prisma.BoolFieldUpdateOperationsInput | boolean
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
@@ -843,6 +874,7 @@ export type ActivityUncheckedUpdateWithoutGroupInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   involvedPeople?: Prisma.ActivityUpdateinvolvedPeopleInput | string[]
+  isExcludeMode?: Prisma.BoolFieldUpdateOperationsInput | boolean
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
@@ -860,6 +892,7 @@ export type ActivityUncheckedUpdateManyWithoutGroupInput = {
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   involvedPeople?: Prisma.ActivityUpdateinvolvedPeopleInput | string[]
+  isExcludeMode?: Prisma.BoolFieldUpdateOperationsInput | boolean
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
@@ -908,6 +941,7 @@ export type ActivitySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   location?: boolean
   locationUrl?: boolean
   involvedPeople?: boolean
+  isExcludeMode?: boolean
   note?: boolean
   imageUrl?: boolean
   sortOrder?: boolean
@@ -928,6 +962,7 @@ export type ActivitySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   location?: boolean
   locationUrl?: boolean
   involvedPeople?: boolean
+  isExcludeMode?: boolean
   note?: boolean
   imageUrl?: boolean
   sortOrder?: boolean
@@ -946,6 +981,7 @@ export type ActivitySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   location?: boolean
   locationUrl?: boolean
   involvedPeople?: boolean
+  isExcludeMode?: boolean
   note?: boolean
   imageUrl?: boolean
   sortOrder?: boolean
@@ -964,6 +1000,7 @@ export type ActivitySelectScalar = {
   location?: boolean
   locationUrl?: boolean
   involvedPeople?: boolean
+  isExcludeMode?: boolean
   note?: boolean
   imageUrl?: boolean
   sortOrder?: boolean
@@ -972,7 +1009,7 @@ export type ActivitySelectScalar = {
   createdBy?: boolean
 }
 
-export type ActivityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "participationGroupId" | "name" | "from" | "to" | "location" | "locationUrl" | "involvedPeople" | "note" | "imageUrl" | "sortOrder" | "createdAt" | "updatedAt" | "createdBy", ExtArgs["result"]["activity"]>
+export type ActivityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "participationGroupId" | "name" | "from" | "to" | "location" | "locationUrl" | "involvedPeople" | "isExcludeMode" | "note" | "imageUrl" | "sortOrder" | "createdAt" | "updatedAt" | "createdBy", ExtArgs["result"]["activity"]>
 export type ActivityInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   group?: boolean | Prisma.ParticipationGroupDefaultArgs<ExtArgs>
   media?: boolean | Prisma.Activity$mediaArgs<ExtArgs>
@@ -1000,6 +1037,7 @@ export type $ActivityPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     location: string | null
     locationUrl: string | null
     involvedPeople: string[]
+    isExcludeMode: boolean
     note: string | null
     imageUrl: string | null
     sortOrder: number
@@ -1439,6 +1477,7 @@ export interface ActivityFieldRefs {
   readonly location: Prisma.FieldRef<"Activity", 'String'>
   readonly locationUrl: Prisma.FieldRef<"Activity", 'String'>
   readonly involvedPeople: Prisma.FieldRef<"Activity", 'String[]'>
+  readonly isExcludeMode: Prisma.FieldRef<"Activity", 'Boolean'>
   readonly note: Prisma.FieldRef<"Activity", 'String'>
   readonly imageUrl: Prisma.FieldRef<"Activity", 'String'>
   readonly sortOrder: Prisma.FieldRef<"Activity", 'Int'>

@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { format } from "date-fns";
+import { format, isSameDay } from "date-fns";
 import {
   ArrowUpDown,
   ChevronDown,
   Clock,
   ExternalLink,
-  GripVertical,
   MapPin,
+  MapPinCheck,
   MoreHorizontal,
   Pencil,
   Plus,
@@ -51,6 +51,7 @@ import {
 } from "@/hooks/activities/useActivities";
 import { useUpdateParticipationDates } from "@/hooks/participations/useParticipations";
 import { ActivityMediaDTO, ActivityWithMedia } from "@/types/activity.d";
+import type { ParticipationParticipant } from "@/types/participation.d";
 import { cn } from "@/lib/utils";
 import ActivityInlineForm from "@/components/pages/participation/activity-inline-form";
 
@@ -82,6 +83,7 @@ type EventActivity = {
   locationUrl: string | null;
   imageUrl: string | null;
   involvedPeople: string[];
+  isExcludeMode?: boolean;
   note: null;
   media: ActivityMediaDTO[];
   isSynthetic: true;
@@ -181,16 +183,9 @@ function ActivityCard({
   };
 
   return (
-    <Card className="group hover:shadow-md transition-shadow">
+    <Card className="hover:shadow-md transition-shadow">
       <CardContent className="p-4">
         <div className="flex gap-3">
-          {/* Drag handle placeholder */}
-          {isOwner && !isSynthetic && (
-            <div className="flex items-start pt-1 opacity-0 group-hover:opacity-50 transition-opacity cursor-grab">
-              <GripVertical className="h-4 w-4" />
-            </div>
-          )}
-
           {/* Image thumbnail */}
           {activity.imageUrl && (
             <div className="relative h-16 w-16 rounded-lg overflow-hidden shrink-0">
@@ -210,14 +205,17 @@ function ActivityCard({
                 <h4 className="font-semibold text-sm leading-tight">
                   {activity.name}
                 </h4>
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Clock className="h-3 w-3" />
+                <div className="flex items-center gap-1.5 text-xs">
+                  <Clock className="h-3 w-3 text-muted-foreground" />
                   {sameTime ? (
-                    <span>{format(from, "MMM d, yyyy 'at' h:mm a")}</span>
+                    <span className="font-medium tabular-nums">
+                      {format(from, "h:mm a")}
+                    </span>
                   ) : (
-                    <span>
-                      {format(from, "MMM d, h:mm a")} –{" "}
-                      {format(to, "MMM d, h:mm a, yyyy")}
+                    <span className="font-medium tabular-nums">
+                      {isSameDay(from, to)
+                        ? `${format(from, "h:mm a")} – ${format(to, "h:mm a")}`
+                        : `${format(from, "h:mm a, MMM d")} – ${format(to, "h:mm a, MMM d")}`}
                     </span>
                   )}
                 </div>
@@ -283,14 +281,38 @@ function ActivityCard({
             )}
 
             {/* Involved people */}
-            {activity.involvedPeople.length > 0 && (
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <Users className="h-3 w-3 text-muted-foreground shrink-0" />
-                {activity.involvedPeople.map((uid) => (
-                  <UserPopover key={uid} userId={uid} allUsers={allUsers} />
-                ))}
-              </div>
-            )}
+            {(() => {
+              const isExclude =
+                "isExcludeMode" in activity && activity.isExcludeMode;
+              const hasPeople = activity.involvedPeople.length > 0;
+              // Empty array = @Everyone
+              if (!hasPeople) {
+                return (
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <Users className="h-3 w-3 text-muted-foreground shrink-0" />
+                    <Badge
+                      variant="secondary"
+                      className="text-xs h-5 px-2 font-normal"
+                    >
+                      @Everyone
+                    </Badge>
+                  </div>
+                );
+              }
+              return (
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <Users className="h-3 w-3 text-muted-foreground shrink-0" />
+                  {isExclude && (
+                    <span className="text-[10px] text-muted-foreground font-medium">
+                      Everyone except
+                    </span>
+                  )}
+                  {activity.involvedPeople.map((uid) => (
+                    <UserPopover key={uid} userId={uid} allUsers={allUsers} />
+                  ))}
+                </div>
+              );
+            })()}
 
             {/* Note */}
             {activity.note && (
@@ -324,16 +346,18 @@ export default function ActivityTimeline({
   currentUserId,
   isOwner,
   members = [],
+  participants = [],
   event,
 }: {
   participationId: string;
-  participationFrom: Date | string;
-  participationTo: Date | string;
-  participantUser?: { id: string; name: string };
-  currentUserId?: string;
+  participationFrom: Date | string | null;
+  participationTo: Date | string | null;
+  participantUser?: MemberUser | null;
+  currentUserId?: string | null;
   isOwner: boolean;
   members?: MemberUser[];
-  event?: EventProp | null;
+  participants?: ParticipationParticipant[];
+  event?: EventProp;
 }) {
   const { data: activities, isLoading } = useActivities(participationId);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -373,55 +397,193 @@ export default function ActivityTimeline({
     );
   };
 
-  // Synthetic arrival / departure items
-  const isOwnParticipation =
-    !participantUser || participantUser.id === currentUserId;
-  const arrivalName = isOwnParticipation
-    ? "You arrive"
-    : `${participantUser!.name} arrives`;
-  const departureName = isOwnParticipation
-    ? "You depart"
-    : `${participantUser!.name} departs`;
-  const participantTag = participantUser ? [participantUser.id] : [];
+  // Synthetic arrival / departure items for ALL participants
+  const arrivalDepartureItems: EventActivity[] = (() => {
+    // If we have participants list, generate items for each member
+    if (participants.length > 0) {
+      const items: EventActivity[] = [];
+      for (const p of participants) {
+        // Skip "already here" members — they don't need arrival/departure markers
+        if (p.isAlreadyHere) continue;
 
-  const arrivalDepartureItems: EventActivity[] = [
-    ...(participationFrom
-      ? [
-          {
-            id: "__arriving",
-            name: arrivalName,
-            from: participationFrom,
-            to: participationFrom,
+        const isMe = p.userId === currentUserId;
+        const memberName = p.user.name;
+        const arrivalLabel = isMe ? "You arrive" : `${memberName} arrives`;
+        const departureLabel = isMe ? "You depart" : `${memberName} departs`;
+        const isEditable = p.userId === participantUser?.id;
+
+        if (p.from) {
+          items.push({
+            id: `__arriving_${p.userId}`,
+            name: arrivalLabel,
+            from: p.from,
+            to: p.from,
             location: null,
             locationUrl: null,
             imageUrl: null,
-            involvedPeople: participantTag,
-            note: null as null,
+            involvedPeople: [p.userId],
+            note: null,
             media: [],
-            isSynthetic: true as const,
-            editableDateField: "from" as const,
-          },
-        ]
-      : []),
-    ...(participationTo
-      ? [
-          {
-            id: "__departing",
-            name: departureName,
-            from: participationTo,
-            to: participationTo,
+            isSynthetic: true,
+            ...(isEditable ? { editableDateField: "from" as const } : {}),
+          });
+        }
+        if (p.to) {
+          items.push({
+            id: `__departing_${p.userId}`,
+            name: departureLabel,
+            from: p.to,
+            to: p.to,
             location: null,
             locationUrl: null,
             imageUrl: null,
-            involvedPeople: participantTag,
-            note: null as null,
+            involvedPeople: [p.userId],
+            note: null,
             media: [],
-            isSynthetic: true as const,
-            editableDateField: "to" as const,
-          },
-        ]
-      : []),
-  ];
+            isSynthetic: true,
+            ...(isEditable ? { editableDateField: "to" as const } : {}),
+          });
+        }
+      }
+
+      // Merge arrivals at the same timestamp into one card
+      const mergeByTime = (
+        src: EventActivity[],
+        kind: "arriving" | "departing",
+      ): EventActivity[] => {
+        const byTime = new Map<number, EventActivity[]>();
+        for (const item of src) {
+          const t = new Date(item.from).getTime();
+          const bucket = byTime.get(t) ?? [];
+          bucket.push(item);
+          byTime.set(t, bucket);
+        }
+        return Array.from(byTime.values()).map((bucket) => {
+          if (bucket.length === 1) return bucket[0];
+          const allUserIds = bucket.flatMap((b) => b.involvedPeople);
+          const hasMe = allUserIds.includes(currentUserId ?? "");
+          const otherCount = hasMe ? allUserIds.length - 1 : allUserIds.length;
+          let name: string;
+          if (kind === "arriving") {
+            name =
+              allUserIds.length ===
+              participants.length - /* already-here already excluded */ 0
+                ? "Everyone arrives"
+                : hasMe && otherCount === 1
+                  ? `You & ${members.find((m) => allUserIds.find((id) => id !== currentUserId && id === m.id))?.name ?? "1 other"} arrive`
+                  : hasMe
+                    ? `You & ${otherCount} others arrive`
+                    : `${allUserIds.length} members arrive`;
+          } else {
+            name =
+              hasMe && otherCount === 1
+                ? `You & ${members.find((m) => allUserIds.find((id) => id !== currentUserId && id === m.id))?.name ?? "1 other"} depart`
+                : hasMe
+                  ? `You & ${otherCount} others depart`
+                  : `${allUserIds.length} members depart`;
+          }
+          return {
+            ...bucket[0],
+            id: `__${kind}_group_${new Date(bucket[0].from).getTime()}`,
+            name,
+            involvedPeople: allUserIds,
+            // keep editableDateField only if exactly one member's participation is editable
+            editableDateField:
+              bucket.filter((b) => b.editableDateField).length === 1
+                ? bucket.find((b) => b.editableDateField)?.editableDateField
+                : undefined,
+          };
+        });
+      };
+
+      const arrivalItems = items.filter((i) => i.id.startsWith("__arriving_"));
+      const departureItems = items.filter((i) =>
+        i.id.startsWith("__departing_"),
+      );
+      const otherItems = items.filter(
+        (i) =>
+          !i.id.startsWith("__arriving_") && !i.id.startsWith("__departing_"),
+      );
+
+      // Add "Already here" synthetic item for members already at the location
+      const alreadyHereMembers = participants.filter((p) => p.isAlreadyHere);
+      if (alreadyHereMembers.length > 0) {
+        const startTime = event?.startAt ?? participationFrom ?? new Date();
+        otherItems.push({
+          id: "__already_here",
+          name:
+            alreadyHereMembers.length === 1
+              ? `${alreadyHereMembers[0].userId === currentUserId ? "You're" : `${alreadyHereMembers[0].user.name} is`} already here`
+              : `${alreadyHereMembers.length} members already here`,
+          from: startTime,
+          to: startTime,
+          location: null,
+          locationUrl: null,
+          imageUrl: null,
+          involvedPeople: alreadyHereMembers.map((p) => p.userId),
+          note: null,
+          media: [],
+          isSynthetic: true,
+        });
+      }
+
+      return [
+        ...mergeByTime(arrivalItems, "arriving"),
+        ...mergeByTime(departureItems, "departing"),
+        ...otherItems,
+      ];
+    }
+
+    // Fallback: only the current participation's owner
+    const isOwnParticipation =
+      !participantUser || participantUser.id === currentUserId;
+    const arrivalName = isOwnParticipation
+      ? "You arrive"
+      : `${participantUser!.name} arrives`;
+    const departureName = isOwnParticipation
+      ? "You depart"
+      : `${participantUser!.name} departs`;
+    const participantTag = participantUser ? [participantUser.id] : [];
+
+    return [
+      ...(participationFrom
+        ? [
+            {
+              id: "__arriving",
+              name: arrivalName,
+              from: participationFrom,
+              to: participationFrom,
+              location: null,
+              locationUrl: null,
+              imageUrl: null,
+              involvedPeople: participantTag,
+              note: null as null,
+              media: [],
+              isSynthetic: true as const,
+              editableDateField: "from" as const,
+            },
+          ]
+        : []),
+      ...(participationTo
+        ? [
+            {
+              id: "__departing",
+              name: departureName,
+              from: participationTo,
+              to: participationTo,
+              location: null,
+              locationUrl: null,
+              imageUrl: null,
+              involvedPeople: participantTag,
+              note: null as null,
+              media: [],
+              isSynthetic: true as const,
+              editableDateField: "to" as const,
+            },
+          ]
+        : []),
+    ];
+  })();
 
   // Synthetic event boundary items
   const syntheticItems: EventActivity[] = event
@@ -483,8 +645,19 @@ export default function ActivityTimeline({
           return false;
       }
       if (selectedUsers.length > 0) {
-        if (!a.involvedPeople.some((uid) => selectedUsers.includes(uid)))
-          return false;
+        const isExclude = "isExcludeMode" in a && a.isExcludeMode;
+        // Empty involvedPeople = @Everyone — always matches any user filter
+        if (a.involvedPeople.length === 0) {
+          // @Everyone: always visible
+        } else if (isExclude) {
+          // Exclude mode: visible if the selected users are NOT in the excluded list
+          if (selectedUsers.every((uid) => a.involvedPeople.includes(uid)))
+            return false;
+        } else {
+          // Include mode: visible if any selected user is in the involved list
+          if (!a.involvedPeople.some((uid) => selectedUsers.includes(uid)))
+            return false;
+        }
       }
       return true;
     })
@@ -646,6 +819,51 @@ export default function ActivityTimeline({
             </Button>
           )}
         </div>
+        {/* "I'm already here" toggle for current user */}
+        {(() => {
+          const myParticipant = participants.find(
+            (p) => p.userId === currentUserId,
+          );
+          if (!myParticipant) return null;
+          return (
+            <button
+              type="button"
+              className={cn(
+                "flex items-center gap-2 rounded-lg border px-3 py-2 text-xs transition-colors w-full",
+                myParticipant.isAlreadyHere
+                  ? "border-emerald-500/40 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400"
+                  : "border-input bg-muted/30 text-muted-foreground hover:bg-muted/50",
+              )}
+              onClick={() => {
+                updateDates.mutate(
+                  {
+                    id: participationId,
+                    data: {
+                      isAlreadyHere: !myParticipant.isAlreadyHere,
+                    },
+                  },
+                  {
+                    onSuccess: () =>
+                      toast.success(
+                        myParticipant.isAlreadyHere
+                          ? "Marked as not already here"
+                          : "Marked as already here — no arrival/departure shown",
+                      ),
+                    onError: () => toast.error("Failed to update"),
+                  },
+                );
+              }}
+              disabled={updateDates.isPending}
+            >
+              <MapPinCheck className="h-3.5 w-3.5 shrink-0" />
+              <span>
+                {myParticipant.isAlreadyHere
+                  ? "You're already here (no arrival/departure shown)"
+                  : "I'm already here — skip arrival & departure"}
+              </span>
+            </button>
+          );
+        })()}
         {/* Inline add form */}
         {showAddForm && (
           <ActivityInlineForm

@@ -180,11 +180,15 @@ function NotificationItem({
   };
 
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={handleClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") handleClick();
+      }}
       className={cn(
-        "w-full text-left px-4 py-3 hover:bg-accent transition-colors border-b last:border-0",
+        "w-full text-left px-4 py-3 hover:bg-accent transition-colors border-b last:border-0 cursor-pointer",
         !notification.isRead && "bg-primary/5",
       )}
     >
@@ -266,7 +270,7 @@ function NotificationItem({
           )}
         </div>
       </div>
-    </button>
+    </div>
   );
 }
 

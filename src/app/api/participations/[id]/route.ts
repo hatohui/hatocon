@@ -87,6 +87,7 @@ const DELETE = async (_req: NextRequest, ctx: RouteContext) => {
 const datesUpdateSchema = zod.object({
   from: zod.coerce.date().optional(),
   to: zod.coerce.date().optional(),
+  isAlreadyHere: zod.boolean().optional(),
 });
 
 /** PATCH /api/participations/[id] — update arrival / departure dates */
@@ -108,10 +109,16 @@ const PATCH = async (req: NextRequest, ctx: RouteContext) => {
 
   const from = parsed.data.from ?? participation.from;
   const to = parsed.data.to ?? participation.to;
+  const isAlreadyHere =
+    parsed.data.isAlreadyHere ?? participation.isAlreadyHere;
 
   if (to <= from) return BadRequest("Departure must be after arrival");
 
-  const updated = await participationRepository.updateDates(id, { from, to });
+  const updated = await participationRepository.updateDates(id, {
+    from,
+    to,
+    isAlreadyHere,
+  });
   return OK(updated);
 };
 

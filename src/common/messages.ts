@@ -49,6 +49,7 @@ export const messages = {
     notFound: "PARTICIPATION_NOT_FOUND",
     overlap: "PARTICIPATION_OVERLAP",
     outOfEventBounds: "PARTICIPATION_OUT_OF_EVENT_BOUNDS",
+    eventNoOverlap: "PARTICIPATION_EVENT_NO_OVERLAP",
     validation: {
       fromRequired: "VALIDATION_PARTICIPATION_FROM_REQUIRED",
       toRequired: "VALIDATION_PARTICIPATION_TO_REQUIRED",

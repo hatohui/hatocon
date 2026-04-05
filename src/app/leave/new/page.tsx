@@ -386,6 +386,7 @@ function CreatePlanPageInner() {
     useCreateParticipation();
 
   const [selectedEvent, setSelectedEvent] = React.useState<Event | null>(null);
+  const [planName, setPlanName] = React.useState("");
   const [from, setFrom] = React.useState<Date | undefined>();
   const [to, setTo] = React.useState<Date | undefined>();
   const [leaveType, setLeaveType] = React.useState<string>(LeaveType.ANNUAL);
@@ -409,10 +410,14 @@ function CreatePlanPageInner() {
     if (event) {
       setFrom(new Date(event.startAt));
       setTo(new Date(event.endAt));
+    } else {
+      // Remove eventId from URL so the prefill effect doesn't re-trigger
+      router.replace("/leave/new", { scroll: false });
     }
   };
 
-  const canSubmit = from && to && leaveType && to >= from && !isPending;
+  const canSubmit =
+    !!planName.trim() && from && to && leaveType && to >= from && !isPending;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -421,6 +426,7 @@ function CreatePlanPageInner() {
     try {
       await createParticipation({
         eventId: selectedEvent?.id,
+        planName: planName.trim(),
         from,
         to,
         leaveType: leaveType as (typeof LeaveType)[keyof typeof LeaveType],
@@ -429,10 +435,37 @@ function CreatePlanPageInner() {
       toast.success("Plan created successfully!");
       router.push("/");
     } catch (err: unknown) {
-      const msg =
-        (err as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message ?? "Failed to create plan. Please try again.";
-      toast.error(msg);
+      type AxErr = {
+        response?: {
+          data?: {
+            message?: string;
+            data?: { conflictFrom?: string; conflictTo?: string };
+          };
+        };
+      };
+      const axErr = err as AxErr;
+      const msg = axErr?.response?.data?.message;
+
+      if (msg === "PARTICIPATION_OVERLAP") {
+        const conflict = axErr?.response?.data?.data;
+        if (conflict?.conflictFrom && conflict?.conflictTo) {
+          const cf = format(new Date(conflict.conflictFrom), "MMM d, yyyy");
+          const ct = format(new Date(conflict.conflictTo), "MMM d, yyyy");
+          toast.error(
+            `Period conflict: you already have a plan from ${cf} to ${ct}.`,
+          );
+        } else {
+          toast.error(
+            "You already have a plan that overlaps with these dates.",
+          );
+        }
+      } else if (msg === "PARTICIPATION_EVENT_NO_OVERLAP") {
+        toast.error(
+          "Your selected dates don't overlap with the event by more than 1 hour. Please adjust your dates to include some part of the event.",
+        );
+      } else {
+        toast.error(msg ?? "Failed to create plan. Please try again.");
+      }
     }
   };
 
@@ -492,7 +525,17 @@ function CreatePlanPageInner() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
-            {/* Date pickers */}
+            {/* Plan name */}
+            <div className="space-y-1.5">
+              <Label htmlFor="plan-name">Plan Name</Label>
+              <Input
+                id="plan-name"
+                placeholder="e.g. Tokyo Trip 2026"
+                value={planName}
+                onChange={(e) => setPlanName(e.target.value)}
+                maxLength={100}
+              />
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <DatePickerField
                 label="From"

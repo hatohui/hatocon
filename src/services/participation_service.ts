@@ -35,7 +35,7 @@ const participationService = {
 
   delete: (id: string) => axios.delete(`/api/participations/${id}`),
 
-  update: (id: string, data: { from?: Date | string; to?: Date | string }) =>
+  update: (id: string, data: { from?: Date | string; to?: Date | string; isAlreadyHere?: boolean }) =>
     axios.patch(`/api/participations/${id}`, data),
 
   getImages: (participationId: string) =>

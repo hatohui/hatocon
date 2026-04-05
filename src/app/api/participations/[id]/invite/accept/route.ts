@@ -10,6 +10,7 @@ import { messages } from "@/common/messages";
 import participationRepository from "@/repositories/participation_repository";
 import eventRepository from "@/repositories/event_repository";
 import notificationRepository from "@/repositories/notification_repository";
+import { cacheDel } from "@/config/redis";
 import type { NextRequest } from "next/server";
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -80,6 +81,9 @@ const POST = async (req: NextRequest, ctx: RouteContext) => {
       "INVITE_ACCEPTED",
     );
   }
+
+  // Bust the accepting user's events cache so the new private event appears
+  await cacheDel(`events:list:${session.user.id}`);
 
   return OK(newParticipation);
 };

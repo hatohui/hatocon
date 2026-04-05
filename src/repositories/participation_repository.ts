@@ -128,7 +128,12 @@ const participationRepository = {
   getParticipantsByGroup: async (groupId: string) => {
     return db.participation.findMany({
       where: { groupId },
-      include: {
+      select: {
+        id: true,
+        userId: true,
+        from: true,
+        to: true,
+        isAlreadyHere: true,
         user: { select: { id: true, name: true, image: true, email: true } },
       },
       orderBy: { createdAt: "asc" },
@@ -138,7 +143,12 @@ const participationRepository = {
   getParticipantsByEvent: async (eventId: string) => {
     return db.participation.findMany({
       where: { eventId },
-      include: {
+      select: {
+        id: true,
+        userId: true,
+        from: true,
+        to: true,
+        isAlreadyHere: true,
         user: { select: { id: true, name: true, image: true, email: true } },
       },
       orderBy: { createdAt: "asc" },
@@ -373,10 +383,14 @@ const participationRepository = {
     return { total, groups };
   },
 
-  updateDates: async (id: string, data: { from: Date; to: Date }) => {
+  updateDates: async (id: string, data: { from: Date; to: Date; isAlreadyHere?: boolean }) => {
     return db.participation.update({
       where: { id },
-      data: { from: data.from, to: data.to },
+      data: {
+        from: data.from,
+        to: data.to,
+        ...(data.isAlreadyHere !== undefined && { isAlreadyHere: data.isAlreadyHere }),
+      },
     });
   },
 

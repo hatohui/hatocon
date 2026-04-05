@@ -58,11 +58,12 @@ const Created = (data?: unknown) =>
 
 const NoContent = () => new NextResponse(null, { status: status.NoContent });
 
-const Conflict = (message?: string) =>
+const Conflict = (message?: string, data?: unknown) =>
   NextResponse.json(
     {
       status: status.Conflict,
       message: message || messages.Conflict,
+      ...(data !== undefined ? { data } : {}),
     },
     { status: status.Conflict },
   );

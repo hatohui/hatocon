@@ -5,6 +5,7 @@ import zod from "zod";
 export const participationBaseSchema = zod.object({
   eventId: zod.uuid().optional(),
   groupId: zod.uuid().optional(),
+  planName: zod.string().min(1).max(100).optional(),
   from: zod.coerce.date({
     message: messages.participation.validation.fromRequired,
   }),

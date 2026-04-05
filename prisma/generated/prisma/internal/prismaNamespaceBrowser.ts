@@ -190,6 +190,7 @@ export const ParticipationScalarFieldEnum = {
   to: 'to',
   leaveType: 'leaveType',
   createdBy: 'createdBy',
+  isAlreadyHere: 'isAlreadyHere',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -217,6 +218,7 @@ export const ActivityScalarFieldEnum = {
   location: 'location',
   locationUrl: 'locationUrl',
   involvedPeople: 'involvedPeople',
+  isExcludeMode: 'isExcludeMode',
   note: 'note',
   imageUrl: 'imageUrl',
   sortOrder: 'sortOrder',
