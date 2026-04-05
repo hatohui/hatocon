@@ -27,6 +27,8 @@ const POST = async (req: NextRequest, ctx: RouteContext) => {
   const { id } = await ctx.params;
   const body = await req.json().catch(() => ({}));
   const notificationId: string | undefined = body?.notificationId;
+  const fromBody: string | undefined = body?.from;
+  const toBody: string | undefined = body?.to;
 
   const template = await participationRepository.getById(id);
   if (!template) return NotFound(messages.participation.notFound);
@@ -47,11 +49,17 @@ const POST = async (req: NextRequest, ctx: RouteContext) => {
   const event = await eventRepository.getById(template.eventId);
   if (!event) return NotFound(messages.event.notFound);
 
+  // Resolve dates: use user-provided if given, otherwise copy from the template
+  const resolvedFrom = fromBody ? new Date(fromBody) : template.from;
+  const resolvedTo = toBody ? new Date(toBody) : template.to;
+  if (isNaN(resolvedFrom.getTime()) || isNaN(resolvedTo.getTime()))
+    return BadRequest("Invalid date format");
+
   // Check for date overlap
   const overlap = await participationRepository.getOverlapping(
     session.user.id,
-    template.from,
-    template.to,
+    resolvedFrom,
+    resolvedTo,
   );
   if (overlap) return Conflict(messages.participation.overlap);
 
@@ -66,8 +74,8 @@ const POST = async (req: NextRequest, ctx: RouteContext) => {
     {
       eventId: template.eventId,
       groupId: group?.id ?? template.groupId ?? undefined,
-      from: template.from,
-      to: template.to,
+      from: resolvedFrom,
+      to: resolvedTo,
       leaveType: template.leaveType,
     },
     session.user.id,

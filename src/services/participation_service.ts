@@ -80,10 +80,14 @@ const participationService = {
       { userId },
     ),
 
-  acceptInvite: (participationId: string, notificationId?: string) =>
+  acceptInvite: (
+    participationId: string,
+    notificationId?: string,
+    dates?: { from: string; to: string },
+  ) =>
     axios.post<ApiOk<Participation>>(
       `/api/participations/${participationId}/invite/accept`,
-      { notificationId },
+      { notificationId, ...dates },
     ),
   declineInvite: (participationId: string, notificationId?: string) =>
     axios.post<ApiOk<{ message: string }>>(

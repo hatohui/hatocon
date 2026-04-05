@@ -160,6 +160,97 @@ function EditGroupNameDialog({
   );
 }
 
+// ─── Edit Own Dates Dialog ───────────────────────────────────────────────────
+
+function EditOwnDatesDialog({
+  participationId,
+  defaultFrom,
+  defaultTo,
+  open,
+  onOpenChange,
+}: {
+  participationId: string;
+  defaultFrom: Date | string;
+  defaultTo: Date | string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const [fromVal, setFromVal] = useState(
+    format(new Date(defaultFrom), "yyyy-MM-dd'T'HH:mm"),
+  );
+  const [toVal, setToVal] = useState(
+    format(new Date(defaultTo), "yyyy-MM-dd'T'HH:mm"),
+  );
+  const updateDates = useUpdateParticipationDates();
+
+  const handleSave = () => {
+    if (!fromVal || !toVal) return;
+    updateDates.mutate(
+      {
+        id: participationId,
+        data: {
+          from: new Date(fromVal).toISOString(),
+          to: new Date(toVal).toISOString(),
+        },
+      },
+      {
+        onSuccess: () => {
+          toast.success("Your dates updated");
+          onOpenChange(false);
+        },
+        onError: () => toast.error("Failed to update dates"),
+      },
+    );
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Edit your arrival &amp; departure</DialogTitle>
+        </DialogHeader>
+        <p className="text-sm text-muted-foreground -mt-2">
+          Set your personal arrival and departure times within the group plan.
+        </p>
+        <div className="space-y-3 pt-1">
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium">Your arrival</label>
+            <Input
+              type="datetime-local"
+              value={fromVal}
+              onChange={(e) => setFromVal(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium">Your departure</label>
+            <Input
+              type="datetime-local"
+              value={toVal}
+              onChange={(e) => setToVal(e.target.value)}
+            />
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onOpenChange(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleSave}
+              disabled={!fromVal || !toVal || updateDates.isPending}
+            >
+              Save
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 // ─── Photo Gallery ───────────────────────────────────────────────────────────
 
 function PhotoGallery({
@@ -756,6 +847,10 @@ export default function ParticipationDetailPage() {
   const { data: participation, isLoading } = useParticipationById(params.id);
   const [activeTab, setActiveTab] = useState("overview");
   const [editNameOpen, setEditNameOpen] = useState(false);
+  const [acceptDatesOpen, setAcceptDatesOpen] = useState(false);
+  const [acceptFromInput, setAcceptFromInput] = useState("");
+  const [acceptToInput, setAcceptToInput] = useState("");
+  const [editOwnDatesOpen, setEditOwnDatesOpen] = useState(false);
 
   // All hooks must be declared before any early returns (rules of hooks)
   const { data: notifications } = useNotifications();
@@ -807,6 +902,11 @@ export default function ParticipationDetailPage() {
     participation.group?.isMemberListPublicVisible ?? true;
   const isAdmin = session.data?.user?.isAdmin ?? false;
 
+  // Current user's own participation record within this group (may differ from the plan owner's)
+  const myParticipationRecord = participation.participants.find(
+    (p) => p.userId === currentUserId,
+  );
+
   const handleShare = () => {
     const url = `${window.location.origin}/share/p/${params.id}`;
     navigator.clipboard.writeText(url);
@@ -826,15 +926,18 @@ export default function ParticipationDetailPage() {
   const showInviteBanner =
     !!pendingInviteNotification && !isMemberOfGroup && !!currentUserId;
 
-  const handleBannerAccept = () => {
+  const handleBannerAccept = (from?: string, to?: string) => {
     acceptInvite.mutate(
       {
         participationId: params.id,
         notificationId: pendingInviteNotification?.id,
+        from,
+        to,
       },
       {
         onSuccess: () => {
           toast.success("Welcome! You've joined the plan.");
+          setAcceptDatesOpen(false);
         },
         onError: (err: unknown) => {
           const msg = (err as { response?: { data?: { message?: string } } })
@@ -892,7 +995,15 @@ export default function ParticipationDetailPage() {
               size="sm"
               variant="default"
               className="h-7 gap-1.5 text-xs"
-              onClick={handleBannerAccept}
+              onClick={() => {
+                setAcceptFromInput(
+                  format(new Date(participation.from), "yyyy-MM-dd'T'HH:mm"),
+                );
+                setAcceptToInput(
+                  format(new Date(participation.to), "yyyy-MM-dd'T'HH:mm"),
+                );
+                setAcceptDatesOpen(true);
+              }}
               disabled={acceptInvite.isPending || declineInvite.isPending}
             >
               <UserCheck className="h-3.5 w-3.5" />
@@ -951,9 +1062,44 @@ export default function ParticipationDetailPage() {
                 <Clock className="h-3.5 w-3.5" />
                 {days} {days === 1 ? "day" : "days"}
               </span>
-              <span className="text-sm text-muted-foreground">
-                {format(new Date(participation.from), "MMM d")} –{" "}
-                {format(new Date(participation.to), "MMM d, yyyy")}
+              <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                <TooltipProvider delayDuration={300}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="cursor-default">
+                        {format(new Date(participation.from), "MMM d")} –{" "}
+                        {format(new Date(participation.to), "MMM d, yyyy")}
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-56 text-center">
+                      <p className="font-medium">Group plan dates</p>
+                      {isMemberOfGroup && (
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Your arrival &amp; departure may differ — use the pencil to edit.
+                        </p>
+                      )}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                {isMemberOfGroup && myParticipationRecord && (
+                  <TooltipProvider delayDuration={300}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 text-muted-foreground hover:text-foreground"
+                          onClick={() => setEditOwnDatesOpen(true)}
+                        >
+                          <Pencil className="h-3 w-3" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">
+                        Edit your arrival &amp; departure
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
               </span>
             </div>
           </div>
@@ -971,12 +1117,82 @@ export default function ParticipationDetailPage() {
         </div>
       </div>
 
-      {isOwner && (
-        <EditGroupNameDialog
-          participationId={participation.id}
-          currentName={groupName}
-          open={editNameOpen}
-          onOpenChange={setEditNameOpen}
+      <EditGroupNameDialog
+        participationId={participation.id}
+        currentName={groupName}
+        open={editNameOpen}
+        onOpenChange={setEditNameOpen}
+      />
+
+      {/* Accept-with-dates dialog — opens when user clicks Accept on the invite banner */}
+      {acceptDatesOpen && (
+        <Dialog open={acceptDatesOpen} onOpenChange={setAcceptDatesOpen}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Set your arrival &amp; departure</DialogTitle>
+            </DialogHeader>
+            {participation.event && (
+              <p className="text-sm text-muted-foreground -mt-2">
+                Group plan:{" "}
+                {format(new Date(participation.event.startAt), "MMM d")} &ndash;{" "}
+                {format(new Date(participation.event.endAt), "MMM d, yyyy")}
+              </p>
+            )}
+            <div className="space-y-3 pt-1">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium">Your arrival</label>
+                <Input
+                  type="datetime-local"
+                  value={acceptFromInput}
+                  onChange={(e) => setAcceptFromInput(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium">Your departure</label>
+                <Input
+                  type="datetime-local"
+                  value={acceptToInput}
+                  onChange={(e) => setAcceptToInput(e.target.value)}
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setAcceptDatesOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() =>
+                    handleBannerAccept(
+                      new Date(acceptFromInput).toISOString(),
+                      new Date(acceptToInput).toISOString(),
+                    )
+                  }
+                  disabled={
+                    !acceptFromInput ||
+                    !acceptToInput ||
+                    acceptInvite.isPending
+                  }
+                >
+                  Join
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Edit own arrival/departure dialog */}
+      {editOwnDatesOpen && myParticipationRecord && (
+        <EditOwnDatesDialog
+          participationId={myParticipationRecord.id}
+          defaultFrom={myParticipationRecord.from}
+          defaultTo={myParticipationRecord.to}
+          open={editOwnDatesOpen}
+          onOpenChange={setEditOwnDatesOpen}
         />
       )}
 

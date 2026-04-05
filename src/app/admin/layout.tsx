@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import AdminSidenav from "@/components/admin/AdminSidenav";
+
+export const metadata: Metadata = {
+  title: "Admin",
+  description: "Platform administration dashboard.",
+};
 
 export default function AdminLayout({
   children,

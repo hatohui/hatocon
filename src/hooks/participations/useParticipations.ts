@@ -156,10 +156,19 @@ const useAcceptInvite = () => {
     mutationFn: ({
       participationId,
       notificationId,
+      from,
+      to,
     }: {
       participationId: string;
       notificationId?: string;
-    }) => participationService.acceptInvite(participationId, notificationId),
+      from?: string;
+      to?: string;
+    }) =>
+      participationService.acceptInvite(
+        participationId,
+        notificationId,
+        from && to ? { from, to } : undefined,
+      ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["participations"] });
       queryClient.invalidateQueries({ queryKey: ["heatmap"] });

@@ -1,48 +1,18 @@
-"use client";
+import type { Metadata } from "next";
+import type { ReactNode } from "react";
+import SettingsNav from "@/components/settings/settings-nav";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { CalendarDays, Clock, Star, User } from "lucide-react";
+export const metadata: Metadata = {
+  title: "Settings",
+  description: "Manage your profile, leave settings, schedule, and holidays.",
+};
 
-const links = [
-  { href: "/settings/profile", label: "Profile", icon: User },
-  { href: "/settings/leave", label: "Leave", icon: CalendarDays },
-  { href: "/settings/schedule", label: "Schedule", icon: Clock },
-  { href: "/settings/holidays", label: "Holidays", icon: Star },
-];
-
-export default function SettingsLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const pathname = usePathname();
-
+export default function SettingsLayout({ children }: { children: ReactNode }) {
   return (
     <div className="mx-auto max-w-4xl p-4 md:p-6">
       <h1 className="mb-4 text-2xl font-bold md:mb-6">Settings</h1>
       <div className="flex flex-col gap-4 md:flex-row md:gap-6">
-        <nav className="shrink-0 md:w-48">
-          <ul className="flex flex-row gap-1 overflow-x-auto md:flex-col md:space-y-1">
-            {links.map(({ href, label, icon: Icon }) => (
-              <li key={href} className="shrink-0">
-                <Link
-                  href={href}
-                  className={cn(
-                    "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                    pathname === href
-                      ? "bg-accent text-accent-foreground"
-                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-                  )}
-                >
-                  <Icon className="h-4 w-4" />
-                  {label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        <SettingsNav />
         <div className="min-w-0 flex-1">{children}</div>
       </div>
     </div>

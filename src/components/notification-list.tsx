@@ -10,7 +10,6 @@ import {
 } from "lucide-react";
 
 import {
-  useAcceptInvite,
   useDeclineInvite,
 } from "@/hooks/participations/useParticipations";
 import { useRouter } from "next/navigation";
@@ -96,7 +95,6 @@ function NotificationItem({
   const isInvite = notification.type === "INVITED_TO_JOIN";
   const isAccepted = notification.type === "INVITE_ACCEPTED";
   const isDeclined = notification.type === "INVITE_DECLINED";
-  const acceptInvite = useAcceptInvite();
   const declineInvite = useDeclineInvite();
 
   const handleClick = () => {
@@ -142,26 +140,9 @@ function NotificationItem({
   const handleAcceptInvite = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!data.participationId) return;
-    acceptInvite.mutate(
-      {
-        participationId: data.participationId,
-        notificationId: notification.id,
-      },
-      {
-        onSuccess: () => {
-          toast.success("Invitation accepted!");
-        },
-        onError: (err: unknown) => {
-          const msg = (err as { response?: { data?: { message?: string } } })
-            ?.response?.data?.message;
-          if (msg === "ALREADY_MEMBER") {
-            toast.info("You are already a member");
-          } else {
-            toast.error("Failed to accept invitation");
-          }
-        },
-      },
-    );
+    // Navigate to the participation page — the invite banner there handles date-setting
+    router.push(`/participations/${data.participationId}`);
+    onClose();
   };
 
   const handleDeclineInvite = (e: React.MouseEvent) => {
@@ -239,17 +220,16 @@ function NotificationItem({
                 variant="default"
                 className="h-7 text-xs gap-1"
                 onClick={handleAcceptInvite}
-                disabled={acceptInvite.isPending || declineInvite.isPending}
               >
                 <UserCheck className="h-3 w-3" />
-                Accept
+                View & Accept
               </Button>
               <Button
                 size="sm"
                 variant="outline"
                 className="h-7 text-xs gap-1"
                 onClick={handleDeclineInvite}
-                disabled={acceptInvite.isPending || declineInvite.isPending}
+                disabled={declineInvite.isPending}
               >
                 <UserX className="h-3 w-3" />
                 Decline
