@@ -63,6 +63,8 @@ const ActivityTimeline = ({
   members = [],
   participants = [],
   event,
+  showEventBoundaries,
+  onToggleEventBoundaries,
 }: {
   participationId: string;
   participationFrom: Date | string | null;
@@ -75,6 +77,8 @@ const ActivityTimeline = ({
   members?: MemberUser[];
   participants?: ParticipationParticipant[];
   event?: EventProp;
+  showEventBoundaries?: boolean;
+  onToggleEventBoundaries?: () => void;
 }) => {
   const { data: activities, isLoading } = useActivities(participationId);
   const isGroupMember =
@@ -94,7 +98,7 @@ const ActivityTimeline = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const [showEventBoundaries, setShowEventBoundaries] = useState(true);
+  const effectiveShowEventBoundaries = showEventBoundaries ?? true;
   const [editDateValue, setEditDateValue] = useState("");
   const [editFlightValue, setEditFlightValue] = useState("");
   const updateDates = useUpdateParticipationDates();
@@ -193,7 +197,7 @@ const ActivityTimeline = ({
 
   const allItems: DisplayActivity[] = [
     ...arrivalDepartureItems,
-    ...(showEventBoundaries ? syntheticItems : []),
+    ...(effectiveShowEventBoundaries ? syntheticItems : []),
     ...(activities ?? []),
   ];
 
@@ -384,12 +388,14 @@ const ActivityTimeline = ({
 
           {event && (
             <Button
-              variant={showEventBoundaries ? "secondary" : "outline"}
+              variant={effectiveShowEventBoundaries ? "secondary" : "outline"}
               size="sm"
               className="h-8 gap-1.5 shrink-0"
-              onClick={() => setShowEventBoundaries((v) => !v)}
+              onClick={() =>
+                onToggleEventBoundaries ? onToggleEventBoundaries() : undefined
+              }
             >
-              {showEventBoundaries
+              {effectiveShowEventBoundaries
                 ? "Hide event markers"
                 : "Show event markers"}
             </Button>

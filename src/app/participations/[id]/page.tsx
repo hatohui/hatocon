@@ -946,11 +946,26 @@ export default function ParticipationDetailPage() {
   const [activeTab, setActiveTab] = useState(
     searchParams.get("tab") ?? "overview",
   );
+  const [showEventBoundaries, setShowEventBoundaries] = useState(
+    searchParams.get("markers") !== "0",
+  );
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
     const sp = new URLSearchParams(searchParams.toString());
     sp.set("tab", tab);
+    router.replace(`${pathname}?${sp.toString()}`, { scroll: false });
+  };
+
+  const handleToggleEventBoundaries = () => {
+    const next = !showEventBoundaries;
+    setShowEventBoundaries(next);
+    const sp = new URLSearchParams(searchParams.toString());
+    if (next) {
+      sp.delete("markers");
+    } else {
+      sp.set("markers", "0");
+    }
     router.replace(`${pathname}?${sp.toString()}`, { scroll: false });
   };
   const [editNameOpen, setEditNameOpen] = useState(false);
@@ -1593,6 +1608,8 @@ export default function ParticipationDetailPage() {
               members={members}
               participants={participation.participants}
               event={participation.event}
+              showEventBoundaries={showEventBoundaries}
+              onToggleEventBoundaries={handleToggleEventBoundaries}
             />
           </TabsContent>
         )}
