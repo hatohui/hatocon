@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import {
   ArrowUpDown,
@@ -65,6 +65,8 @@ const ActivityTimeline = ({
   event,
   showEventBoundaries,
   onToggleEventBoundaries,
+  highlightedActivityId,
+  onClearHighlight,
 }: {
   participationId: string;
   participationFrom: Date | string | null;
@@ -76,11 +78,33 @@ const ActivityTimeline = ({
   isOwner: boolean;
   members?: MemberUser[];
   participants?: ParticipationParticipant[];
-  event?: EventProp;
+  event?: EventProp | null;
   showEventBoundaries?: boolean;
   onToggleEventBoundaries?: () => void;
+  highlightedActivityId?: string | null;
+  onClearHighlight?: () => void;
 }) => {
   const { data: activities, isLoading } = useActivities(participationId);
+
+  // Scroll to and highlight a specific activity when navigated from overview
+  useEffect(() => {
+    if (!highlightedActivityId) return;
+    const scroll = () => {
+      const el = document.getElementById(`activity-${highlightedActivityId}`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    };
+    // Delay slightly to allow tab render + React Query data to paint
+    const t = setTimeout(scroll, 120);
+    const handler = () => onClearHighlight?.();
+    document.addEventListener("pointerdown", handler, { once: true });
+    return () => {
+      clearTimeout(t);
+      document.removeEventListener("pointerdown", handler);
+    };
+  }, [highlightedActivityId]);
+
   const isGroupMember =
     !!currentUserId && participants.some((p) => p.userId === currentUserId);
   const canAdd = isOwner || isGroupMember;
@@ -167,7 +191,7 @@ const ActivityTimeline = ({
   const syntheticItems: EventActivity[] = event
     ? [
         {
-          id: "__event_start",
+          id: "event-start",
           name: `${event.title} starts`,
           from: event.startAt,
           to: event.startAt,
@@ -180,7 +204,7 @@ const ActivityTimeline = ({
           isSynthetic: true,
         },
         {
-          id: "__event_end",
+          id: "event-end",
           name: `${event.title} ends`,
           from: event.endAt,
           to: event.endAt,
@@ -512,6 +536,7 @@ const ActivityTimeline = ({
                       : isSynth
                         ? "h-3 w-3 shrink-0 rounded-full border-2 border-violet-500 bg-violet-500 z-10"
                         : "h-3 w-3 shrink-0 rounded-full border-2 border-primary bg-background z-10";
+                    const isHighlighted = highlightedActivityId === activity.id;
                     return (
                       <div key={activity.id} className="contents">
                         <div className="flex items-center justify-center self-stretch">
@@ -527,26 +552,34 @@ const ActivityTimeline = ({
                             onDone={() => setEditingId(null)}
                           />
                         ) : (
-                          <ActivityCard
-                            activity={activity}
-                            participationId={participationId}
-                            isOwner={isOwner}
-                            allUsers={members}
-                            onEdit={
-                              "isSynthetic" in activity
-                                ? undefined
-                                : () => setEditingId(activity.id)
-                            }
-                            onEditDates={
-                              "isSynthetic" in activity &&
-                              activity.isSynthetic &&
-                              (activity.editableDateField ||
-                                activity.mergedMembers?.length)
-                                ? (pid, field, current, name) =>
-                                    openDateEdit(pid, field, current, name)
-                                : undefined
-                            }
-                          />
+                          <div
+                            id={`activity-${activity.id}`}
+                            className={cn(
+                              isHighlighted &&
+                                "ring-2 ring-primary ring-offset-2 rounded-xl",
+                            )}
+                          >
+                            <ActivityCard
+                              activity={activity}
+                              participationId={participationId}
+                              isOwner={isOwner}
+                              allUsers={members}
+                              onEdit={
+                                "isSynthetic" in activity
+                                  ? undefined
+                                  : () => setEditingId(activity.id)
+                              }
+                              onEditDates={
+                                "isSynthetic" in activity &&
+                                activity.isSynthetic &&
+                                (activity.editableDateField ||
+                                  activity.mergedMembers?.length)
+                                  ? (pid, field, current, name) =>
+                                      openDateEdit(pid, field, current, name)
+                                  : undefined
+                              }
+                            />
+                          </div>
                         )}
                       </div>
                     );

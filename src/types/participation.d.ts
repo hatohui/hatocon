@@ -70,3 +70,20 @@ export type ParticipationDetail = Participation & {
       })
     | null;
 };
+
+export type MediaItem = {
+  id: string;
+  url: string;
+  caption?: string | null;
+  createdAt: Date | string;
+  source: "participation" | "activity";
+  activityName?: string;
+  activityId?: string;
+  uploadedBy?: string;
+};
+
+export type MediaMember = {
+  id: string;
+  name: string;
+  image?: string | null;
+};

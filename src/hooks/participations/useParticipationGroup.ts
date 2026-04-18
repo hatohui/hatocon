@@ -1,3 +1,4 @@
+import { useCallback, useEffect } from "react";
 import { participationService } from "@/services/participation_service";
 import type { ParticipationGroupSettingsUpdate } from "@/types/notification.d";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -162,6 +163,41 @@ const useRejectJoinRequest = () => {
     },
   });
 };
+
+export function useMediaNavigation({
+  index,
+  total,
+  onIndexChange,
+}: {
+  index: number | null;
+  total: number;
+  onIndexChange: (i: number | null) => void;
+}) {
+  const goPrev = useCallback(() => {
+    if (index !== null && index > 0) onIndexChange(index - 1);
+  }, [index, onIndexChange]);
+
+  const goNext = useCallback(() => {
+    if (index !== null && index < total - 1) onIndexChange(index + 1);
+  }, [index, total, onIndexChange]);
+
+  useEffect(() => {
+    if (index === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") goPrev();
+      else if (e.key === "ArrowRight") goNext();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [index, goPrev, goNext]);
+
+  return {
+    goPrev,
+    goNext,
+    hasPrev: index !== null && index > 0,
+    hasNext: index !== null && index < total - 1,
+  };
+}
 
 export {
   useJoinRequests,

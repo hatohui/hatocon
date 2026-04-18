@@ -73,27 +73,38 @@ const activityRepository = {
   },
 
   removeUserFromGroup: async (groupId: string, userId: string) => {
-    // Delete activities created by the user in this group
-    await db.activity.deleteMany({
-      where: { participationGroupId: groupId, createdBy: userId },
-    });
-
-    // Remove the user from involvedPeople in remaining activities
-    const affected = await db.activity.findMany({
+    // Find all include-mode activities where the user is specifically tagged
+    const activities = await db.activity.findMany({
       where: {
         participationGroupId: groupId,
+        isExcludeMode: false,
         involvedPeople: { has: userId },
       },
       select: { id: true, involvedPeople: true },
     });
 
-    for (const activity of affected) {
-      await db.activity.update({
-        where: { id: activity.id },
-        data: {
+    const toDelete: string[] = [];
+    const toUpdate: { id: string; involvedPeople: string[] }[] = [];
+
+    for (const activity of activities) {
+      if (activity.involvedPeople.length === 1) {
+        // Only the leaving user is tagged → delete the activity
+        toDelete.push(activity.id);
+      } else {
+        // Tagged alongside others → remove their tag
+        toUpdate.push({
+          id: activity.id,
           involvedPeople: activity.involvedPeople.filter((p) => p !== userId),
-        },
-      });
+        });
+      }
+    }
+
+    if (toDelete.length > 0) {
+      await db.activity.deleteMany({ where: { id: { in: toDelete } } });
+    }
+
+    for (const { id, involvedPeople } of toUpdate) {
+      await db.activity.update({ where: { id }, data: { involvedPeople } });
     }
   },
 

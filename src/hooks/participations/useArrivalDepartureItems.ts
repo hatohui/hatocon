@@ -41,7 +41,7 @@ export function useArrivalDepartureItems({
 
         if (p.from) {
           items.push({
-            id: `__arriving_${p.userId}`,
+            id: `arrival-${p.userId}`,
             name: arrivalLabel,
             from: p.from,
             to: p.from,
@@ -62,7 +62,7 @@ export function useArrivalDepartureItems({
 
         if (p.to) {
           items.push({
-            id: `__departing_${p.userId}`,
+            id: `departure-${p.userId}`,
             name: departureLabel,
             from: p.to,
             to: p.to,
@@ -131,7 +131,7 @@ export function useArrivalDepartureItems({
               : undefined;
           return {
             ...bucket[0],
-            id: `__${kind}_group_${new Date(bucket[0].from).getTime()}`,
+            id: `${kind === "arriving" ? "arrival" : "departure"}-group-${new Date(bucket[0].from).getTime()}`,
             name,
             involvedPeople: allUserIds,
             isTravelItem: true as const,
@@ -148,13 +148,10 @@ export function useArrivalDepartureItems({
         });
       };
 
-      const arrivalItems = items.filter((i) => i.id.startsWith("__arriving_"));
-      const departureItems = items.filter((i) =>
-        i.id.startsWith("__departing_"),
-      );
+      const arrivalItems = items.filter((i) => i.id.startsWith("arrival-"));
+      const departureItems = items.filter((i) => i.id.startsWith("departure-"));
       const otherItems = items.filter(
-        (i) =>
-          !i.id.startsWith("__arriving_") && !i.id.startsWith("__departing_"),
+        (i) => !i.id.startsWith("arrival-") && !i.id.startsWith("departure-"),
       );
 
       return [
@@ -179,7 +176,7 @@ export function useArrivalDepartureItems({
       ...(participationFrom
         ? [
             {
-              id: "__arriving",
+              id: "arrival",
               name: arrivalName,
               from: participationFrom,
               to: participationFrom,
@@ -200,7 +197,7 @@ export function useArrivalDepartureItems({
       ...(participationTo
         ? [
             {
-              id: "__departing",
+              id: "departure",
               name: departureName,
               from: participationTo,
               to: participationTo,

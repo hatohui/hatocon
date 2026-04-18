@@ -10,32 +10,18 @@ import {
   useSearchParams,
 } from "next/navigation";
 import { useSession } from "next-auth/react";
-import {
-  differenceInCalendarDays,
-  eachDayOfInterval,
-  format,
-  isSameDay,
-  isAfter,
-  startOfMonth,
-  endOfMonth,
-  addMonths,
-} from "date-fns";
+import { differenceInCalendarDays, format } from "date-fns";
 import {
   ArrowLeft,
   Calendar,
-  Camera,
-  ChevronRight,
   Clock,
   ExternalLink,
-  ImageIcon,
   Link2,
   Lock,
   LogIn,
   Mail,
-  MapPin,
   Pencil,
   Plane,
-  Trash2,
   UserCheck,
   UserX,
   X,
@@ -45,13 +31,6 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
 import {
   Dialog,
   DialogContent,
@@ -74,8 +53,6 @@ import {
 
 import {
   useParticipationById,
-  useUploadParticipationImage,
-  useDeleteParticipationImage,
   useUpdateParticipationDates,
   useAcceptInvite,
   useDeclineInvite,
@@ -84,854 +61,20 @@ import {
   useNotifications,
   useDeleteNotification,
 } from "@/hooks/notifications/useNotifications";
-import {
-  useActivities,
-  useDeleteActivity,
-} from "@/hooks/activities/useActivities";
 import { useUpdateGroupSettings } from "@/hooks/participations/useParticipationGroup";
 import { cn } from "@/lib/utils";
 import ActivityTimeline from "@/components/pages/participation/activity-timeline";
-import ActivityInlineForm from "@/components/pages/participation/activity-inline-form";
 import MediaGallery from "@/components/pages/participation/media-gallery";
 import ParticipationSettings from "@/components/pages/participation/participation-settings";
 import MembersList from "@/components/pages/participation/members-list";
 import JoinRequestsPanel from "@/components/pages/participation/join-requests-panel";
-
-// ─── Edit Group Name Dialog ──────────────────────────────────────────────────
-
-function EditGroupNameDialog({
-  participationId,
-  currentName,
-  open,
-  onOpenChange,
-}: {
-  participationId: string;
-  currentName: string;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}) {
-  const [name, setName] = useState(currentName);
-  const updateSettings = useUpdateGroupSettings();
-
-  const handleSave = () => {
-    if (!name.trim()) return;
-    updateSettings.mutate(
-      { participationId, data: { name: name.trim() } },
-      {
-        onSuccess: () => {
-          toast.success("Name updated");
-          onOpenChange(false);
-        },
-        onError: () => toast.error("Failed to update name"),
-      },
-    );
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm">
-        <DialogHeader>
-          <DialogTitle>Rename plan</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4 pt-2">
-          <Input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Plan name"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleSave();
-            }}
-            autoFocus
-          />
-          <div className="flex justify-end gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onOpenChange(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              size="sm"
-              onClick={handleSave}
-              disabled={!name.trim() || updateSettings.isPending}
-            >
-              Save
-            </Button>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-// ─── Edit Own Dates Dialog ───────────────────────────────────────────────────
-
-function EditOwnDatesDialog({
-  participationId,
-  defaultFrom,
-  defaultTo,
-  defaultEntryFlight,
-  defaultExitFlight,
-  open,
-  onOpenChange,
-  onSuccess,
-}: {
-  participationId: string;
-  defaultFrom: Date | string;
-  defaultTo: Date | string;
-  defaultEntryFlight?: string | null;
-  defaultExitFlight?: string | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSuccess?: () => void;
-}) {
-  const [fromVal, setFromVal] = useState(
-    format(new Date(defaultFrom), "yyyy-MM-dd'T'HH:mm"),
-  );
-  const [toVal, setToVal] = useState(
-    format(new Date(defaultTo), "yyyy-MM-dd'T'HH:mm"),
-  );
-  const [entryFlight, setEntryFlight] = useState(defaultEntryFlight ?? "");
-  const [exitFlight, setExitFlight] = useState(defaultExitFlight ?? "");
-  const updateDates = useUpdateParticipationDates();
-
-  const handleSave = () => {
-    if (!fromVal || !toVal) return;
-    updateDates.mutate(
-      {
-        id: participationId,
-        data: {
-          from: new Date(fromVal).toISOString(),
-          to: new Date(toVal).toISOString(),
-          entryFlight: entryFlight.trim() || null,
-          exitFlight: exitFlight.trim() || null,
-        },
-      },
-      {
-        onSuccess: () => {
-          toast.success("Your dates updated");
-          onOpenChange(false);
-          onSuccess?.();
-        },
-        onError: () => toast.error("Failed to update dates"),
-      },
-    );
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm">
-        <DialogHeader>
-          <DialogTitle>Edit your arrival &amp; departure</DialogTitle>
-        </DialogHeader>
-        <p className="text-sm text-muted-foreground -mt-2">
-          Set your personal arrival and departure times within the group plan.
-        </p>
-        <div className="space-y-3 pt-1">
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium">Your arrival</label>
-            <Input
-              type="datetime-local"
-              value={fromVal}
-              onChange={(e) => setFromVal(e.target.value)}
-            />
-            <Input
-              placeholder="Arrival flight (e.g. TGW517)"
-              value={entryFlight}
-              onChange={(e) => setEntryFlight(e.target.value.toUpperCase())}
-              className="uppercase"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium">Your departure</label>
-            <Input
-              type="datetime-local"
-              value={toVal}
-              onChange={(e) => setToVal(e.target.value)}
-            />
-            <Input
-              placeholder="Departure flight (e.g. TGW518)"
-              value={exitFlight}
-              onChange={(e) => setExitFlight(e.target.value.toUpperCase())}
-              className="uppercase"
-            />
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onOpenChange(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              size="sm"
-              onClick={handleSave}
-              disabled={!fromVal || !toVal || updateDates.isPending}
-            >
-              Save
-            </Button>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-// ─── Photo Gallery ───────────────────────────────────────────────────────────
-
-function PhotoGallery({
-  images,
-  participationId,
-  onViewAll,
-  isOwner,
-  isAdmin,
-  userId,
-}: {
-  images: {
-    id: string;
-    url: string;
-    caption?: string | null;
-    uploadedBy?: string | null;
-  }[];
-  participationId: string;
-  onViewAll: () => void;
-  isOwner?: boolean;
-  isAdmin?: boolean;
-  userId?: string;
-}) {
-  const [lightbox, setLightbox] = useState<string | null>(null);
-  const uploadMutation = useUploadParticipationImage();
-  const deleteMutation = useDeleteParticipationImage();
-
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error("File too large. Max 10 MB.");
-      return;
-    }
-    try {
-      await uploadMutation.mutateAsync({ participationId, file });
-      toast.success("Photo uploaded!");
-    } catch {
-      toast.error("Upload failed");
-    }
-    e.target.value = "";
-  };
-
-  if (images.length === 0) {
-    return (
-      <Card>
-        <CardContent className="py-12 text-center">
-          <ImageIcon className="h-10 w-10 mx-auto mb-3 text-muted-foreground/40" />
-          <p className="text-sm text-muted-foreground mb-4">No photos yet</p>
-          <div className="flex items-center justify-center gap-2">
-            <Button size="sm" variant="outline" asChild>
-              <label className="cursor-pointer">
-                <Camera className="h-4 w-4 sm:mr-1.5" />
-                <span className="hidden sm:inline">Upload First Photo</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleUpload}
-                  disabled={uploadMutation.isPending}
-                />
-              </label>
-            </Button>
-            <Button size="sm" variant="ghost" onClick={onViewAll}>
-              <span className="hidden sm:inline">Open Gallery</span>
-              <span className="sm:hidden">Gallery</span>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <>
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold">Photos ({images.length})</h3>
-            <button
-              type="button"
-              onClick={onViewAll}
-              className="text-xs text-primary hover:underline"
-            >
-              View all →
-            </button>
-          </div>
-          <Button size="sm" variant="outline" asChild>
-            <label className="cursor-pointer gap-0 sm:gap-1.5">
-              <Camera className="h-4 w-4" />
-              <span className="hidden sm:inline">Upload</span>
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleUpload}
-                disabled={uploadMutation.isPending}
-              />
-            </label>
-          </Button>
-        </div>
-        <div className="relative px-8">
-          <Carousel className="w-full" opts={{ align: "start", loop: false }}>
-            <CarouselContent className="-ml-2">
-              {images.map((img) => (
-                <CarouselItem
-                  key={img.id}
-                  className="pl-2 basis-1/2 sm:basis-1/3 md:basis-1/4"
-                >
-                  <div className="group relative">
-                    <button
-                      type="button"
-                      className="w-full"
-                      onClick={() => setLightbox(img.url)}
-                    >
-                      <Image
-                        src={img.url}
-                        alt={img.caption || "Trip photo"}
-                        width={300}
-                        height={300}
-                        className="aspect-square rounded-lg object-cover"
-                      />
-                    </button>
-                    {(isOwner || isAdmin || img.uploadedBy === userId) && (
-                      <Button
-                        size="icon"
-                        variant="destructive"
-                        className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() =>
-                          deleteMutation.mutate({
-                            participationId,
-                            imageId: img.id,
-                          })
-                        }
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    )}
-                    {img.caption && (
-                      <p className="text-xs text-muted-foreground mt-1 truncate">
-                        {img.caption}
-                      </p>
-                    )}
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            {images.length > 3 && (
-              <>
-                <CarouselPrevious />
-                <CarouselNext />
-              </>
-            )}
-          </Carousel>
-        </div>
-      </div>
-
-      {/* Lightbox */}
-      <Dialog open={!!lightbox} onOpenChange={() => setLightbox(null)}>
-        <DialogContent className="max-w-4xl p-0 bg-black/90 border-0">
-          <VisuallyHidden>
-            <DialogTitle>Image preview</DialogTitle>
-          </VisuallyHidden>
-          <button
-            type="button"
-            className="absolute top-2 right-2 z-50 text-white/80 hover:text-white"
-            onClick={() => setLightbox(null)}
-          >
-            <X className="h-6 w-6" />
-          </button>
-          {lightbox && (
-            <Image
-              src={lightbox}
-              alt="Full size"
-              width={1200}
-              height={800}
-              className="w-full h-auto max-h-[85vh] object-contain"
-            />
-          )}
-        </DialogContent>
-      </Dialog>
-    </>
-  );
-}
-
-// ─── Mini Calendar View ──────────────────────────────────────────────────────
-
-function ParticipationCalendar({
-  from,
-  to,
-  leaveType,
-}: {
-  from: Date;
-  to: Date;
-  leaveType: string;
-}) {
-  const start = new Date(from);
-  const end = new Date(to);
-  const [currentMonth, setCurrentMonth] = useState(startOfMonth(start));
-  const monthFrom = startOfMonth(currentMonth);
-  const monthTo = endOfMonth(currentMonth);
-
-  const leaveDays = eachDayOfInterval({ start, end });
-  const leaveDaySet = new Set(leaveDays.map((d) => format(d, "yyyy-MM-dd")));
-
-  const days = eachDayOfInterval({ start: monthFrom, end: monthTo });
-  const dayOfWeek = (monthFrom.getDay() + 6) % 7;
-  const padded: (Date | null)[] = [
-    ...Array<null>(dayOfWeek).fill(null),
-    ...days,
-  ];
-  while (padded.length % 7 !== 0) padded.push(null);
-
-  const weeks: (Date | null)[][] = [];
-  for (let i = 0; i < padded.length; i += 7) weeks.push(padded.slice(i, i + 7));
-
-  const DAY_NAMES = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
-
-  return (
-    <Card>
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-sm">
-            {format(currentMonth, "MMMM yyyy")}
-          </CardTitle>
-          <div className="flex gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 w-7 p-0"
-              onClick={() => setCurrentMonth((m) => addMonths(m, -1))}
-            >
-              ←
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 w-7 p-0"
-              onClick={() => setCurrentMonth((m) => addMonths(m, 1))}
-            >
-              →
-            </Button>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-7 gap-0">
-          {DAY_NAMES.map((d) => (
-            <div
-              key={d}
-              className="text-center text-[10px] font-medium text-muted-foreground py-1"
-            >
-              {d}
-            </div>
-          ))}
-          {weeks.flat().map((day, i) => {
-            if (!day) return <div key={`empty-${i}`} className="h-8" />;
-
-            const key = format(day, "yyyy-MM-dd");
-            const isLeave = leaveDaySet.has(key);
-            const isToday = isSameDay(day, new Date());
-            const isStart = isSameDay(day, start);
-            const isEnd = isSameDay(day, end);
-
-            return (
-              <TooltipProvider key={key} delayDuration={200}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div
-                      className={cn(
-                        "h-8 flex items-center justify-center text-xs relative",
-                        isLeave && "font-semibold",
-                        isStart && "rounded-l-md",
-                        isEnd && "rounded-r-md",
-                        isLeave &&
-                          (leaveType === "ANNUAL"
-                            ? "bg-blue-100 text-blue-900"
-                            : leaveType === "SICK"
-                              ? "bg-amber-100 text-amber-900"
-                              : "bg-gray-100 text-gray-900"),
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          "w-6 h-6 flex items-center justify-center rounded-full",
-                          isToday &&
-                            !isLeave &&
-                            "bg-primary text-primary-foreground font-bold",
-                          isToday && isLeave && "ring-2 ring-primary",
-                        )}
-                      >
-                        {format(day, "d")}
-                      </span>
-                    </div>
-                  </TooltipTrigger>
-                  {isLeave && (
-                    <TooltipContent>
-                      <p>{format(day, "EEEE, MMMM d")}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {leaveType.charAt(0) + leaveType.slice(1).toLowerCase()}{" "}
-                        leave
-                      </p>
-                    </TooltipContent>
-                  )}
-                </Tooltip>
-              </TooltipProvider>
-            );
-          })}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-// ─── Upcoming Activities ─────────────────────────────────────────────────────
-
-type UpcomingEntry = {
-  id: string;
-  name: string;
-  from: Date | string;
-  location?: string | null;
-  /** Synthetic kind identifier, or false for real activities */
-  syntheticKind: string | false;
-  /** For real activities: their ID (used for edit/delete) */
-  activityId?: string;
-  /** For editable arrival/departure items: which participation to PATCH */
-  editParticipationId?: string;
-  /** "from" | "to" – which date field to PATCH */
-  dateField?: "from" | "to";
-};
-
-function UpcomingActivities({
-  participationId,
-  participationFrom,
-  participationTo,
-  participationEntryFlight,
-  participationExitFlight,
-  participantUser,
-  currentUserId,
-  isOwner,
-  showActivityDetails,
-  members = [],
-  participants = [],
-  event,
-  onViewAll,
-}: {
-  participationId: string;
-  participationFrom: Date | string;
-  participationTo: Date | string;
-  participationEntryFlight?: string | null;
-  participationExitFlight?: string | null;
-  participantUser?: { id: string; name: string };
-  currentUserId?: string;
-  isOwner: boolean;
-  showActivityDetails: boolean;
-  members?: { id: string; name: string; image: string | null; email: string }[];
-  participants?: Array<{
-    id: string;
-    userId: string;
-    from: Date | string;
-    to: Date | string;
-    isAlreadyHere: boolean;
-    entryFlight?: string | null;
-    exitFlight?: string | null;
-    user: { id: string; name: string };
-  }>;
-  event?: {
-    title: string;
-    startAt: Date | string;
-    endAt: Date | string;
-    location: string | null;
-  } | null;
-  onViewAll: () => void;
-}) {
-  const { data: activities, isLoading } = useActivities(
-    showActivityDetails ? participationId : null,
-  );
-  const deleteActivity = useDeleteActivity();
-  const [editingActivityId, setEditingActivityId] = useState<string | null>(
-    null,
-  );
-  const [editDialogTarget, setEditDialogTarget] = useState<{
-    id: string;
-    from: Date | string;
-    to: Date | string;
-    entryFlight?: string | null;
-    exitFlight?: string | null;
-  } | null>(null);
-  const now = new Date();
-
-  const handleEditClick = (entry: UpcomingEntry) => {
-    if (!entry.editParticipationId) return;
-    const participant = participants?.find(
-      (p) => p.id === entry.editParticipationId,
-    );
-    if (participant) {
-      setEditDialogTarget({
-        id: participant.id,
-        from: participant.from,
-        to: participant.to,
-        entryFlight: participant.entryFlight,
-        exitFlight: participant.exitFlight,
-      });
-    } else {
-      setEditDialogTarget({
-        id: entry.editParticipationId,
-        from: participationFrom,
-        to: participationTo,
-        entryFlight: participationEntryFlight,
-        exitFlight: participationExitFlight,
-      });
-    }
-  };
-
-  const perParticipantEntries: UpcomingEntry[] =
-    showActivityDetails && participants.length > 0
-      ? participants
-          .filter((p) => !p.isAlreadyHere)
-          .flatMap((p) => {
-            const isMe = p.userId === currentUserId;
-            const canEdit = isOwner || isMe;
-            return [
-              {
-                id: `__arriving_${p.userId}`,
-                name: isMe ? "You arrive" : `${p.user.name} arrives`,
-                from: p.from,
-                syntheticKind: "__arrival_departure",
-                editParticipationId: canEdit ? p.id : undefined,
-                dateField: "from" as const,
-              },
-              {
-                id: `__departing_${p.userId}`,
-                name: isMe ? "You depart" : `${p.user.name} departs`,
-                from: p.to,
-                syntheticKind: "__arrival_departure",
-                editParticipationId: canEdit ? p.id : undefined,
-                dateField: "to" as const,
-              },
-            ];
-          })
-      : showActivityDetails
-        ? [
-            {
-              id: "__arriving",
-              name:
-                !participantUser || participantUser.id === currentUserId
-                  ? "You arrive"
-                  : `${participantUser.name} arrives`,
-              from: participationFrom,
-              syntheticKind: "__arrival_departure",
-              editParticipationId: isOwner ? participationId : undefined,
-              dateField: "from" as const,
-            },
-            {
-              id: "__departing",
-              name:
-                !participantUser || participantUser.id === currentUserId
-                  ? "You depart"
-                  : `${participantUser.name} departs`,
-              from: participationTo,
-              syntheticKind: "__arrival_departure",
-              editParticipationId: isOwner ? participationId : undefined,
-              dateField: "to" as const,
-            },
-          ]
-        : [];
-
-  const syntheticEntries: UpcomingEntry[] = [
-    ...perParticipantEntries,
-    ...(event
-      ? [
-          {
-            id: "__event_start",
-            name: `${event.title} starts`,
-            from: event.startAt,
-            location: event.location,
-            syntheticKind: "__event_start",
-          },
-          {
-            id: "__event_end",
-            name: `${event.title} ends`,
-            from: event.endAt,
-            location: event.location,
-            syntheticKind: "__event_end",
-          },
-        ]
-      : []),
-  ];
-
-  const activityEntries: UpcomingEntry[] = (activities ?? []).map((a) => ({
-    id: a.id,
-    name: a.name,
-    from: a.from,
-    location: a.location,
-    syntheticKind: false,
-    activityId: a.id,
-  }));
-
-  const upcoming = [...syntheticEntries, ...activityEntries]
-    .filter((a) => isAfter(new Date(a.from), now))
-    .sort((a, b) => new Date(a.from).getTime() - new Date(b.from).getTime())
-    .slice(0, 5);
-
-  const isEditable = (entry: UpcomingEntry) =>
-    !!entry.editParticipationId && !!entry.dateField;
-
-  return (
-    <>
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-sm">Upcoming Activities</CardTitle>
-            <button
-              type="button"
-              onClick={onViewAll}
-              className="text-xs text-primary hover:underline flex items-center gap-0.5"
-            >
-              View all
-              <ChevronRight className="h-3 w-3" />
-            </button>
-          </div>
-        </CardHeader>
-        <CardContent className="pt-0 space-y-1">
-          {isLoading && (
-            <div className="space-y-2 py-1">
-              {[1, 2].map((i) => (
-                <Skeleton key={i} className="h-10 rounded-lg" />
-              ))}
-            </div>
-          )}
-          {!isLoading && upcoming.length === 0 && (
-            <p className="text-xs text-muted-foreground text-center py-4">
-              No upcoming activities
-            </p>
-          )}
-          {!isLoading &&
-            upcoming.map((a) => (
-              <div
-                key={a.id}
-                className="group flex items-center gap-3 px-2 py-2 rounded-md hover:bg-muted/50 text-xs"
-              >
-                <div className="shrink-0 text-center w-14">
-                  <p className="font-mono tabular-nums text-muted-foreground">
-                    {format(new Date(a.from), "MMM d")}
-                  </p>
-                  <p className="font-mono tabular-nums text-muted-foreground/70">
-                    {format(new Date(a.from), "HH:mm")}
-                  </p>
-                </div>
-                <div className="h-8 w-px bg-border shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">
-                    {a.syntheticKind || showActivityDetails
-                      ? a.name
-                      : "Activity"}
-                  </p>
-                  {(a.syntheticKind || showActivityDetails) && a.location && (
-                    <div className="flex items-center gap-1 min-w-0 text-muted-foreground">
-                      <MapPin className="h-2.5 w-2.5 shrink-0" />
-                      <span className="truncate">{a.location}</span>
-                    </div>
-                  )}
-                </div>
-                {/* Arrival/departure edit */}
-                {isEditable(a) && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="shrink-0 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground"
-                    onClick={() => handleEditClick(a)}
-                  >
-                    <Pencil className="h-3 w-3" />
-                  </Button>
-                )}
-                {/* Activity edit + delete */}
-                {!a.syntheticKind && a.activityId && isOwner && (
-                  <>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="shrink-0 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground"
-                      onClick={() => setEditingActivityId(a.activityId!)}
-                    >
-                      <Pencil className="h-3 w-3" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="shrink-0 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-destructive/70 hover:text-destructive"
-                      onClick={() =>
-                        deleteActivity.mutate(
-                          { participationId, activityId: a.activityId! },
-                          {
-                            onSuccess: () => toast.success("Activity deleted"),
-                          },
-                        )
-                      }
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  </>
-                )}
-                {/* Milestone badge for non-editable synthetic items */}
-                {a.syntheticKind && !isEditable(a) && (
-                  <Badge
-                    variant="secondary"
-                    className="shrink-0 text-[10px] px-1.5 py-0 h-4 font-normal"
-                  >
-                    milestone
-                  </Badge>
-                )}
-              </div>
-            ))}
-        </CardContent>
-      </Card>
-
-      {editDialogTarget && (
-        <EditOwnDatesDialog
-          participationId={editDialogTarget.id}
-          defaultFrom={editDialogTarget.from}
-          defaultTo={editDialogTarget.to}
-          defaultEntryFlight={editDialogTarget.entryFlight}
-          defaultExitFlight={editDialogTarget.exitFlight}
-          open={editDialogTarget !== null}
-          onOpenChange={(open) => {
-            if (!open) setEditDialogTarget(null);
-          }}
-        />
-      )}
-
-      {/* Activity inline edit dialog */}
-      <Dialog
-        open={editingActivityId !== null}
-        onOpenChange={(open) => !open && setEditingActivityId(null)}
-      >
-        <DialogContent className="max-w-2xl p-0 gap-0 overflow-y-auto max-h-[90vh]">
-          <DialogHeader className="sr-only">
-            <DialogTitle>Edit Activity</DialogTitle>
-          </DialogHeader>
-          <div className="p-4">
-            {editingActivityId && (
-              <ActivityInlineForm
-                participationId={participationId}
-                activity={activities?.find((a) => a.id === editingActivityId)}
-                allUsers={members}
-                onDone={() => setEditingActivityId(null)}
-              />
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
-  );
-}
+import AcceptDatesDialog from "@/components/pages/participation/accept-dates-dialog";
+import EditGroupNameDialog from "@/components/pages/participation/edit-group-name-dialog";
+import EditOwnDatesDialog from "@/components/pages/participation/edit-own-dates-dialog";
+import EventInfoCard from "@/components/pages/participation/event-info-card";
+import PhotoGallery from "@/components/pages/participation/photo-gallery-preview";
+import ParticipationCalendar from "@/components/pages/participation/participation-calendar";
+import UpcomingActivities from "@/components/pages/participation/upcoming-activities";
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
@@ -946,6 +89,9 @@ export default function ParticipationDetailPage() {
   const [activeTab, setActiveTab] = useState(
     searchParams.get("tab") ?? "overview",
   );
+  const [highlightedActivityId, setHighlightedActivityId] = useState<
+    string | null
+  >(null);
   const [showEventBoundaries, setShowEventBoundaries] = useState(
     searchParams.get("markers") !== "0",
   );
@@ -1358,75 +504,28 @@ export default function ParticipationDetailPage() {
         onOpenChange={setEditNameOpen}
       />
 
-      {/* Accept-with-dates dialog — opens when user clicks Accept on the invite banner */}
-      {acceptDatesOpen && (
-        <Dialog open={acceptDatesOpen} onOpenChange={setAcceptDatesOpen}>
-          <DialogContent className="max-w-sm">
-            <DialogHeader>
-              <DialogTitle>Set your arrival &amp; departure</DialogTitle>
-            </DialogHeader>
-            {participation.event && (
-              <p className="text-sm text-muted-foreground -mt-2">
-                Group plan:{" "}
-                {format(new Date(participation.event.startAt), "MMM d")} &ndash;{" "}
-                {format(new Date(participation.event.endAt), "MMM d, yyyy")}
-              </p>
-            )}
-            <div className="space-y-3 pt-1">
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium">Your arrival</label>
-                <Input
-                  type="datetime-local"
-                  value={acceptFromInput}
-                  onChange={(e) => setAcceptFromInput(e.target.value)}
-                />
-                <Input
-                  placeholder="Arrival flight (e.g. TGW517)"
-                  value={acceptEntryFlight}
-                  onChange={(e) =>
-                    setAcceptEntryFlight(e.target.value.toUpperCase())
-                  }
-                  className="uppercase"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium">Your departure</label>
-                <Input
-                  type="datetime-local"
-                  value={acceptToInput}
-                  onChange={(e) => setAcceptToInput(e.target.value)}
-                />
-                <Input
-                  placeholder="Departure flight (e.g. TGW518)"
-                  value={acceptExitFlight}
-                  onChange={(e) =>
-                    setAcceptExitFlight(e.target.value.toUpperCase())
-                  }
-                  className="uppercase"
-                />
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setAcceptDatesOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={handleBannerAccept}
-                  disabled={
-                    !acceptFromInput || !acceptToInput || acceptInvite.isPending
-                  }
-                >
-                  Join
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+      <AcceptDatesDialog
+        open={acceptDatesOpen}
+        onOpenChange={setAcceptDatesOpen}
+        fromInput={acceptFromInput}
+        toInput={acceptToInput}
+        entryFlight={acceptEntryFlight}
+        exitFlight={acceptExitFlight}
+        onFromChange={setAcceptFromInput}
+        onToChange={setAcceptToInput}
+        onEntryFlightChange={setAcceptEntryFlight}
+        onExitFlightChange={setAcceptExitFlight}
+        onAccept={handleBannerAccept}
+        isPending={acceptInvite.isPending}
+        eventDateRange={
+          participation.event
+            ? {
+                from: participation.event.startAt,
+                to: participation.event.endAt,
+              }
+            : null
+        }
+      />
 
       {/* Edit own arrival/departure dialog */}
       {editOwnDatesOpen && myParticipationRecord && (
@@ -1451,71 +550,6 @@ export default function ParticipationDetailPage() {
         />
       )}
 
-      {/* Event info banner */}
-      {participation.event && (
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-start gap-4">
-              {participation.event.image && (
-                <div className="relative h-20 w-28 rounded-lg overflow-hidden shrink-0">
-                  <Image
-                    src={participation.event.image}
-                    alt={participation.event.title}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              )}
-              <div className="flex-1 min-w-0 space-y-1 space-x-3">
-                <Link
-                  href={`/events?selected=${participation.event.id}`}
-                  className="font-semibold hover:underline"
-                >
-                  {participation.event.title}
-                </Link>
-                {participation.event.visibility === "PRIVATE" && (
-                  <Badge className="mt-1 text-[10px] h-4 px-1.5 gap-0.5 bg-violet-500/15 text-violet-700 border border-violet-300 hover:bg-violet-500/15 dark:text-violet-400 dark:border-violet-700">
-                    <Lock className="h-2.5 w-2.5" />
-                    Private
-                  </Badge>
-                )}
-                {participation.event.description && (
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {participation.event.description}
-                  </p>
-                )}
-                <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
-                    {format(
-                      new Date(participation.event.startAt),
-                      "MMM d",
-                    )} –{" "}
-                    {format(new Date(participation.event.endAt), "MMM d, yyyy")}
-                  </span>
-                  {participation.event.location && (
-                    <span className="flex items-center gap-1">
-                      <MapPin className="h-3 w-3" />
-                      {participation.event.location}
-                      {participation.event.locationUrl && (
-                        <a
-                          href={participation.event.locationUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary"
-                        >
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
-                      )}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Tabs */}
       <Tabs
         value={activeTab}
@@ -1537,6 +571,7 @@ export default function ParticipationDetailPage() {
 
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-6">
+          {participation.event && <EventInfoCard event={participation.event} />}
           <div className="grid gap-6 md:grid-cols-3">
             <div className="md:col-span-2 space-y-6 min-w-0">
               {(isMemberOfGroup || isMediaVisible) && (
@@ -1569,6 +604,10 @@ export default function ParticipationDetailPage() {
                 participants={participation.participants}
                 event={participation.event}
                 onViewAll={() => handleTabChange("timeline")}
+                onNavigateToActivity={(id) => {
+                  setHighlightedActivityId(id);
+                  handleTabChange("timeline");
+                }}
               />
             </div>
             <div className="space-y-6">
@@ -1610,6 +649,8 @@ export default function ParticipationDetailPage() {
               event={participation.event}
               showEventBoundaries={showEventBoundaries}
               onToggleEventBoundaries={handleToggleEventBoundaries}
+              highlightedActivityId={highlightedActivityId}
+              onClearHighlight={() => setHighlightedActivityId(null)}
             />
           </TabsContent>
         )}
@@ -1622,6 +663,7 @@ export default function ParticipationDetailPage() {
             isMember={isMemberOfGroup}
             isAdmin={isAdmin}
             userId={currentUserId}
+            members={members}
           />
         </TabsContent>
 
